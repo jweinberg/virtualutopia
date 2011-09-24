@@ -1,0 +1,287 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		821438D314146AD100A98E34 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 821438D214146AD100A98E34 /* main.cpp */; };
+		821438DC14146D1500A98E34 /* v810.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 821438DB14146D1500A98E34 /* v810.cpp */; };
+		821438DF14148B2600A98E34 /* mmu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 821438DE14148B2600A98E34 /* mmu.cpp */; };
+		821438E514149B9E00A98E34 /* rom.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 821438E414149B9E00A98E34 /* rom.cpp */; };
+		8242852D141EE73C00846D29 /* MovbsuTest_emu.vb in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8242852B141EE71D00846D29 /* MovbsuTest_emu.vb */; };
+		8242852F141EF12E00846D29 /* MovbsuTest.vb in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8242852E141EF11D00846D29 /* MovbsuTest.vb */; };
+		826DA393141EA01A00CE9579 /* BitString Demo.vb in CopyFiles */ = {isa = PBXBuildFile; fileRef = 826DA392141EA00D00CE9579 /* BitString Demo.vb */; };
+		82C8AB3F14170758006213AA /* test1.vb in CopyFiles */ = {isa = PBXBuildFile; fileRef = 82C8AB3E14170751006213AA /* test1.vb */; };
+		82C8AB4114171A0C006213AA /* mario.vb in CopyFiles */ = {isa = PBXBuildFile; fileRef = 82C8AB4014171A05006213AA /* mario.vb */; };
+		82C8AB43141726BA006213AA /* mariofly.vb in CopyFiles */ = {isa = PBXBuildFile; fileRef = 82C8AB42141726AF006213AA /* mariofly.vb */; };
+		82C8AB5D1417DFB3006213AA /* instruction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82C8AB5C1417DFB3006213AA /* instruction.cpp */; };
+		82C8AB6414180084006213AA /* v810_instructions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82C8AB6314180083006213AA /* v810_instructions.cpp */; };
+		82C8AB6614180589006213AA /* test2.vb in CopyFiles */ = {isa = PBXBuildFile; fileRef = 82C8AB6514180541006213AA /* test2.vb */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		821438CC14146AD100A98E34 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 12;
+			dstPath = "";
+			dstSubfolderSpec = 16;
+			files = (
+				8242852F141EF12E00846D29 /* MovbsuTest.vb in CopyFiles */,
+				8242852D141EE73C00846D29 /* MovbsuTest_emu.vb in CopyFiles */,
+				826DA393141EA01A00CE9579 /* BitString Demo.vb in CopyFiles */,
+				82C8AB6614180589006213AA /* test2.vb in CopyFiles */,
+				82C8AB43141726BA006213AA /* mariofly.vb in CopyFiles */,
+				82C8AB4114171A0C006213AA /* mario.vb in CopyFiles */,
+				82C8AB3F14170758006213AA /* test1.vb in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		821438CE14146AD100A98E34 /* virtualutopia */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = virtualutopia; sourceTree = BUILT_PRODUCTS_DIR; };
+		821438D214146AD100A98E34 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		821438DB14146D1500A98E34 /* v810.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = v810.cpp; sourceTree = "<group>"; };
+		821438DD14146D2500A98E34 /* v810.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = v810.h; sourceTree = "<group>"; };
+		821438DE14148B2600A98E34 /* mmu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mmu.cpp; sourceTree = "<group>"; };
+		821438E014148B2F00A98E34 /* mmu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mmu.h; sourceTree = "<group>"; };
+		821438E414149B9E00A98E34 /* rom.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = rom.cpp; sourceTree = "<group>"; };
+		821438E614149BA700A98E34 /* rom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rom.h; sourceTree = "<group>"; };
+		8242852B141EE71D00846D29 /* MovbsuTest_emu.vb */ = {isa = PBXFileReference; lastKnownFileType = file; path = MovbsuTest_emu.vb; sourceTree = "<group>"; };
+		8242852E141EF11D00846D29 /* MovbsuTest.vb */ = {isa = PBXFileReference; lastKnownFileType = file; path = MovbsuTest.vb; sourceTree = "<group>"; };
+		8242C45A1425A38000B47B75 /* memory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = memory.h; sourceTree = "<group>"; };
+		8242C4601425AFB600B47B75 /* bitstring.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bitstring.h; sourceTree = "<group>"; };
+		826DA392141EA00D00CE9579 /* BitString Demo.vb */ = {isa = PBXFileReference; lastKnownFileType = file; path = "BitString Demo.vb"; sourceTree = "<group>"; };
+		82C8AB3E14170751006213AA /* test1.vb */ = {isa = PBXFileReference; lastKnownFileType = file; path = test1.vb; sourceTree = "<group>"; };
+		82C8AB4014171A05006213AA /* mario.vb */ = {isa = PBXFileReference; lastKnownFileType = file; path = mario.vb; sourceTree = "<group>"; };
+		82C8AB42141726AF006213AA /* mariofly.vb */ = {isa = PBXFileReference; lastKnownFileType = file; path = mariofly.vb; sourceTree = "<group>"; };
+		82C8AB591417D5B0006213AA /* cpu_utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cpu_utils.h; sourceTree = "<group>"; };
+		82C8AB5C1417DFB3006213AA /* instruction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = instruction.cpp; sourceTree = "<group>"; };
+		82C8AB5E1417DFBE006213AA /* instruction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = instruction.h; sourceTree = "<group>"; };
+		82C8AB6314180083006213AA /* v810_instructions.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = v810_instructions.cpp; sourceTree = "<group>"; };
+		82C8AB6514180541006213AA /* test2.vb */ = {isa = PBXFileReference; lastKnownFileType = file; path = test2.vb; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		821438CB14146AD100A98E34 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		821438C314146AD000A98E34 = {
+			isa = PBXGroup;
+			children = (
+				821438D114146AD100A98E34 /* virtualutopia */,
+				821438CF14146AD100A98E34 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		821438CF14146AD100A98E34 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				821438CE14146AD100A98E34 /* virtualutopia */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		821438D114146AD100A98E34 /* virtualutopia */ = {
+			isa = PBXGroup;
+			children = (
+				8242852E141EF11D00846D29 /* MovbsuTest.vb */,
+				8242852B141EE71D00846D29 /* MovbsuTest_emu.vb */,
+				826DA392141EA00D00CE9579 /* BitString Demo.vb */,
+				82C8AB6514180541006213AA /* test2.vb */,
+				82C8AB42141726AF006213AA /* mariofly.vb */,
+				82C8AB4014171A05006213AA /* mario.vb */,
+				82C8AB3E14170751006213AA /* test1.vb */,
+				821438D214146AD100A98E34 /* main.cpp */,
+				82C8AB551417D090006213AA /* CPU */,
+				8242C45814259B4C00B47B75 /* Memory */,
+			);
+			path = virtualutopia;
+			sourceTree = "<group>";
+		};
+		8242C45814259B4C00B47B75 /* Memory */ = {
+			isa = PBXGroup;
+			children = (
+				821438DE14148B2600A98E34 /* mmu.cpp */,
+				821438E014148B2F00A98E34 /* mmu.h */,
+				821438E414149B9E00A98E34 /* rom.cpp */,
+				821438E614149BA700A98E34 /* rom.h */,
+				8242C45A1425A38000B47B75 /* memory.h */,
+				8242C4601425AFB600B47B75 /* bitstring.h */,
+			);
+			name = Memory;
+			sourceTree = "<group>";
+		};
+		82C8AB551417D090006213AA /* CPU */ = {
+			isa = PBXGroup;
+			children = (
+				821438DB14146D1500A98E34 /* v810.cpp */,
+				82C8AB6314180083006213AA /* v810_instructions.cpp */,
+				821438DD14146D2500A98E34 /* v810.h */,
+				82C8AB591417D5B0006213AA /* cpu_utils.h */,
+				82C8AB5C1417DFB3006213AA /* instruction.cpp */,
+				82C8AB5E1417DFBE006213AA /* instruction.h */,
+			);
+			name = CPU;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		821438CD14146AD100A98E34 /* virtualutopia */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 821438D814146AD100A98E34 /* Build configuration list for PBXNativeTarget "virtualutopia" */;
+			buildPhases = (
+				821438CA14146AD100A98E34 /* Sources */,
+				821438CB14146AD100A98E34 /* Frameworks */,
+				821438CC14146AD100A98E34 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = virtualutopia;
+			productName = virtualutopia;
+			productReference = 821438CE14146AD100A98E34 /* virtualutopia */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		821438C514146AD000A98E34 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0420;
+			};
+			buildConfigurationList = 821438C814146AD000A98E34 /* Build configuration list for PBXProject "virtualutopia" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 821438C314146AD000A98E34;
+			productRefGroup = 821438CF14146AD100A98E34 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				821438CD14146AD100A98E34 /* virtualutopia */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		821438CA14146AD100A98E34 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				821438D314146AD100A98E34 /* main.cpp in Sources */,
+				821438DC14146D1500A98E34 /* v810.cpp in Sources */,
+				821438DF14148B2600A98E34 /* mmu.cpp in Sources */,
+				821438E514149B9E00A98E34 /* rom.cpp in Sources */,
+				82C8AB5D1417DFB3006213AA /* instruction.cpp in Sources */,
+				82C8AB6414180084006213AA /* v810_instructions.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		821438D614146AD100A98E34 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		821438D714146AD100A98E34 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		821438D914146AD100A98E34 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WARNING_CFLAGS = "";
+			};
+			name = Debug;
+		};
+		821438DA14146AD100A98E34 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WARNING_CFLAGS = "";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		821438C814146AD000A98E34 /* Build configuration list for PBXProject "virtualutopia" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				821438D614146AD100A98E34 /* Debug */,
+				821438D714146AD100A98E34 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		821438D814146AD100A98E34 /* Build configuration list for PBXNativeTarget "virtualutopia" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				821438D914146AD100A98E34 /* Debug */,
+				821438DA14146AD100A98E34 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 821438C514146AD000A98E34 /* Project object */;
+}
