@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <stdint.h>
+#include "registers.h"
 #include <vector>
 
 class MMU;
@@ -11,17 +12,6 @@ namespace CPU
     class v810;
     class Instruction;
  
-#ifdef REGISTER_BITFIELD
-#undef REGISTER_BITFIELD
-#endif
-    
-#define REGISTER_BITFIELD(NAME, ...) \
-    struct \
-    {\
-        __VA_ARGS__\
-        operator uint32_t&() { return *(uint32_t*)this; }\
-        uint32_t &operator =(const uint32_t& val) { *(uint32_t*)this = val; return *(uint32_t*)this; }\
-    } NAME
     
     enum ExceptionCode
     {
@@ -91,7 +81,6 @@ namespace CPU
             
             int32_t& operator [] (const int index) { return ((int32_t*)this)[index]; }
         }systemRegisters;
-#undef REGISTER_BITFIELD
         
         MMU &memoryManagmentUnit;
         
