@@ -21,6 +21,7 @@
 		82C8AB6414180084006213AA /* v810_instructions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82C8AB6314180083006213AA /* v810_instructions.cpp */; };
 		82C8AB6614180589006213AA /* test2.vb in CopyFiles */ = {isa = PBXBuildFile; fileRef = 82C8AB6514180541006213AA /* test2.vb */; };
 		82E9442A14339FCB007F3291 /* vip.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82E9442914339FCB007F3291 /* vip.cpp */; };
+		82E944301433A9F7007F3291 /* nvc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82E9442F1433A9F7007F3291 /* nvc.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -67,6 +68,8 @@
 		82E9442914339FCB007F3291 /* vip.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vip.cpp; sourceTree = "<group>"; };
 		82E9442B14339FD9007F3291 /* vip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vip.h; sourceTree = "<group>"; };
 		82E9442C1433A169007F3291 /* registers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = registers.h; sourceTree = "<group>"; };
+		82E9442E1433A9AC007F3291 /* nvc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = nvc.h; sourceTree = "<group>"; };
+		82E9442F1433A9F7007F3291 /* nvc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = nvc.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -99,6 +102,7 @@
 		821438D114146AD100A98E34 /* virtualutopia */ = {
 			isa = PBXGroup;
 			children = (
+				82E9442D1433A995007F3291 /* NVC */,
 				82E9442714339F62007F3291 /* VIP */,
 				8242852E141EF11D00846D29 /* MovbsuTest.vb */,
 				8242852B141EE71D00846D29 /* MovbsuTest_emu.vb */,
@@ -108,7 +112,6 @@
 				82C8AB4014171A05006213AA /* mario.vb */,
 				82C8AB3E14170751006213AA /* test1.vb */,
 				821438D214146AD100A98E34 /* main.cpp */,
-				82C8AB551417D090006213AA /* CPU */,
 				8242C45814259B4C00B47B75 /* Memory */,
 				82E9442C1433A169007F3291 /* registers.h */,
 			);
@@ -148,6 +151,16 @@
 				82E9442B14339FD9007F3291 /* vip.h */,
 			);
 			name = VIP;
+			sourceTree = "<group>";
+		};
+		82E9442D1433A995007F3291 /* NVC */ = {
+			isa = PBXGroup;
+			children = (
+				82C8AB551417D090006213AA /* CPU */,
+				82E9442E1433A9AC007F3291 /* nvc.h */,
+				82E9442F1433A9F7007F3291 /* nvc.cpp */,
+			);
+			name = NVC;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -207,6 +220,7 @@
 				82C8AB5D1417DFB3006213AA /* instruction.cpp in Sources */,
 				82C8AB6414180084006213AA /* v810_instructions.cpp in Sources */,
 				82E9442A14339FCB007F3291 /* vip.cpp in Sources */,
+				82E944301433A9F7007F3291 /* nvc.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
