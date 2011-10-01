@@ -1,10 +1,10 @@
 #include <iostream>
 #include "mmu.h"
 #include "rom.h"
+#include "vip.h"
 
-MMU::MMU(const ROM &_rom) : rom(_rom)
+MMU::MMU(const ROM &_rom, VIP::VIP &_vip) : rom(_rom), vip(_vip)
 {
-    memset(videoRam, 0x5010000, sizeof(videoRam));
 }
 
 const char * MMU::rawData(uint32_t virtualAddress) const
@@ -15,7 +15,7 @@ const char * MMU::rawData(uint32_t virtualAddress) const
     {
         case 0x0 ... 0x7FFFF: //Display RAM, VIP
 //            std::cout << "display region" << std::endl;
-            return &videoRam[virtualAddress];
+            return vip[virtualAddress];
         case 0x01000000 ... 0x010005FF: //Sound Memory
 //            std::cout << "sound region" << std::endl;
             break;

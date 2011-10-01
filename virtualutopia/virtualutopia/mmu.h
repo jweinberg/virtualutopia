@@ -2,13 +2,18 @@
 #define virtualutopia_mmu_h
 #include "rom.h"
 
+namespace VIP
+{
+    class VIP;
+};
+
 class MMU 
 {
 public:
     template <typename T>
     class Stream;
     
-    MMU(const ROM &rom);
+    MMU(const ROM &rom, VIP::VIP &vip);
 
     template<typename T>
     struct GetDataProxy
@@ -50,9 +55,9 @@ public:
 private:
     const char * rawData(uint32_t virtualAddress) const;
     const ROM &rom;
+    VIP::VIP &vip;
     char programRam[0xFFFF];
     char registers[0xFF];
-    char videoRam[0x7FFFF];
 };
 
 #endif

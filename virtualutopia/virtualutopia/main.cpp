@@ -12,11 +12,13 @@
 #include "v810.h"
 #include "rom.h"
 #include "mmu.h"
+#include "vip.h"
 
 int main (int argc, const char * argv[])
 {
-    ROM rom("MovbsuTest.vb");
-    MMU mmu(rom);
+    ROM rom("test1.vb");
+    VIP::VIP vip;
+    MMU mmu(rom, vip);
     
     CPU::v810 cpu(mmu);
 

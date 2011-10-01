@@ -15,6 +15,17 @@ namespace VIP
 {
     class VIP
     {
+    public:
+        VIP();
+        char * operator[](int offset);
+        
+        
+        private:
+        char videoRam[0x7FFFF];
+        bool gameStartTriggered;
+        uint8_t framesWaited;
+        uint8_t rowCount;
+        void Step(int cycles);
 #pragma mark - 4.1 Interrupt Registers
         REGISTER_BITFIELD(INTPND,
             uint16_t SCANERR:1;
@@ -53,8 +64,26 @@ namespace VIP
         );
         
 #pragma mark - 4.2 Image Display Registers
-        uint16_t DPSTTS;
-        uint16_t DPCTRL;
+        REGISTER_BITFIELD(DPSTTS,
+            uint16_t padding_0:1;
+            uint16_t DISP:1;
+            uint16_t DPBSY:4;
+            uint16_t SCANRDY:1;
+            uint16_t FCLK:1;
+            uint16_t RE:1;
+            uint16_t SYNCE:1;
+            uint16_t LOCK:1;
+            uint16_t padding_1:5;
+        );
+        REGISTER_BITFIELD(DPCTRL,
+            uint16_t DPRST:1;
+            uint16_t DISP:1;
+            uint16_t padding_0:6;
+            uint16_t RE:1;
+            uint16_t SYNCE:1;
+            uint16_t LOCK:1;
+            uint16_t padding_1:5;
+        );
         uint16_t BRTA;
         uint16_t BRTB;
         uint16_t BRTC;
