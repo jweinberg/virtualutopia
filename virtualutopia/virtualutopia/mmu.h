@@ -24,6 +24,8 @@ public:
         T& operator()(uint32_t address) const
         {
             T* tp = (T*)(mmu.rawData(address));
+            if (tp == NULL)
+                return *tp;
             return *tp;   
         }        
     };    
@@ -57,6 +59,7 @@ private:
     const ROM &rom;
     VIP::VIP &vip;
     char programRam[0xFFFF];
+    char gamepackRam[0xFFFF];
     char registers[0xFF];
 };
 

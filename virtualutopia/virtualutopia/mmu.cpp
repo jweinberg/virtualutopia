@@ -29,9 +29,9 @@ const char * MMU::rawData(uint32_t virtualAddress) const
         case 0x05000000 ... 0x0500FFFF: //Program RAM (mask with 0xFFFF)
 //            std::cout << "program ram region" << std::endl;
             return &programRam[virtualAddress & 0xFFFF];
-        case 0x06000000 ... 0x06001FFF: //Cartridge RAM
+        case 0x06000000 ... 0x06FFFFFF: //Cartridge RAM
 //            std::cout << "cart ram region" << std::endl;
-            break;
+            return &gamepackRam[virtualAddress & 0xFFFFFF];
         case 0x07000000 ... 0x07FFFFFF: //Cartridge ROM
 //            std::cout << "cart rom region" << std::endl;
             return rom[virtualAddress];

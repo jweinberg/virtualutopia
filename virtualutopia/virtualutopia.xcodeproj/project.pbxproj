@@ -11,6 +11,7 @@
 		821438DC14146D1500A98E34 /* v810.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 821438DB14146D1500A98E34 /* v810.cpp */; };
 		821438DF14148B2600A98E34 /* mmu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 821438DE14148B2600A98E34 /* mmu.cpp */; };
 		821438E514149B9E00A98E34 /* rom.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 821438E414149B9E00A98E34 /* rom.cpp */; };
+		8218D6DF143807A800F9FBA6 /* hello11.vb in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8218D6DD1438079300F9FBA6 /* hello11.vb */; };
 		8242852D141EE73C00846D29 /* MovbsuTest_emu.vb in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8242852B141EE71D00846D29 /* MovbsuTest_emu.vb */; };
 		8242852F141EF12E00846D29 /* MovbsuTest.vb in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8242852E141EF11D00846D29 /* MovbsuTest.vb */; };
 		826DA393141EA01A00CE9579 /* BitString Demo.vb in CopyFiles */ = {isa = PBXBuildFile; fileRef = 826DA392141EA00D00CE9579 /* BitString Demo.vb */; };
@@ -31,6 +32,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 16;
 			files = (
+				8218D6DF143807A800F9FBA6 /* hello11.vb in CopyFiles */,
 				8242852F141EF12E00846D29 /* MovbsuTest.vb in CopyFiles */,
 				8242852D141EE73C00846D29 /* MovbsuTest_emu.vb in CopyFiles */,
 				826DA393141EA01A00CE9579 /* BitString Demo.vb in CopyFiles */,
@@ -52,6 +54,7 @@
 		821438E014148B2F00A98E34 /* mmu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mmu.h; sourceTree = "<group>"; };
 		821438E414149B9E00A98E34 /* rom.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = rom.cpp; sourceTree = "<group>"; };
 		821438E614149BA700A98E34 /* rom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rom.h; sourceTree = "<group>"; };
+		8218D6DD1438079300F9FBA6 /* hello11.vb */ = {isa = PBXFileReference; lastKnownFileType = file; path = hello11.vb; sourceTree = "<group>"; };
 		8242852B141EE71D00846D29 /* MovbsuTest_emu.vb */ = {isa = PBXFileReference; lastKnownFileType = file; path = MovbsuTest_emu.vb; sourceTree = "<group>"; };
 		8242852E141EF11D00846D29 /* MovbsuTest.vb */ = {isa = PBXFileReference; lastKnownFileType = file; path = MovbsuTest.vb; sourceTree = "<group>"; };
 		8242C45A1425A38000B47B75 /* memory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = memory.h; sourceTree = "<group>"; };
@@ -104,6 +107,7 @@
 			children = (
 				82E9442D1433A995007F3291 /* NVC */,
 				82E9442714339F62007F3291 /* VIP */,
+				8218D6DD1438079300F9FBA6 /* hello11.vb */,
 				8242852E141EF11D00846D29 /* MovbsuTest.vb */,
 				8242852B141EE71D00846D29 /* MovbsuTest_emu.vb */,
 				826DA392141EA00D00CE9579 /* BitString Demo.vb */,

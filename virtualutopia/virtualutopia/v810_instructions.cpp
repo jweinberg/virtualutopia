@@ -10,8 +10,8 @@
 #include "bitstring.h"
 #include <cmath>
 
-//#define d_printf(A, ...)
-#define d_printf(A, ...) printf(A, ##__VA_ARGS__)
+#define d_printf(A, ...)
+//#define d_printf(A, ...) printf(A, ##__VA_ARGS__)
 
 enum FlagCondition
 {

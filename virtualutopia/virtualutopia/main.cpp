@@ -30,9 +30,10 @@ int main (int argc, const char * argv[])
     
     
     bool wait = true;
+    int steps = 0;
     while (1)
     {
-        if (wait)
+        if (wait && steps == 0)
         {
             switch (getchar())
             {
@@ -44,13 +45,26 @@ int main (int argc, const char * argv[])
                 case 'C':
                     wait = false;
                     break;
+                case '0':
+                    steps = 1000;
+                    break;
+                case '9':
+                    steps = 500;
+                    break;
+                case '8':
+                    steps = 100;
+                    break;
                 default:
                     cpu.step();
                     break;
             }
         }
         else
+        {
+            if (steps)
+                steps--;
             cpu.step();
+        }
         
     }
 }
