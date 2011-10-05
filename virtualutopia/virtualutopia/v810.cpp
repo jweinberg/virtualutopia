@@ -15,7 +15,7 @@ namespace CPU
     v810::v810(MMU &_mmu) : memoryManagmentUnit(_mmu)
     {
         reset();
-        
+        debugOutput = true;
         systemRegisters.TKCW = 0x000000E0;
         systemRegisters.PIR = 0x00005346;
     }
@@ -145,6 +145,8 @@ break;
     
     void v810::step()
     {    
+        //Some instructions think its FUNNY to assign to reg 0 as an optimization
+        generalRegisters[0] = 0;   
         Instruction instruction = memoryManagmentUnit.GetData<Instruction>(programCounter);
         decode(instruction);
     }

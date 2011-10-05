@@ -26,6 +26,7 @@ namespace CPU
         void step();
         const std::string registerDescription() const;
     private:        
+        bool debugOutput;
         void decode(const Instruction &anInstruction);
         void bitstringDecode(const Instruction &instruction);
         void floatingPointDecode(const Instruction &instruction);

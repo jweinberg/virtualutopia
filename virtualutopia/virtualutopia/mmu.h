@@ -58,8 +58,9 @@ private:
     const char * rawData(uint32_t virtualAddress) const;
     const ROM &rom;
     VIP::VIP &vip;
+    char soundRegisters[0x5FF];
     char programRam[0xFFFF];
-    char gamepackRam[0xFFFF];
+    char *gamepackRam;
     char registers[0xFF];
 };
 

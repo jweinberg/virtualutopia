@@ -35,10 +35,7 @@ const std::string ROM::romName() const
 }
 
 const char* ROM::operator[](uint32_t address) const
-{
-    //Address needs to be in range, should be taken care of by the MMU
-   // assert(address > 0x07000000 && address < 0x07FFFFFF);
-    
+{    
     //The data is mirrored from 0x07000000 to 0x07FFFFFF
     address = ((address & 0x07FFFFFF) - 0x07000000);
     return &data[address % fileLength];

@@ -10,8 +10,8 @@
 #include "bitstring.h"
 #include <cmath>
 
-#define d_printf(A, ...)
-//#define d_printf(A, ...) printf(A, ##__VA_ARGS__)
+//#define d_printf(A, ...)
+#define d_printf(A, ...) do{ if(debugOutput) { printf("%X: " A, programCounter, ##__VA_ARGS__); } }while(0)
 
 enum FlagCondition
 {
@@ -468,7 +468,7 @@ namespace CPU
         generalRegisters[instruction.reg2()] = generalRegisters[instruction.reg1()] & instruction.imm16();
         
         systemRegisters.PSW.OV = 0;
-        systemRegisters.PSW.S = generalRegisters[instruction.reg2()] < 0;
+        systemRegisters.PSW.S = 0;
         systemRegisters.PSW.Z = (generalRegisters[instruction.reg2()] == 0) ? 1 : 0;
         
         programCounter += 4;
@@ -753,48 +753,55 @@ namespace CPU
     
     void v810::storeWord(const Instruction& instruction)
     {
-        d_printf("ST.W\n");
-        uint32_t address = (generalRegisters[instruction.reg1()] + sign_extend(16, instruction.disp16())) & 0xFFFFFFFE;
+        uint32_t address = (generalRegisters[instruction.reg1()] + sign_extend(16, instruction.disp16())) & 0xFFFFFFFC;
+        d_printf("ST.W: [GR[%d](0x%X) + %d](0x%X) <- [GR[%d](0x%X)\n", instruction.reg1(), generalRegisters[instruction.reg1()], sign_extend(16, instruction.disp16()) & 0xFFFFFFFC, address, instruction.reg2(), generalRegisters[instruction.reg2()]);
+
         memoryManagmentUnit.StoreWord(address, generalRegisters[instruction.reg2()]);
         programCounter += 4;
     }
     
     void v810::storeHWord(const Instruction& instruction)
     {
-        d_printf("ST.H\n");
         uint32_t address = (generalRegisters[instruction.reg1()] + sign_extend(16, instruction.disp16())) & 0xFFFFFFFE;
+        d_printf("ST.H: [GR[%d](0x%X) + %d](0x%X) <- [GR[%d](0x%X)\n", instruction.reg1(), generalRegisters[instruction.reg1()], sign_extend(16, instruction.disp16()) & 0xFFFFFFFE, address, instruction.reg2(), generalRegisters[instruction.reg2()]);
+
         memoryManagmentUnit.StoreHWord(address, generalRegisters[instruction.reg2()] & 0xFFFF);
         programCounter += 4;
     }
     
     void v810::storeByte(const Instruction& instruction)
     {
-        d_printf("ST.B\n");
-        uint32_t address = (generalRegisters[instruction.reg1()] + sign_extend(16, instruction.disp16())) & 0xFFFFFFFE;
+        uint32_t address = (generalRegisters[instruction.reg1()] + sign_extend(16, instruction.disp16()));
+        d_printf("ST.B: [GR[%d](0x%X) + %d](0x%X) <- [GR[%d](0x%X)\n", instruction.reg1(), generalRegisters[instruction.reg1()], sign_extend(16, instruction.disp16()), address, instruction.reg2(), generalRegisters[instruction.reg2()]);
+
+
         memoryManagmentUnit.StoreHWord(address, generalRegisters[instruction.reg2()] & 0xFF);
         programCounter += 4;
     }
     
     void v810::loadByte(const Instruction& instruction)
     {
-        d_printf("LD.B\n");
-        uint32_t address = (generalRegisters[instruction.reg1()] + sign_extend(16, instruction.disp16())) & 0xFFFFFFFE;
+        d_printf("LD.B: GR[%d] <- [GR[%d](0x%X) + %d\n", instruction.reg2(), instruction.reg1(), generalRegisters[instruction.reg1()], sign_extend(16, instruction.disp16()));
+
+        uint32_t address = (generalRegisters[instruction.reg1()] + sign_extend(16, instruction.disp16()));
         generalRegisters[instruction.reg2()] = memoryManagmentUnit.GetData<int8_t>(address);
         programCounter += 4;    
     }
     
     void v810::loadHWord(const Instruction& instruction)
     {
-        d_printf("LD.H: GR[%d] <- [GR[%d](0x%X) + %d\n", instruction.reg2(), instruction.reg1(), generalRegisters[instruction.reg1()], sign_extend(16, instruction.disp16()) & 0xFFFFFFFE);
-        uint32_t address = (generalRegisters[instruction.reg1()] + sign_extend(16, instruction.disp16())) & 0xFFFFFFFE;
+        uint32_t address = (generalRegisters[instruction.reg1()] + sign_extend(16, instruction.disp16()));
+        address &= 0xFFFFFFFE;
+        d_printf("LD.H: GR[%d] <- [GR[%d](0x%X) + %d\n", instruction.reg2(), instruction.reg1(), generalRegisters[instruction.reg1()], sign_extend(16, instruction.disp16()));
+        
         generalRegisters[instruction.reg2()] = memoryManagmentUnit.GetData<int16_t>(address);
         programCounter += 4;    
     }
     
     void v810::loadWord(const Instruction& instruction)
     {
+        uint32_t address = (generalRegisters[instruction.reg1()] + sign_extend(16, instruction.disp16())) & 0xFFFFFFFC;
         d_printf("LD.W\n");
-        uint32_t address = (generalRegisters[instruction.reg1()] + sign_extend(16, instruction.disp16())) & 0xFFFFFFFE;
         generalRegisters[instruction.reg2()] = memoryManagmentUnit.GetData<int32_t>(address);
         programCounter += 4;    
     }

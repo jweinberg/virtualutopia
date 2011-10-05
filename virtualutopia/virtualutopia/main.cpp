@@ -16,7 +16,7 @@
 
 int main (int argc, const char * argv[])
 {
-    ROM rom("test1.vb");
+    ROM rom("hello11.vb");
     VIP::VIP vip;
     MMU mmu(rom, vip);
     
