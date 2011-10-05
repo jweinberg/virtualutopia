@@ -97,7 +97,7 @@ namespace CPU
         d_printf("ADDI: GR[%d] <- GR[%d](0x%X) + 0x%X\n", instruction.reg2(), instruction.reg1(), generalRegisters[instruction.reg1()], sign_extend(16, instruction.imm16()));
         
         int32_t a = sign_extend(16, instruction.imm16());
-        int32_t b = generalRegisters[instruction.reg2()];
+        int32_t b = generalRegisters[instruction.reg1()];
         int64_t r = a+b;
         int32_t truncatedResult = (int32_t)r;
         generalRegisters[instruction.reg2()] = truncatedResult;           
