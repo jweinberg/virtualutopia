@@ -17,12 +17,6 @@ namespace VIP
         DPSTTS.FCLK = 1;
     }
     
-    
-    void v810_int(int a)
-    {
-        
-    }
-    
     char * VIP::operator[](int offset)
     {
         switch (offset)
@@ -61,38 +55,137 @@ namespace VIP
                 return (char*)&SPT2;
             case 0x5F84E:
                 return (char*)&SPT3;
+            //Remap CHR RAM from virtual memory
+            case 0x78000 ... 0x79FFF:
+                return &videoRam[(offset - 0x78000) + 0x06000];
+            case 0x7A000 ... 0x7BFFF:
+                return &videoRam[(offset - 0x7A000) + 0x0E000];
+            case 0x7C000 ... 0x7DFFF:
+                return &videoRam[(offset - 0x7C000) + 0x16000];
+            case 0x7E000 ... 0x7FFFF:
+                return &videoRam[(offset - 0x7EFFF) + 0x1E000];
             default:
                 return &videoRam[offset];
         }
     }
     
-    void VIP::Step(int cycles)
+    uint16_t VIP::Step(uint32_t cycles)
     {
         //There are 400,000 cycles in one frame (1 cycle = 50ns, 1 frame = 20ms)
+        uint32_t timeSinceBuffer = cycles - lastFrameBuffer;
         
-        if (rowCount == 0) //Starting a new cycle
+        if (rowCount < 28)
         {
-            XPSTTS.SBCOUNT = 0;
-            XPSTTS.SBOUT = 0;
-            
-            framesWaited++;
-            if (framesWaited > FRMCYC) //We've triggered a GCLK
+            if (rowCount == -1 && timeSinceBuffer > 528)
             {
-                framesWaited = 0;
-                INTPND.GAMESTART = 1;
+                rowCount = 0;
+                XPSTTS.OVERTIME = 0;
+                XPSTTS.SBCOUNT = 0;
+                XPSTTS.SBOUT = 0;
+                
+                DPSTTS.SCANRDY = 1;
+                DPSTTS.FCLK = 1;
+                DPSTTS.DPBSY = 0;
+                DPSTTS.DISP = DPCTRL.DISP;
+                DPSTTS.RE = DPCTRL.RE;
+                DPSTTS.SYNCE = DPCTRL.SYNCE;
+                DPSTTS.LOCK = 0;
+                
+                framesWaited++;
+                if (framesWaited > FRMCYC) //We've triggered a GCLK
+                {
+                    framesWaited = 0;
+                    INTPND.GAMESTART = 1;
+                }
+                INTPND.FRAMESTART = 1; //Trigger an FCLK
+                return 1;
             }
-            INTPND.FRAMESTART = 1; //Trigger an FCLK
+            
+            if (!XPSTTS.SBOUT) XPSTTS.SBOUT = 1;
+            
+            if (timeSinceBuffer > 2560)
+            {
+                XPSTTS = 0;
+                XPSTTS.SBCOUNT = rowCount;
+                XPSTTS.XPEN = XPCTRL.XPEN;
+                rowCount++;
+                lastFrameBuffer = cycles;
+            }
+            
+            if (rowCount == 18 && timeSinceBuffer > 1648)
+            {
+                DPSTTS.SCANRDY = 0;
+                DPSTTS.DISP = DPCTRL.DISP;
+                DPSTTS.RE = DPCTRL.RE;
+                DPSTTS.SYNCE = DPCTRL.SYNCE;
+                DPSTTS.FCLK = 1;
+                DPSTTS.DPBSY = (frame & 1) ? 0x1 : 0x4;
+            }
         }
-        
-        if (!XPSTTS.SBOUT) XPSTTS.SBOUT = 1;
-        XPSTTS.SBCOUNT = rowCount;
-     
-        
-        INTPND &= INTENB;
-        if (INTPND)
+        else
         {
-            INTPND = 0;
-            v810_int(4);
+            if (rowCount == 28 && timeSinceBuffer > 65536)
+            {
+                XPSTTS = 0;
+                XPSTTS.SBCOUNT = 27;
+                XPSTTS.XPEN = XPCTRL.XPEN;
+                
+                rowCount++;
+            }
+            else if (rowCount == 29 && timeSinceBuffer > 98304)
+            {
+                DPSTTS.SCANRDY = 1;
+                DPSTTS.FCLK = 1;
+                DPSTTS.DPBSY = 0;
+                DPSTTS.DISP = DPCTRL.DISP;
+                DPSTTS.RE = DPCTRL.RE;
+                DPSTTS.SYNCE = DPCTRL.SYNCE;
+                DPSTTS.LOCK = 0;
+                rowCount++;
+            }
+            else if (rowCount == 30 && timeSinceBuffer > 131072)
+            {
+                DPSTTS.SCANRDY = 1;
+                DPSTTS.FCLK = 0;
+                DPSTTS.DPBSY = 0;
+                DPSTTS.DISP = DPCTRL.DISP;
+                DPSTTS.RE = DPCTRL.RE;
+                DPSTTS.SYNCE = DPCTRL.SYNCE;
+                DPSTTS.LOCK = 0;
+                rowCount++;
+            }
+            else if (rowCount == 31 && timeSinceBuffer > 163840)
+            {
+                DPSTTS.SCANRDY = 0;
+                DPSTTS.DISP = DPCTRL.DISP;
+                DPSTTS.RE = DPCTRL.RE;
+                DPSTTS.SYNCE = DPCTRL.SYNCE;
+                DPSTTS.FCLK = 1;
+                DPSTTS.DPBSY = (frame & 1) ? 0x8 : 0x2;
+                rowCount++;
+            }
+            else if (rowCount == 32 && timeSinceBuffer > 229376)
+            {
+                DPSTTS.SCANRDY = 1;
+                DPSTTS.FCLK = 1;
+                DPSTTS.DPBSY = 0;
+                DPSTTS.DISP = DPCTRL.DISP;
+                DPSTTS.RE = DPCTRL.RE;
+                DPSTTS.SYNCE = DPCTRL.SYNCE;
+                DPSTTS.LOCK = 0;
+                rowCount++;
+            }
+            else if (rowCount == 33 && timeSinceBuffer > 270336)
+            {
+                rowCount = -1;
+                frame++;
+                if (frame < 1 || frame > 2) frame = 1;
+                XPSTTS.XPBSY = frame;
+                XPSTTS.SBCOUNT = 27;
+                XPSTTS.OVERTIME = 0;
+                XPSTTS.XPEN = XPCTRL.XPEN;
+                lastFrameBuffer = cycles;
+            }
         }
     }
 }

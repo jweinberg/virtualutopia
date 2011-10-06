@@ -7,6 +7,12 @@
 #include <vector>
 
 class MMU;
+namespace VIP
+{
+    class VIP;
+};
+
+
 namespace CPU
 {
     class v810;
@@ -18,10 +24,14 @@ namespace CPU
         DIV0 = 0xFF80,
     };
     
+    enum InterruptCode
+    {
+        Dunno,
+    };
     class v810 
     {
     public:
-        v810(MMU& mmu);
+        v810(MMU& mmu, VIP::VIP& vip);
         void reset();
         void step();
         const std::string registerDescription() const;
@@ -31,8 +41,9 @@ namespace CPU
         void bitstringDecode(const Instruction &instruction);
         void floatingPointDecode(const Instruction &instruction);
         void throwException(ExceptionCode exceptionCode);
+        void processInterrupt(InterruptCode interruptCode);
         uint32_t programCounter;
-        uint64_t cycles;
+        uint32_t cycles;
         union
         {
             int32_t generalRegisters[32];
@@ -84,7 +95,7 @@ namespace CPU
         }systemRegisters;
         
         MMU &memoryManagmentUnit;
-        
+        VIP::VIP &vip;
 #pragma mark - Instructions
         void move(const Instruction& anInstruction);
         void add(const Instruction& anInstruction);

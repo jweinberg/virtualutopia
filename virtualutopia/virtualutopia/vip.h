@@ -18,14 +18,15 @@ namespace VIP
     public:
         VIP();
         char * operator[](int offset);
-        
+        uint16_t Step(uint32_t cycles);
         
         private:
         char videoRam[0x7FFFF];
         bool gameStartTriggered;
         uint8_t framesWaited;
-        uint8_t rowCount;
-        void Step(int cycles);
+        int8_t rowCount;
+        uint32_t lastFrameBuffer;
+        char frame;
 #pragma mark - 4.1 Interrupt Registers
         REGISTER_BITFIELD(INTPND,
             uint16_t SCANERR:1;

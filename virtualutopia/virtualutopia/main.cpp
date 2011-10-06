@@ -20,7 +20,7 @@ int main (int argc, const char * argv[])
     VIP::VIP vip;
     MMU mmu(rom, vip);
     
-    CPU::v810 cpu(mmu);
+    CPU::v810 cpu(mmu, vip);
 
     //Lets break the term and have some fun!
 	struct sgttyb modmodes;

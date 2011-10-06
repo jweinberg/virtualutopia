@@ -3,6 +3,7 @@
 #include "v810.h"
 #include "cpu_utils.h"
 #include "mmu.h"
+#include "vip.h"
 #include "instruction.h"
 #include <sstream>
 #include <string>
@@ -12,7 +13,7 @@
 
 namespace CPU
 {
-    v810::v810(MMU &_mmu) : memoryManagmentUnit(_mmu)
+    v810::v810(MMU &_mmu, VIP::VIP &_vip) : memoryManagmentUnit(_mmu), vip(_vip)
     {
         reset();
         debugOutput = true;
@@ -147,8 +148,26 @@ break;
     {    
         //Some instructions think its FUNNY to assign to reg 0 as an optimization
         generalRegisters[0] = 0;   
+        vip.Step(cycles);
         Instruction instruction = memoryManagmentUnit.GetData<Instruction>(programCounter);
         decode(instruction);
+    }
+    
+    void v810::processInterrupt(InterruptCode interruptCode)
+    {
+        if (systemRegisters.PSW.NP) return;
+        if (systemRegisters.PSW.EP) return;
+        if (systemRegisters.PSW.ID) return;
+        if (systemRegisters.PSW.IntLevel > interruptCode) return;
+        
+        systemRegisters.EIPC = programCounter;
+        systemRegisters.EIPSW = systemRegisters.PSW;
+        systemRegisters.ECR.EICC = interruptCode;
+        systemRegisters.PSW.EP = 1;
+        systemRegisters.PSW.ID = 1;
+        systemRegisters.PSW.AE = 0;
+        
+        programCounter = 0xFFFFFE | interruptCode << 4;
     }
     
     void v810::throwException(ExceptionCode exceptionCode)
