@@ -11,6 +11,7 @@
 
 #include "registers.h"
 #include "world.h"
+#include "obj.h"
 
 namespace VIP
 {
@@ -22,6 +23,7 @@ namespace VIP
         uint16_t Step(uint32_t cycles);
         
         private:
+        Obj oam[1024];
         World worlds[32];
         char videoRam[0x7FFFF];
         bool gameStartTriggered;

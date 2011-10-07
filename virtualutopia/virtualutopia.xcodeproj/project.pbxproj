@@ -59,7 +59,8 @@
 		8242852E141EF11D00846D29 /* MovbsuTest.vb */ = {isa = PBXFileReference; lastKnownFileType = file; path = MovbsuTest.vb; sourceTree = "<group>"; };
 		8242C45A1425A38000B47B75 /* memory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = memory.h; sourceTree = "<group>"; };
 		8242C4601425AFB600B47B75 /* bitstring.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bitstring.h; sourceTree = "<group>"; };
-		8260EDFB143F97ED004CC416 /* world.h */ = {isa = PBXFileReference; fileEncoding = 4; path = world.h; sourceTree = "<group>"; };
+		8260EDFB143F97ED004CC416 /* world.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = world.h; sourceTree = "<group>"; };
+		8260EDFD143FA374004CC416 /* obj.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = obj.h; sourceTree = "<group>"; };
 		826DA392141EA00D00CE9579 /* BitString Demo.vb */ = {isa = PBXFileReference; lastKnownFileType = file; path = "BitString Demo.vb"; sourceTree = "<group>"; };
 		82C8AB3E14170751006213AA /* test1.vb */ = {isa = PBXFileReference; lastKnownFileType = file; path = test1.vb; sourceTree = "<group>"; };
 		82C8AB4014171A05006213AA /* mario.vb */ = {isa = PBXFileReference; lastKnownFileType = file; path = mario.vb; sourceTree = "<group>"; };
@@ -155,6 +156,7 @@
 				82E9442914339FCB007F3291 /* vip.cpp */,
 				82E9442B14339FD9007F3291 /* vip.h */,
 				8260EDFB143F97ED004CC416 /* world.h */,
+				8260EDFD143FA374004CC416 /* obj.h */,
 			);
 			name = VIP;
 			sourceTree = "<group>";
