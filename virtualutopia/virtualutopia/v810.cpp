@@ -16,7 +16,7 @@ namespace CPU
     v810::v810(MMU &_mmu, VIP::VIP &_vip) : memoryManagmentUnit(_mmu), vip(_vip)
     {
         reset();
-        debugOutput = true;
+        debugOutput = false;
         systemRegisters.TKCW = 0x000000E0;
         systemRegisters.PIR = 0x00005346;
     }

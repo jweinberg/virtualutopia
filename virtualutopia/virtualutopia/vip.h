@@ -10,6 +10,7 @@
 #define virtualutopia_vip_h
 
 #include "registers.h"
+#include "world.h"
 
 namespace VIP
 {
@@ -21,6 +22,7 @@ namespace VIP
         uint16_t Step(uint32_t cycles);
         
         private:
+        World worlds[32];
         char videoRam[0x7FFFF];
         bool gameStartTriggered;
         uint8_t framesWaited;

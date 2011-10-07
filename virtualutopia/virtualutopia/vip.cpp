@@ -8,6 +8,8 @@
 
 #include <iostream>
 #include "vip.h"
+#include "world.h"
+
 namespace VIP
 {
     VIP::VIP()
@@ -21,6 +23,9 @@ namespace VIP
     {
         switch (offset)
         {
+            case 0x3D800 ... 0X3DC00:
+                printf("Writing to worlds!\n");
+                return *((char*)&worlds[0] + (offset - 0x3D800));
             case 0x5F800:
                 return *(char*)&INTPND;
             case 0x5F802:
