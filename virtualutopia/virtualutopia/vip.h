@@ -12,6 +12,7 @@
 #include "registers.h"
 #include "world.h"
 #include "obj.h"
+#include "chr.h"
 
 namespace VIP
 {
@@ -23,6 +24,7 @@ namespace VIP
         uint16_t Step(uint32_t cycles);
         
         private:
+        Chr chrRam[2048];
         Obj oam[1024];
         World worlds[32];
         char videoRam[0x7FFFF];

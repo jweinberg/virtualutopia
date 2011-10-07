@@ -23,6 +23,14 @@ namespace VIP
     {
         switch (offset)
         {
+            case 0x06000 ... 0x07FFF:
+                return *((char*)&chrRam[0] + (offset - 0x06000));
+            case 0x0E000 ... 0x0FFFF:
+                return *((char*)&chrRam[512] + (offset - 0x0E000));
+            case 0x16000 ... 0x17FFF:
+                return *((char*)&chrRam[1024] + (offset - 0x16000));
+            case 0x1E000 ... 0x1FFFF:
+                return *((char*)&chrRam[1536] + (offset - 0x1E000));
             case 0x3D800 ... 0x3DC00:
                 return *((char*)&worlds[0] + (offset - 0x3D800));
             case 0x3E000 ... 0x3FFFF:
@@ -61,15 +69,8 @@ namespace VIP
                 return *(char*)&SPT2;
             case 0x5F84E:
                 return *(char*)&SPT3;
-            //Remap CHR RAM from virtual memory
-            case 0x78000 ... 0x79FFF:
-                return videoRam[(offset - 0x78000) + 0x06000];
-            case 0x7A000 ... 0x7BFFF:
-                return videoRam[(offset - 0x7A000) + 0x0E000];
-            case 0x7C000 ... 0x7DFFF:
-                return videoRam[(offset - 0x7C000) + 0x16000];
-            case 0x7E000 ... 0x7FFFF:
-                return videoRam[(offset - 0x7EFFF) + 0x1E000];
+            case 0x78000 ... 0x7FFFF:
+                return *((char*)&chrRam[0] + (offset - 0x78000));
             default:
                 return videoRam[offset];
         }

@@ -61,6 +61,7 @@
 		8242C4601425AFB600B47B75 /* bitstring.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bitstring.h; sourceTree = "<group>"; };
 		8260EDFB143F97ED004CC416 /* world.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = world.h; sourceTree = "<group>"; };
 		8260EDFD143FA374004CC416 /* obj.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = obj.h; sourceTree = "<group>"; };
+		8260EDFE143FA88C004CC416 /* chr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = chr.h; sourceTree = "<group>"; };
 		826DA392141EA00D00CE9579 /* BitString Demo.vb */ = {isa = PBXFileReference; lastKnownFileType = file; path = "BitString Demo.vb"; sourceTree = "<group>"; };
 		82C8AB3E14170751006213AA /* test1.vb */ = {isa = PBXFileReference; lastKnownFileType = file; path = test1.vb; sourceTree = "<group>"; };
 		82C8AB4014171A05006213AA /* mario.vb */ = {isa = PBXFileReference; lastKnownFileType = file; path = mario.vb; sourceTree = "<group>"; };
@@ -157,6 +158,7 @@
 				82E9442B14339FD9007F3291 /* vip.h */,
 				8260EDFB143F97ED004CC416 /* world.h */,
 				8260EDFD143FA374004CC416 /* obj.h */,
+				8260EDFE143FA88C004CC416 /* chr.h */,
 			);
 			name = VIP;
 			sourceTree = "<group>";
