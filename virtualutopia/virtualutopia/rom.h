@@ -19,7 +19,7 @@ public:
     ~ROM();
     
     const std::string romName() const;
-    const char* operator[](uint32_t address) const;
+    const char& operator[](uint32_t address) const;
 };
 
 

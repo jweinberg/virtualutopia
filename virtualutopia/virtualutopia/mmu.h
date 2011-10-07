@@ -23,7 +23,7 @@ public:
         
         T& operator()(uint32_t address) const
         {
-            T* tp = (T*)(mmu.rawData(address));
+            T* tp = (T*)(&mmu[address]);
             if (tp == NULL)
                 return *tp;
             return *tp;   
@@ -38,7 +38,7 @@ public:
         
         T* operator()(uint32_t address)
         {
-            T* tp = (T*)(mmu.rawData(address));
+            T* tp = (T*)(&mmu[address]);
             return tp;   
         }
     };
@@ -55,7 +55,7 @@ public:
     void StoreWord(uint32_t address, uint32_t word);
     
 private:
-    const char * rawData(uint32_t virtualAddress) const;
+    const char &operator[](const uint32_t virtualAddress) const;
     const ROM &rom;
     VIP::VIP &vip;
     char soundRegisters[0x5FF];

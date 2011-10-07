@@ -17,7 +17,7 @@ namespace VIP
     {
     public:
         VIP();
-        char * operator[](int offset);
+        char& operator[](const int offset);
         uint16_t Step(uint32_t cycles);
         
         private:

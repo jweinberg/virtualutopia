@@ -17,55 +17,55 @@ namespace VIP
         DPSTTS.FCLK = 1;
     }
     
-    char * VIP::operator[](int offset)
+    char& VIP::operator[](const int offset)
     {
         switch (offset)
         {
             case 0x5F800:
-                return (char*)&INTPND;
+                return *(char*)&INTPND;
             case 0x5F802:
-                return (char*)&INTENB;
+                return *(char*)&INTENB;
             case 0x5F804:
-                return (char*)&INTCLR;
+                return *(char*)&INTCLR;
             case 0x5F820:
-                return (char*)&DPSTTS;
+                return *(char*)&DPSTTS;
             case 0x5F822:
-                return (char*)&DPCTRL;
+                return *(char*)&DPCTRL;
             case 0x5F824:
-                return (char*)&BRTA;
+                return *(char*)&BRTA;
             case 0x5F826:
-                return (char*)&BRTB;
+                return *(char*)&BRTB;
             case 0x5F828:
-                return (char*)&BRTC;
+                return *(char*)&BRTC;
             case 0x5F82A:
-                return (char*)&REST;
+                return *(char*)&REST;
             case 0x5F830:
-                return (char*)&CTA;
+                return *(char*)&CTA;
             case 0x5F840:
-                return (char*)&XPSTTS;
+                return *(char*)&XPSTTS;
             case 0x5F842:
-                return (char*)&XPCTRL;
+                return *(char*)&XPCTRL;
             case 0x5F844:
-                return (char*)&VER;
+                return *(char*)&VER;
             case 0x5F848:
-                return (char*)&SPT0;
+                return *(char*)&SPT0;
             case 0x5F85A:
-                return (char*)&SPT1;
+                return *(char*)&SPT1;
             case 0x5F84C:
-                return (char*)&SPT2;
+                return *(char*)&SPT2;
             case 0x5F84E:
-                return (char*)&SPT3;
+                return *(char*)&SPT3;
             //Remap CHR RAM from virtual memory
             case 0x78000 ... 0x79FFF:
-                return &videoRam[(offset - 0x78000) + 0x06000];
+                return videoRam[(offset - 0x78000) + 0x06000];
             case 0x7A000 ... 0x7BFFF:
-                return &videoRam[(offset - 0x7A000) + 0x0E000];
+                return videoRam[(offset - 0x7A000) + 0x0E000];
             case 0x7C000 ... 0x7DFFF:
-                return &videoRam[(offset - 0x7C000) + 0x16000];
+                return videoRam[(offset - 0x7C000) + 0x16000];
             case 0x7E000 ... 0x7FFFF:
-                return &videoRam[(offset - 0x7EFFF) + 0x1E000];
+                return videoRam[(offset - 0x7EFFF) + 0x1E000];
             default:
-                return &videoRam[offset];
+                return videoRam[offset];
         }
     }
     
@@ -187,5 +187,6 @@ namespace VIP
                 lastFrameBuffer = cycles;
             }
         }
+        return 0;
     }
 }
