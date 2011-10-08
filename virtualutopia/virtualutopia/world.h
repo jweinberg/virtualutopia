@@ -13,10 +13,8 @@ namespace VIP
 {
 
     
-    class World
+    struct World
     {
-    public:
-        
         enum WorldType
         {
             kEndType,
@@ -27,7 +25,6 @@ namespace VIP
             kAffineType,
         };
         
-        public:
         union
         {
             struct

@@ -13,7 +13,7 @@ namespace VIP
 {
     //2 bits for each pixel
     //Data is 8x8
-    class Chr
+    struct Chr
     {
         uint16_t data[8];
     };

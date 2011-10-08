@@ -23,18 +23,26 @@ namespace VIP
     {
         switch (offset)
         {
+            case 0x00000 ... 0x05FFF:
+                return *((char*)&leftFrameBuffer_0 + offset);
             case 0x06000 ... 0x07FFF:
-                return *((char*)&chrRam[0] + (offset - 0x06000));
+                return *(((char*)&chrRam[0]) + (offset - 0x06000));
+            case 0x08000 ... 0x0DFFF:
+                return *((char*)&leftFrameBuffer_1 + (offset - 0x08000));
             case 0x0E000 ... 0x0FFFF:
-                return *((char*)&chrRam[512] + (offset - 0x0E000));
+                return *(((char*)&chrRam[512]) + (offset - 0x0E000));
+            case 0x10000 ... 0x15FFF:
+                return *((char*)&rightFrameBuffer_0 + (offset - 0x10000));
             case 0x16000 ... 0x17FFF:
-                return *((char*)&chrRam[1024] + (offset - 0x16000));
+                return *(((char*)&chrRam[1024]) + (offset - 0x16000));
+            case 0x18000 ... 0x1DFFF:
+                return *((char*)&rightFrameBuffer_1 + (offset - 0x18000));
             case 0x1E000 ... 0x1FFFF:
-                return *((char*)&chrRam[1536] + (offset - 0x1E000));
+                return *(((char*)&chrRam[1536]) + (offset - 0x1E000));
             case 0x3D800 ... 0x3DC00:
-                return *((char*)&worlds[0] + (offset - 0x3D800));
+                return *(((char*)&worlds[0]) + (offset - 0x3D800));
             case 0x3E000 ... 0x3FFFF:
-                return *((char*)&oam[0] + (offset - 0x3E000));
+                return *(((char*)&oam[0]) + (offset - 0x3E000));
             case 0x5F800:
                 return *(char*)&INTPND;
             case 0x5F802:
@@ -70,9 +78,35 @@ namespace VIP
             case 0x5F84E:
                 return *(char*)&SPT3;
             case 0x78000 ... 0x7FFFF:
-                return *((char*)&chrRam[0] + (offset - 0x78000));
+                return *(((char*)&chrRam[0]) + (offset - 0x78000));
             default:
                 return videoRam[offset];
+        }
+    }
+    
+    void VIP::DrawChr(const Chr &chr)
+    {
+        
+    }
+    
+    void VIP::SetPixel(int x, int y, int val)
+    {
+        printf("Setting (%d, %d) to %d\n", x, y, val);
+        
+    }
+    
+    void VIP::DrawObj(const Obj &obj)
+    {
+        printf("Drawing char %d\n", obj.JCA);
+        Chr chr = chrRam[obj.JCA];
+        
+        for (int x = 0; x < 8; ++x)
+        {
+            for (int y = 0; y < 8; ++y)
+            {
+                SetPixel(x, y, chr.data[y] & 0x3);
+                chr.data[y] >>= 2;
+            }
         }
     }
     
@@ -95,6 +129,7 @@ namespace VIP
                 for (int objIdx = objControl[objSearchIndex]; objIdx >= stopIndex; --objIdx)
                 {
                     printf("Drawing obj %d\n", objIdx);
+                    DrawObj(oam[objIdx]);
                 }
                 if (objSearchIndex)
                     objSearchIndex--;

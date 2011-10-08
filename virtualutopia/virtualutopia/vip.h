@@ -18,6 +18,10 @@ namespace VIP
 {
     class VIP
     {
+    private:
+        void DrawObj(const Obj& obj);
+        void DrawChr(const Chr& chr);
+        void SetPixel(int x, int y, int val);
     public:
         VIP();
         char& operator[](const int offset);
@@ -27,13 +31,18 @@ namespace VIP
         Chr chrRam[2048];
         Obj oam[1024];
         World worlds[32];
-        char videoRam[0x7FFFF];
+        char leftFrameBuffer_0[0x6000];
+        char rightFrameBuffer_0[0x6000];
+        char leftFrameBuffer_1[0x6000];
+        char rightFrameBuffer_1[0x6000];
+        char videoRam[0x80000];
         bool gameStartTriggered;
         uint8_t framesWaited;
         int8_t rowCount;
         uint32_t lastFrameBuffer;
         char frame;
         int8_t objSearchIndex;
+
 #pragma mark - 4.1 Interrupt Registers
         REGISTER_BITFIELD(INTPND,
             uint16_t SCANERR:1;

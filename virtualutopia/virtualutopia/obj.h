@@ -11,7 +11,7 @@
 
 namespace VIP
 {
-    class Obj
+    struct Obj
     {
         int16_t JX;
         int16_t JP:14;

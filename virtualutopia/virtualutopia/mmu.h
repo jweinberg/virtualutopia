@@ -58,7 +58,7 @@ private:
     const char &operator[](const uint32_t virtualAddress) const;
     const ROM &rom;
     VIP::VIP &vip;
-    char soundRegisters[0x5FF];
+    char soundRegisters[0x600];
     char programRam[0xFFFF];
     char *gamepackRam;
     char registers[0xFF];
