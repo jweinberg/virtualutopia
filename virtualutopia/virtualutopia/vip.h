@@ -22,7 +22,7 @@ namespace VIP
         VIP();
         char& operator[](const int offset);
         uint16_t Step(uint32_t cycles);
-        
+        void Draw();
         private:
         Chr chrRam[2048];
         Obj oam[1024];
@@ -33,6 +33,7 @@ namespace VIP
         int8_t rowCount;
         uint32_t lastFrameBuffer;
         char frame;
+        int8_t objSearchIndex;
 #pragma mark - 4.1 Interrupt Registers
         REGISTER_BITFIELD(INTPND,
             uint16_t SCANERR:1;
@@ -117,10 +118,18 @@ namespace VIP
             uint16_t padding_1:3;
         );
         uint16_t VER;
-        uint16_t SPT0;
-        uint16_t SPT1;
-        uint16_t SPT2;
-        uint16_t SPT3;
+        
+        union
+        {
+            struct
+            {
+                uint16_t SPT0;
+                uint16_t SPT1;
+                uint16_t SPT2;
+                uint16_t SPT3;
+            };
+            uint16_t objControl[4];
+        };
         uint16_t GPLT0;
         uint16_t GPLT1;
         uint16_t GPLT2;

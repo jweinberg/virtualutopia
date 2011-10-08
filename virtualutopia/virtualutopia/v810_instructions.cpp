@@ -47,8 +47,8 @@ namespace CPU
     //Move Form II
     void v810::moveImmediate(const Instruction& instruction)
     {
-        d_printf("MOV: GR[%d] <- GR[%d](0x%X)\n", instruction.reg2(), instruction.reg1(), sign_extend(5, generalRegisters[instruction.imm5()]));
-        generalRegisters[instruction.reg2()] = sign_extend(5, generalRegisters[instruction.imm5()]);
+        d_printf("MOV: GR[%d] <- (0x%X)\n", instruction.reg2(), sign_extend(5, instruction.imm5()));
+        generalRegisters[instruction.reg2()] = sign_extend(5, instruction.imm5());
         programCounter += 2;
         cycles += 1;
     }

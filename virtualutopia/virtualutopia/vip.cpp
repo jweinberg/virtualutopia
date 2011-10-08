@@ -76,6 +76,32 @@ namespace VIP
         }
     }
     
+    void VIP::Draw()
+    {
+        objSearchIndex = 3;
+        //Draw the worlds, starting with the lowest priority
+        for (int n = 31; n >= 0; --n)
+        {
+            World::WorldType type = worlds[n].Type();
+            
+            //Stop drawing now
+            if (type == World::kEndType)
+                break;            
+            else if (type == World::kDummyType)
+                continue;
+            else if (type == World::kObjType)
+            {
+                int stopIndex = (objSearchIndex > 0) ? objControl[objSearchIndex - 1] : 0;
+                for (int objIdx = objControl[objSearchIndex]; objIdx >= stopIndex; --objIdx)
+                {
+                    printf("Drawing obj %d\n", objIdx);
+                }
+                if (objSearchIndex)
+                    objSearchIndex--;
+            }
+        }
+    }
+    
     uint16_t VIP::Step(uint32_t cycles)
     {
         //There are 400,000 cycles in one frame (1 cycle = 50ns, 1 frame = 20ms)
@@ -184,6 +210,7 @@ namespace VIP
             }
             else if (rowCount == 33 && timeSinceBuffer > 270336)
             {
+                Draw();
                 rowCount = -1;
                 frame++;
                 if (frame < 1 || frame > 2) frame = 1;
