@@ -105,7 +105,9 @@ namespace VIP
         {
             for (int y = sourceYOffset; y < h; ++y)
             {
-                SetPixel(x + xoff, y + yoff, palette[chrCpy.data[y] & 0x3]);
+                uint8_t colorIdx = chrCpy.data[y] & 0x3;
+                if (colorIdx)
+                    SetPixel(x + xoff, y + yoff, palette[colorIdx]);
                 chrCpy.data[y] >>= 2;
             }
         }   
@@ -126,6 +128,7 @@ namespace VIP
         column += (y / 4);
         
         int shift = (y % 4) * 2;
+        *column &= ~(0x3 << shift);
         *column |= (val << shift);
     }
     
@@ -219,19 +222,20 @@ namespace VIP
             else if (type == World::kNormalType)
             {
                 const World &world = worlds[n];
-                
-                printf("World %d\n", world.GX);
+             
+                if (!world.LON)
+                    continue;
                 const BGMap &map = bgMaps[world.BGMAP_BASE];
-                
+                                
                 int x = 0;
-                
                 do
                 {
                     int y = 0;
                     do
                     {
-                        const BGMapData &data = map.chars[(y/8) * 64 + (x/8)];
-                        const Chr& chr = chrRam[data.charNum];
+                        const BGMapData &data = map.chars[((y + world.MY)/8) * 64 + ((x + world.MX)/8)];
+                        const Chr& chr = chrRam[data.charNum];  
+                        
                         DrawChr(chr, x + world.GX, y + world.GY, 0, 0, MIN(8, world.W - x), MIN(8, world.H - y), data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
                         y += 8;
                     } while(y < world.H);
@@ -240,7 +244,7 @@ namespace VIP
                 
             }
         }
-       WriteFrame();
+       //WriteFrame();
     }
     
     uint16_t VIP::Step(uint32_t cycles)
@@ -351,6 +355,7 @@ namespace VIP
             }
             else if (rowCount == 33 && timeSinceBuffer > 270336)
             {
+                memset(leftFrameBuffer_0, 0, 0x6000);
                 Draw();
                 rowCount = -1;
                 frame++;
@@ -360,7 +365,6 @@ namespace VIP
                 XPSTTS.OVERTIME = 0;
                 XPSTTS.XPEN = XPCTRL.XPEN;
                 lastFrameBuffer = cycles;
-                memset(leftFrameBuffer_0, 0, 0x6000);
             }
         }
         return 0;
