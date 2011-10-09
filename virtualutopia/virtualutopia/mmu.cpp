@@ -3,8 +3,9 @@
 #include "mmu.h"
 #include "rom.h"
 #include "vip.h"
+#include "nvc.h"
 
-MMU::MMU(const ROM &_rom, VIP::VIP &_vip) : rom(_rom), vip(_vip)
+MMU::MMU(const ROM &_rom, VIP::VIP &_vip, NVC::NVC &_nvc) : rom(_rom), vip(_vip), nvc(_nvc)
 {
     gamepackRam = (char*)calloc(0xFFFFFF, sizeof(char));
 }
@@ -19,7 +20,7 @@ const char &MMU::operator[](uint32_t virtualAddress) const
         case 0x01000000 ... 0x010005FF: //Sound Memory
             return soundRegisters[virtualAddress & 0x5FF];
         case 0x02000000 ... 0x0200002C: //Hardware registers
-            return registers[virtualAddress & 0xFF];
+            return nvc[virtualAddress];
         case 0x04000000 ... 0x04FFFFFF: //Expansion Area
             break;
         case 0x05000000 ... 0x0500FFFF: //Program RAM (mask with 0xFFFF)

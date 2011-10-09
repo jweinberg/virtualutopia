@@ -157,9 +157,6 @@ namespace VIP
             }
         }
         
-        
-        
-        
         CGContextRef context = CGBitmapContextCreate(bmpdata,
                                                      384, 
                                                      256, 8, 1536, colorSpace, kCGImageAlphaPremultipliedLast);
@@ -176,6 +173,7 @@ namespace VIP
         
         CGImageDestinationFinalize(destination);
         
+        
         CFRelease(destination);
         CFRelease(url);
         CFRelease(str);
@@ -191,8 +189,7 @@ namespace VIP
     }
     
     void VIP::Draw()
-    {
-//       
+    {    
         objSearchIndex = 3;
         //Draw the worlds, starting with the lowest priority
         for (int n = 31; n >= 0; --n)
@@ -217,6 +214,8 @@ namespace VIP
             else if (type == World::kNormalType)
             {
                 const World &world = worlds[n];
+                
+                printf("World %d\n", world.GX);
                 const BGMap &map = bgMaps[world.BGMAP_BASE];
                 
                 int x = 0;

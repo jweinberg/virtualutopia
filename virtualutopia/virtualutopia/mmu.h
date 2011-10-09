@@ -7,13 +7,17 @@ namespace VIP
     class VIP;
 };
 
+namespace NVC {
+    class NVC;
+};
+
 class MMU 
 {
 public:
     template <typename T>
     class Stream;
     
-    MMU(const ROM &rom, VIP::VIP &vip);
+    MMU(const ROM &rom, VIP::VIP &vip, NVC::NVC &nvc);
 
     template<typename T>
     struct GetDataProxy
@@ -57,11 +61,11 @@ public:
 private:
     const char &operator[](const uint32_t virtualAddress) const;
     const ROM &rom;
+    NVC::NVC &nvc;
     VIP::VIP &vip;
     char soundRegisters[0x600];
     char programRam[0xFFFF];
     char *gamepackRam;
-    char registers[0xFF];
 };
 
 #endif

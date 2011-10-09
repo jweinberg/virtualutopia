@@ -26,9 +26,12 @@
 		82EB1C8E1440C645007A22EA /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 82EB1C8D1440C645007A22EA /* Foundation.framework */; };
 		82EB1C901440C78E007A22EA /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 82EB1C8F1440C78E007A22EA /* QuartzCore.framework */; };
 		82EB1C921440C7AA007A22EA /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 82EB1C911440C7AA007A22EA /* ApplicationServices.framework */; };
-		82EB1C9414414869007A22EA /* demo.VB in CopyFiles */ = {isa = PBXBuildFile; fileRef = 82EB1C931441485D007A22EA /* demo.VB */; };
 		82EB1C9714414BC9007A22EA /* hello-old.vb in CopyFiles */ = {isa = PBXBuildFile; fileRef = 82EB1C9614414BBF007A22EA /* hello-old.vb */; };
 		82EB1C9914414CCD007A22EA /* hibuff.vb in CopyFiles */ = {isa = PBXBuildFile; fileRef = 82EB1C9814414CB5007A22EA /* hibuff.vb */; };
+		82EB1C9E144161D9007A22EA /* blox.vb in CopyFiles */ = {isa = PBXBuildFile; fileRef = 82EB1C9D144161C5007A22EA /* blox.vb */; };
+		82EB1CA21441680D007A22EA /* demo2.vb in CopyFiles */ = {isa = PBXBuildFile; fileRef = 82EB1CA1144167FD007A22EA /* demo2.vb */; };
+		82EB1CA4144168C1007A22EA /* demo1.vb in CopyFiles */ = {isa = PBXBuildFile; fileRef = 82EB1CA3144168A6007A22EA /* demo1.vb */; };
+		82EB1CA614416926007A22EA /* DitherTest.vb in CopyFiles */ = {isa = PBXBuildFile; fileRef = 82EB1CA514416918007A22EA /* DitherTest.vb */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -38,9 +41,12 @@
 			dstPath = "";
 			dstSubfolderSpec = 16;
 			files = (
+				82EB1CA614416926007A22EA /* DitherTest.vb in CopyFiles */,
+				82EB1CA4144168C1007A22EA /* demo1.vb in CopyFiles */,
+				82EB1CA21441680D007A22EA /* demo2.vb in CopyFiles */,
+				82EB1C9E144161D9007A22EA /* blox.vb in CopyFiles */,
 				82EB1C9914414CCD007A22EA /* hibuff.vb in CopyFiles */,
 				82EB1C9714414BC9007A22EA /* hello-old.vb in CopyFiles */,
-				82EB1C9414414869007A22EA /* demo.VB in CopyFiles */,
 				8218D6DF143807A800F9FBA6 /* hello11.vb in CopyFiles */,
 				8242852F141EF12E00846D29 /* MovbsuTest.vb in CopyFiles */,
 				8242852D141EE73C00846D29 /* MovbsuTest_emu.vb in CopyFiles */,
@@ -88,11 +94,14 @@
 		82EB1C8D1440C645007A22EA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		82EB1C8F1440C78E007A22EA /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		82EB1C911440C7AA007A22EA /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = System/Library/Frameworks/ApplicationServices.framework; sourceTree = SDKROOT; };
-		82EB1C931441485D007A22EA /* demo.VB */ = {isa = PBXFileReference; lastKnownFileType = file; path = demo.VB; sourceTree = "<group>"; };
 		82EB1C95144148B5007A22EA /* bgmap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bgmap.h; sourceTree = "<group>"; };
 		82EB1C9614414BBF007A22EA /* hello-old.vb */ = {isa = PBXFileReference; lastKnownFileType = file; path = "hello-old.vb"; sourceTree = "<group>"; };
 		82EB1C9814414CB5007A22EA /* hibuff.vb */ = {isa = PBXFileReference; lastKnownFileType = file; path = hibuff.vb; sourceTree = "<group>"; };
 		82EB1C9A1441556A007A22EA /* palette.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = palette.h; sourceTree = "<group>"; };
+		82EB1C9D144161C5007A22EA /* blox.vb */ = {isa = PBXFileReference; lastKnownFileType = file; path = blox.vb; sourceTree = "<group>"; };
+		82EB1CA1144167FD007A22EA /* demo2.vb */ = {isa = PBXFileReference; lastKnownFileType = file; path = demo2.vb; sourceTree = "<group>"; };
+		82EB1CA3144168A6007A22EA /* demo1.vb */ = {isa = PBXFileReference; lastKnownFileType = file; path = demo1.vb; sourceTree = "<group>"; };
+		82EB1CA514416918007A22EA /* DitherTest.vb */ = {isa = PBXFileReference; lastKnownFileType = file; path = DitherTest.vb; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -131,19 +140,9 @@
 		821438D114146AD100A98E34 /* virtualutopia */ = {
 			isa = PBXGroup;
 			children = (
-				82EB1C9614414BBF007A22EA /* hello-old.vb */,
+				82EB1CA71441FD0A007A22EA /* ROMS */,
 				82E9442D1433A995007F3291 /* NVC */,
 				82E9442714339F62007F3291 /* VIP */,
-				8218D6DD1438079300F9FBA6 /* hello11.vb */,
-				8242852E141EF11D00846D29 /* MovbsuTest.vb */,
-				8242852B141EE71D00846D29 /* MovbsuTest_emu.vb */,
-				826DA392141EA00D00CE9579 /* BitString Demo.vb */,
-				82C8AB6514180541006213AA /* test2.vb */,
-				82C8AB42141726AF006213AA /* mariofly.vb */,
-				82C8AB4014171A05006213AA /* mario.vb */,
-				82C8AB3E14170751006213AA /* test1.vb */,
-				82EB1C931441485D007A22EA /* demo.VB */,
-				82EB1C9814414CB5007A22EA /* hibuff.vb */,
 				821438D214146AD100A98E34 /* main.cpp */,
 				8242C45814259B4C00B47B75 /* Memory */,
 				82E9442C1433A169007F3291 /* registers.h */,
@@ -199,6 +198,27 @@
 				82E9442F1433A9F7007F3291 /* nvc.cpp */,
 			);
 			name = NVC;
+			sourceTree = "<group>";
+		};
+		82EB1CA71441FD0A007A22EA /* ROMS */ = {
+			isa = PBXGroup;
+			children = (
+				8218D6DD1438079300F9FBA6 /* hello11.vb */,
+				82EB1C9614414BBF007A22EA /* hello-old.vb */,
+				82EB1CA1144167FD007A22EA /* demo2.vb */,
+				82EB1C9D144161C5007A22EA /* blox.vb */,
+				82EB1CA514416918007A22EA /* DitherTest.vb */,
+				8242852E141EF11D00846D29 /* MovbsuTest.vb */,
+				8242852B141EE71D00846D29 /* MovbsuTest_emu.vb */,
+				826DA392141EA00D00CE9579 /* BitString Demo.vb */,
+				82C8AB6514180541006213AA /* test2.vb */,
+				82C8AB42141726AF006213AA /* mariofly.vb */,
+				82C8AB4014171A05006213AA /* mario.vb */,
+				82C8AB3E14170751006213AA /* test1.vb */,
+				82EB1C9814414CB5007A22EA /* hibuff.vb */,
+				82EB1CA3144168A6007A22EA /* demo1.vb */,
+			);
+			name = ROMS;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
