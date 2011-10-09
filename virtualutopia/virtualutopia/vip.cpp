@@ -9,6 +9,7 @@
 #include <iostream>
 #include "vip.h"
 #include "world.h"
+#import <QuartzCore/QuartzCore.h>
 
 namespace VIP
 {
@@ -39,8 +40,12 @@ namespace VIP
                 return *((char*)&rightFrameBuffer_1 + (offset - 0x18000));
             case 0x1E000 ... 0x1FFFF:
                 return *(((char*)&chrRam[1536]) + (offset - 0x1E000));
-            case 0x3D800 ... 0x3DC00:
+            case 0x20000 ... 0x3BFFF:
+                return *(((char*)&bgMaps[0]) + (offset - 0x20000));
+            case 0x3D800 ... 0x3DBFF:
                 return *(((char*)&worlds[0]) + (offset - 0x3D800));
+            case 0x3DC00 ... 0x3DFFF:
+                return *(((char*)&columnTable[0]) + (offset - 0x3DC00));
             case 0x3E000 ... 0x3FFFF:
                 return *(((char*)&oam[0]) + (offset - 0x3E000));
             case 0x5F800:
@@ -77,6 +82,10 @@ namespace VIP
                 return *(char*)&SPT2;
             case 0x5F84E:
                 return *(char*)&SPT3;
+            case 0x5F860 ... 0x5F867:
+                return *(((char*)&GPLT[0]) + (offset - 0x5F860));
+            case 0x5F868 ... 0x5F86F:
+                return *(((char*)&JPLT[0]) + (offset - 0x5F868));
             case 0x78000 ... 0x7FFFF:
                 return *(((char*)&chrRam[0]) + (offset - 0x78000));
             default:
@@ -84,34 +93,106 @@ namespace VIP
         }
     }
     
-    void VIP::DrawChr(const Chr &chr)
+    void VIP::DrawChr(const Chr &chr, int xoff, int yoff, int sourceXOffset, int sourceYOffset, int w, int h, const Palette &palette)
     {
-        
+        Chr chrCpy = chr;
+        for (int x = sourceXOffset; x < w; ++x)
+        {
+            for (int y = sourceYOffset; y < h; ++y)
+            {
+                SetPixel(x + xoff, y + yoff, palette[chrCpy.data[y] & 0x3]);
+                chrCpy.data[y] >>= 2;
+            }
+        }   
     }
     
     void VIP::SetPixel(int x, int y, int val)
     {
-        printf("Setting (%d, %d) to %d\n", x, y, val);
+        //screen width = 384
+        //screen height = 224
         
+        //Data is stored by column, not by row
+        
+        //We need to figure out what byte of data to look at, each 'pixel'
+        // is 2 bits, each byte store 4 pixels
+        
+        //One column is 64 bytes of data
+        char * column = leftFrameBuffer_0 + (x * 64);
+        column += (y / 4);
+        
+        int shift = (y % 4) * 2;
+        *column |= (val << shift);
+    }
+    
+    void VIP::WriteFrame()
+    {
+        
+        CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+        
+        uint32_t * bmpdata = (uint32_t*)calloc(384 * 256 * 4, sizeof(char));
+        memset(bmpdata, 0xFF, 384 * 256 * 4);
+        
+        char * internalData = leftFrameBuffer_0;
+        
+        for (int x = 0; x < 384; ++x)
+        {
+            for (int y = 0; y < 64; ++y)
+            {
+                for (int bt = 0; bt < 4; ++bt)
+                {
+                    uint32_t pixel;
+                    char px = (*internalData >> (bt * 2)) & 0x3;
+                    if (px == 1)
+                        pixel = 0xFF520052;
+                    else if (px == 2)
+                        pixel = 0xFFAD00AD;
+                    else if (px == 3)
+                        pixel = 0xFFFF00FF;
+                    else if (px == 0)
+                        pixel = 0xFF000000;
+                    
+                    *(bmpdata + (384 * (y * 4 + bt)) + x) = pixel;
+                }
+                internalData++;
+            }
+        }
+        
+        
+        
+        
+        CGContextRef context = CGBitmapContextCreate(bmpdata,
+                                                     384, 
+                                                     256, 8, 1536, colorSpace, kCGImageAlphaPremultipliedLast);
+        
+        
+        CGImageRef image = CGBitmapContextCreateImage(context);
+
+        static int f = 0;
+        CFStringRef str = CFStringCreateWithFormat(NULL, NULL, CFSTR("/Users/jweinberg/frames/frame_%03d.png"), f++); 
+        CFURLRef url = CFURLCreateWithFileSystemPath(NULL, str, kCFURLPOSIXPathStyle, false);
+        
+        CGImageDestinationRef destination = CGImageDestinationCreateWithURL(url, kUTTypePNG, 1, NULL);
+        CGImageDestinationAddImage(destination, image, NULL);
+        
+        CGImageDestinationFinalize(destination);
+        
+        CFRelease(destination);
+        CFRelease(url);
+        CFRelease(str);
+        
+        CGColorSpaceRelease(colorSpace);
+        CGContextRelease(context);
+        free(bmpdata);
     }
     
     void VIP::DrawObj(const Obj &obj)
     {
-        printf("Drawing char %d\n", obj.JCA);
-        Chr chr = chrRam[obj.JCA];
-        
-        for (int x = 0; x < 8; ++x)
-        {
-            for (int y = 0; y < 8; ++y)
-            {
-                SetPixel(x, y, chr.data[y] & 0x3);
-                chr.data[y] >>= 2;
-            }
-        }
+        DrawChr(chrRam[obj.JCA], obj.JX, obj.JY, 0, 0, 8, 8, JPLT[obj.JPLTS]);
     }
     
     void VIP::Draw()
     {
+//       
         objSearchIndex = 3;
         //Draw the worlds, starting with the lowest priority
         for (int n = 31; n >= 0; --n)
@@ -128,13 +209,34 @@ namespace VIP
                 int stopIndex = (objSearchIndex > 0) ? objControl[objSearchIndex - 1] : 0;
                 for (int objIdx = objControl[objSearchIndex]; objIdx >= stopIndex; --objIdx)
                 {
-                    printf("Drawing obj %d\n", objIdx);
                     DrawObj(oam[objIdx]);
                 }
                 if (objSearchIndex)
-                    objSearchIndex--;
+                    objSearchIndex--;   
+            }
+            else if (type == World::kNormalType)
+            {
+                const World &world = worlds[n];
+                const BGMap &map = bgMaps[world.BGMAP_BASE];
+                
+                int x = 0;
+                
+                do
+                {
+                    int y = 0;
+                    do
+                    {
+                        const BGMapData &data = map.chars[(y/8) * 64 + (x/8)];
+                        const Chr& chr = chrRam[data.charNum];
+                        DrawChr(chr, x + world.GX, y + world.GY, 0, 0, MIN(8, world.W - x), MIN(8, world.H - y), GPLT[data.GPLTS]);
+                        y += 8;
+                    } while(y < world.H);
+                    x += 8;
+                } while(x<world.W);
+                
             }
         }
+       WriteFrame();
     }
     
     uint16_t VIP::Step(uint32_t cycles)
@@ -254,6 +356,7 @@ namespace VIP
                 XPSTTS.OVERTIME = 0;
                 XPSTTS.XPEN = XPCTRL.XPEN;
                 lastFrameBuffer = cycles;
+                memset(leftFrameBuffer_0, 0, 0x6000);
             }
         }
         return 0;

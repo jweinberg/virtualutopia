@@ -13,14 +13,17 @@
 #include "world.h"
 #include "obj.h"
 #include "chr.h"
+#include "bgmap.h"
+#include "palette.h"
 
 namespace VIP
 {
     class VIP
     {
     private:
+        void WriteFrame();
         void DrawObj(const Obj& obj);
-        void DrawChr(const Chr& chr);
+        void DrawChr(const Chr &chr, int xoff, int yoff, int sourceXOffset, int sourceYOffset, int w, int h, const Palette& palette);
         void SetPixel(int x, int y, int val);
     public:
         VIP();
@@ -30,11 +33,13 @@ namespace VIP
         private:
         Chr chrRam[2048];
         Obj oam[1024];
+        BGMap bgMaps[14];
         World worlds[32];
         char leftFrameBuffer_0[0x6000];
         char rightFrameBuffer_0[0x6000];
         char leftFrameBuffer_1[0x6000];
         char rightFrameBuffer_1[0x6000];
+        char columnTable[0x3FF];
         char videoRam[0x80000];
         bool gameStartTriggered;
         uint8_t framesWaited;
@@ -139,14 +144,8 @@ namespace VIP
             };
             uint16_t objControl[4];
         };
-        uint16_t GPLT0;
-        uint16_t GPLT1;
-        uint16_t GPLT2;
-        uint16_t GPLT3;
-        uint16_t JPLT0;
-        uint16_t JPLT1;
-        uint16_t JPLT2;
-        uint16_t JPLT3;
+        Palette GPLT[4];
+        Palette JPLT[4];
         uint16_t BKCOL;
     };
     
