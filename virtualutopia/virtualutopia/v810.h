@@ -35,6 +35,7 @@ namespace CPU
         void reset();
         void step();
         const std::string registerDescription() const;
+        uint32_t cycles;
     private:        
         bool debugOutput;
         void decode(const Instruction &anInstruction);
@@ -43,7 +44,6 @@ namespace CPU
         void throwException(ExceptionCode exceptionCode);
         void processInterrupt(InterruptCode interruptCode);
         uint32_t programCounter;
-        uint32_t cycles;
         union
         {
             int32_t generalRegisters[32];

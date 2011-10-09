@@ -25,21 +25,7 @@
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2011 __MyCompanyName__. All rights reserved.</string>
 	<key>NSPrincipalClass</key>
-	<string>VBGameCoreController</string>
-	<key>CFBundleDocumentTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>vb</string>
-				<string>bin</string>
-			</array>
-			<key>CFBundleTypeName</key>
-			<string>Virtual Boy Game</string>
-			<key>LSTypeIsPackage</key>
-			<false/>
-		</dict>
-	</array>
+	<string>OEVBSystemController</string>
 	<key>OESystemPluginName</key>
 	<string>Nintendo Virtual Boy</string>
 </dict>

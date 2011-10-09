@@ -8,8 +8,8 @@
 
 #import <OpenEmuBase/OEGameCore.h>
 #import "vb.h"
-
-@interface VBGameCore : OEGameCore
+#import "OEVBSystemResponderClient.h"
+@interface VBGameCore : OEGameCore <OEVBSystemResponderClient>
 {
     VB *vb;
 }
