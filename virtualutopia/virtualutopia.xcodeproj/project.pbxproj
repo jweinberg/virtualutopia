@@ -121,10 +121,8 @@
 		821438C314146AD000A98E34 = {
 			isa = PBXGroup;
 			children = (
-				82EB1C911440C7AA007A22EA /* ApplicationServices.framework */,
-				82EB1C8F1440C78E007A22EA /* QuartzCore.framework */,
-				82EB1C8D1440C645007A22EA /* Foundation.framework */,
 				821438D114146AD100A98E34 /* virtualutopia */,
+				82EB1CA81441FD58007A22EA /* Frameworks */,
 				821438CF14146AD100A98E34 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -219,6 +217,16 @@
 				82EB1CA3144168A6007A22EA /* demo1.vb */,
 			);
 			name = ROMS;
+			sourceTree = "<group>";
+		};
+		82EB1CA81441FD58007A22EA /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				82EB1C911440C7AA007A22EA /* ApplicationServices.framework */,
+				82EB1C8F1440C78E007A22EA /* QuartzCore.framework */,
+				82EB1C8D1440C645007A22EA /* Foundation.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

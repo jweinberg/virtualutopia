@@ -37,7 +37,7 @@ int kbhit()
 
 int main (int argc, const char * argv[])
 {
-    ROM rom("mariofly.vb");
+    ROM rom("DitherTest.vb");
     VIP::VIP vip;
     NVC::NVC nvc;
     MMU mmu(rom, vip, nvc);
