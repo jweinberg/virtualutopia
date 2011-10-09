@@ -93,9 +93,14 @@ namespace VIP
         }
     }
     
-    void VIP::DrawChr(const Chr &chr, int xoff, int yoff, int sourceXOffset, int sourceYOffset, int w, int h, const Palette &palette)
+    void VIP::DrawChr(const Chr &chr, int xoff, int yoff, int sourceXOffset, int sourceYOffset, int w, int h, bool flipHor, bool flipVert,const Palette &palette)
     {
         Chr chrCpy = chr;
+        if (flipHor)
+            chrCpy.FlipHorizontal();
+        if (flipVert)
+            chrCpy.FlipVertical();
+        
         for (int x = sourceXOffset; x < w; ++x)
         {
             for (int y = sourceYOffset; y < h; ++y)
@@ -185,7 +190,7 @@ namespace VIP
     
     void VIP::DrawObj(const Obj &obj)
     {
-        DrawChr(chrRam[obj.JCA], obj.JX, obj.JY, 0, 0, 8, 8, JPLT[obj.JPLTS]);
+        DrawChr(chrRam[obj.JCA], obj.JX, obj.JY, 0, 0, 8, 8, obj.JHFLP, obj.JVFLP, JPLT[obj.JPLTS]);
     }
     
     void VIP::Draw()
@@ -227,7 +232,7 @@ namespace VIP
                     {
                         const BGMapData &data = map.chars[(y/8) * 64 + (x/8)];
                         const Chr& chr = chrRam[data.charNum];
-                        DrawChr(chr, x + world.GX, y + world.GY, 0, 0, MIN(8, world.W - x), MIN(8, world.H - y), GPLT[data.GPLTS]);
+                        DrawChr(chr, x + world.GX, y + world.GY, 0, 0, MIN(8, world.W - x), MIN(8, world.H - y), data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
                         y += 8;
                     } while(y < world.H);
                     x += 8;

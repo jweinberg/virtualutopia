@@ -23,7 +23,7 @@ namespace VIP
     private:
         void WriteFrame();
         void DrawObj(const Obj& obj);
-        void DrawChr(const Chr &chr, int xoff, int yoff, int sourceXOffset, int sourceYOffset, int w, int h, const Palette& palette);
+        void DrawChr(const Chr &chr, int xoff, int yoff, int sourceXOffset, int sourceYOffset, int w, int h, bool flipHor, bool flipVert,const Palette &palette);
         void SetPixel(int x, int y, int val);
     public:
         VIP();

@@ -37,7 +37,7 @@ int kbhit()
 
 int main (int argc, const char * argv[])
 {
-    ROM rom("DitherTest.vb");
+    ROM rom("blox.vb");
     VIP::VIP vip;
     NVC::NVC nvc;
     MMU mmu(rom, vip, nvc);
@@ -94,10 +94,13 @@ int main (int argc, const char * argv[])
             
           //  if (key)
             {
-               // fgetc(stdin);
+                nvc.SDHR = ~nvc.SDHR;
+                nvc.SDLR = ~nvc.SDLR;
+                
+                // fgetc(stdin);
 //                printf("%d\n", );
-                nvc.SDHR.LR = 1;
-                nvc.SDHR.LD = 1;
+//                nvc.SDHR.LR = 1;
+//                nvc.SDHR.LD = 1;
              
             }
 //            else
