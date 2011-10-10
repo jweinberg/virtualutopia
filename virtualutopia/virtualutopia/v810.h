@@ -4,6 +4,11 @@
 #include <iostream>
 #include <stdint.h>
 #include "registers.h"
+#include "instruction.h"
+#include "cpu_utils.h"
+#include "mmu.h"
+#include <cmath>
+#include "bitstring.h"
 #include <vector>
 
 class MMU;
@@ -97,93 +102,7 @@ namespace CPU
         MMU &memoryManagmentUnit;
         VIP::VIP &vip;
 #pragma mark - Instructions
-        void move(const Instruction& anInstruction);
-        void add(const Instruction& anInstruction);
-        void addImmediate5(const Instruction& anInstruction);
-        void subtract(const Instruction& anInstruction);
-        void compare(const Instruction& anInstruction);
-        void divide(const Instruction& anInstruction);
-        void shiftLeft(const Instruction& anInstruction);
-        void shiftRight(const Instruction& anInstruction);
-        void jump(const Instruction& anInstruction);
-        void shiftArithmeticRight(const Instruction& anInstruction);
-        void shiftArithmeticRightImmediate(const Instruction& anInstruction);
-        void multiply(const Instruction& anInstruction);
-        void multiplyUnsigned(const Instruction& anInstruction);
-        void divideUnsigned(const Instruction& anInstruction);
-        void logicalOr(const Instruction& anInstruction);
-        void logicalAnd(const Instruction& anInstruction);
-        void logicalXor(const Instruction& anInstruction);
-        void logicalNot(const Instruction& anInstruction);
-        
-        void andImmediate(const Instruction& anInstruction);
-        void orImmediate(const Instruction &anInstruction);
-        void xorImmediate(const Instruction &anInstruction);
-        void moveImmediate(const Instruction& anInstruction);
-        void setFlag(const Instruction& anInstruction);
-        void compareImmediate(const Instruction& anInstruction);
-        void shiftLeftImmediate(const Instruction& anInstruction);
-        void shiftRightImmediate(const Instruction& anInstruction);
-        
-        void moveHigh(const Instruction& anInstruction);
-        void moveAddImmediate(const Instruction& anInstruction);
-        void addImmediate(const Instruction& anInstruction);
-        void storeByte(const Instruction& anInstruction);
-        void storeHWord(const Instruction& anInstruction);
-        void storeWord(const Instruction& anInstruction);
-        void loadWord(const Instruction& anInstruction);
-        void loadHWord(const Instruction& anInstruction);
-        void loadByte(const Instruction& anInstruction);
-        
-        void loadSystemRegister(const Instruction& anInstruction);
-        void storeSystemRegister(const Instruction& anInstruction);
-        
-        void branchIfOverflow(const Instruction& anInstruction);
-        void branchIfNoOverflow(const Instruction& anInstruction);
-        void branchIfCarry(const Instruction& anInstruction);
-        void branchIfNoCarry(const Instruction& anInstruction);
-        void branchIfZero(const Instruction& anInstruction);
-        void branchIfNotZero(const Instruction& instruction);
-        void branchIfNotHigher(const Instruction& anInstruction);
-        void branchIfNegative(const Instruction& anInstruction);
-        void branchIfPositive(const Instruction& anInstruction);
-        void branchIfHigher(const Instruction& anInstruction);
-        void branchIfLessThan(const Instruction& anInstruction);
-        void branchIfGreaterThan(const Instruction& anInstruction);
-        void branchIfGreaterOrEqual(const Instruction& instruction);
-        void branchIfLessOrEqual(const Instruction& instruction);
-        void branch(const Instruction& anInstruction);
-        
-        void returnFromTrap(const Instruction& anInstruction);
-        void jumpRelative(const Instruction& anInstruction);
-        void jumpAndLink(const Instruction& anInstruction);
-        void nop(const Instruction& anInstruction);
-        void outWrite(const Instruction& anInstruction);
-        
-        void setInterruptDisable(const Instruction &anInstruction);
-        void clearInterruptDisable(const Instruction &anInstruction);
-        
-        void compareFloat(const Instruction& instruction);
-        void convertWordToFloat(const Instruction& instruction);
-        void convertFloatToWord(const Instruction& instruction);
-        void addFloat(const Instruction& instruction);
-        void subtractFloat(const Instruction& instruction);
-        void multiplyFloat(const Instruction& instruction);
-        void divideFloat(const Instruction& instruction);
-        void truncateFloat(const Instruction& instruction);
-        void reverseWord(const Instruction& instruction);
-        void multiplyHalfWord(const Instruction& instruction);
-        void exchangeByte(const Instruction& instruction);
-        void exchangeHalfWord(const Instruction& instruction);
-        void moveBitString(const Instruction& instruction);
-        void andBitString(const Instruction& instruction);
-        void orBitString(const Instruction& instruction);
-        void xorBitString(const Instruction& instruction);
-        
-        void orNotBitString(const Instruction& instruction);
-        void andNotBitString(const Instruction& instruction);
-        void xorNotBitString(const Instruction& instruction);
-        void notBitString(const Instruction& instruction);
+        #include "v810_instructions.h"
     };
     
 }

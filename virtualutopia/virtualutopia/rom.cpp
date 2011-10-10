@@ -33,10 +33,3 @@ const std::string ROM::romName() const
     memcpy(nameBuffer, &(*this)[0x07FFFDE0], nameMaxLength);
     return std::string(nameBuffer);
 }
-
-const char& ROM::operator[](uint32_t address) const
-{    
-    //The data is mirrored from 0x07000000 to 0x07FFFFFF
-    address = ((address & 0x07FFFFFF) - 0x07000000);
-    return data[address % fileLength];
-}

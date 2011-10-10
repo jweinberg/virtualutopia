@@ -35,8 +35,13 @@ uint32_t bmpData[384 * 256];
 {
     uint32_t currentCycles = vb->cpu->cycles;
     
-    while ((vb->cpu->cycles - currentCycles) < 833333)
+    while ((vb->cpu->cycles - currentCycles) < 270336 / 4)
         vb->cpu->step();
+}
+
++ (NSTimeInterval)defaultTimeInterval
+{
+    return 50.0f;
 }
 
 - (void)setupEmulation

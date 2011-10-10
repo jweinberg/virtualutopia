@@ -30,10 +30,7 @@ namespace CPU
     
     void v810::decode(const Instruction &instruction)
     {
-#define OPCODE_DECODE(OPCODE, FUNCTION)\
-case OPCODE: \
-FUNCTION(instruction);\
-break;
+#define OPCODE_DECODE(OPCODE, FUNCTION) case OPCODE: FUNCTION(instruction); break;
 
         switch (instruction.opcode())
         {
@@ -149,7 +146,7 @@ break;
         //Some instructions think its FUNNY to assign to reg 0 as an optimization
         generalRegisters[0] = 0;   
         vip.Step(cycles);
-        Instruction instruction = memoryManagmentUnit.GetData<Instruction>(programCounter);
+        const Instruction &instruction = memoryManagmentUnit.GetData<Instruction>(programCounter);
         decode(instruction);
     }
     

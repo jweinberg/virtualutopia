@@ -61,9 +61,9 @@
 {
     NSDictionary *controls = [NSDictionary dictionaryWithObjectsAndKeys:
                               [NSNumber numberWithUnsignedInt:kHIDUsage_KeyboardUpArrow]   , @"OEVBButtonRightUp[1]"   ,
-                              [NSNumber numberWithUnsignedInt:kHIDUsage_KeyboardRightArrow], @"OEVBButtonRightDown[1]",
+                              [NSNumber numberWithUnsignedInt:kHIDUsage_KeyboardDownArrow], @"OEVBButtonRightDown[1]",
                               [NSNumber numberWithUnsignedInt:kHIDUsage_KeyboardLeftArrow] , @"OEVBButtonRightLeft[1]" ,
-                              [NSNumber numberWithUnsignedInt:kHIDUsage_KeyboardDownArrow] , @"OEVBButtonRightRight[1]" ,
+                              [NSNumber numberWithUnsignedInt:kHIDUsage_KeyboardRightArrow] , @"OEVBButtonRightRight[1]" ,
 
                               [NSNumber numberWithUnsignedInt:kHIDUsage_KeyboardW], @"OEVBButtonLeftUp[1]"   ,
                               [NSNumber numberWithUnsignedInt:kHIDUsage_KeyboardS], @"OEVBButtonLeftDown[1]",
@@ -74,8 +74,8 @@
                               [NSNumber numberWithUnsignedInt:kHIDUsage_KeyboardCloseBracket]         , @"OEVBButtonR[1]"    ,
                               [NSNumber numberWithUnsignedInt:kHIDUsage_KeyboardQ]         , @"OEVBButtonA[1]"    ,
                               [NSNumber numberWithUnsignedInt:kHIDUsage_KeyboardE]         , @"OEVBButtonB[1]"    ,
-                            [NSNumber numberWithUnsignedInt:kHIDUsage_KeyboardTab]    , @"OESMSButtonSelect[1]"   ,
-                              [NSNumber numberWithUnsignedInt:kHIDUsage_KeyboardReturn]  , @"OESMSButtonStart[1]"   ,
+                            [NSNumber numberWithUnsignedInt:kHIDUsage_KeyboardTab]    , @"OEVBButtonSelect[1]"   ,
+                              [NSNumber numberWithUnsignedInt:kHIDUsage_KeyboardReturnOrEnter]  , @"OEVBButtonStart[1]"   ,
                               nil];
     return controls;
 }

@@ -19,7 +19,12 @@ public:
     ~ROM();
     
     const std::string romName() const;
-    const char& operator[](uint32_t address) const;
+    inline char& operator[](uint32_t address) const
+    {
+        //The data is mirrored from 0x07000000 to 0x07FFFFFF
+        address = ((address & 0x07FFFFFF) - 0x07000000);
+        return data[address & (fileLength-1)];
+    }
 };
 
 

@@ -1,6 +1,8 @@
 #ifndef virtualutopia_mmu_h
 #define virtualutopia_mmu_h
 #include "rom.h"
+#include "vip.h"
+#include "nvc.h"
 
 namespace VIP
 {
@@ -22,7 +24,7 @@ public:
     template<typename T>
     struct GetDataProxy
     {
-        const MMU & mmu;
+        MMU & mmu;
         GetDataProxy<T>(MMU& _mmu) : mmu(_mmu) {}
         
         T& operator()(uint32_t address) const
@@ -37,7 +39,7 @@ public:
     template<typename T>
     struct GetDataProxy<T*>
     {
-        const MMU& mmu;
+        MMU& mmu;
         GetDataProxy<T>(MMU& _mmu) : mmu(_mmu) {}
         
         T* operator()(uint32_t address)
@@ -59,12 +61,32 @@ public:
     void StoreWord(uint32_t address, uint32_t word);
     
 private:
-    const char &operator[](const uint32_t virtualAddress) const;
+    inline char &operator[](uint32_t virtualAddress)
+    {
+        virtualAddress = virtualAddress & 0x07FFFFFF;
+        switch (virtualAddress)
+        {
+            case 0x0 ... 0xFFFFFF: //Display RAM, VIP
+                return vip[virtualAddress & 0x7FFFF];
+            case 0x01000000 ... 0x010005FF: //Sound Memory
+                return soundRegisters[virtualAddress & 0x5FF];
+            case 0x02000000 ... 0x0200002C: //Hardware registers
+                return nvc[virtualAddress];
+            case 0x05000000 ... 0x0500FFFF: //Program RAM (mask with 0xFFFF)
+                return programRam[virtualAddress & 0xFFFF];
+            case 0x06000000 ... 0x06FFFFFF: //Cartridge RAM
+                return gamepackRam[(virtualAddress & 0xFFFFFF) & 0x1FFFF];
+            case 0x07000000 ... 0x07FFFFFF: //Cartridge ROM
+                return rom[virtualAddress];
+        }
+        //assert(false);
+        return vip[0];
+    }
     const ROM &rom;
     NVC::NVC &nvc;
     VIP::VIP &vip;
     char soundRegisters[0x600];
-    char programRam[0xFFFF];
+    char *programRam;
     char *gamepackRam;
 };
 

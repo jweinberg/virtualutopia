@@ -141,48 +141,48 @@ namespace CPU
         
         //Form III instructions have a 7 bit opcode, this can be checked based on
         //the high 3 bits of the opcode
-        inline OpcodeMnumonic opcode() const
+        inline const OpcodeMnumonic opcode() const
         {
             const uint8_t highCode = (instruction >> 13) & 0x7;
             return (OpcodeMnumonic)((instruction & 0xFFFF) >> (highCode == 4 ? 9 : 10));
         }
         
-        inline uint8_t reg1() const
+        inline const uint8_t reg1() const
         {
             return instruction & 0x1F;
         }
         
-        inline uint8_t reg2() const
+        inline const uint8_t reg2() const
         {
             return (instruction >> 5) & 0x1F;
         }
         
-        inline uint16_t imm16() const
+        inline const uint16_t imm16() const
         {
             return (instruction >> 16);
         }
         
-        inline uint8_t imm5() const
+        inline const uint8_t imm5() const
         {
             return instruction & 0x1F;
         }
         
-        inline uint16_t disp16() const
+        inline const uint16_t disp16() const
         {
             return (instruction >> 16);
         }
         
-        inline uint16_t disp9() const
+        inline const uint16_t disp9() const
         {
             return (instruction & 0x1FF);
         }
         
-        inline uint8_t subopcode() const
+        inline const uint8_t subopcode() const
         {
             return (instruction >> 26);
         }
         
-        inline uint32_t disp26() const
+        inline const uint32_t disp26() const
         {
             return ((instruction & 0x3FF) << 16) | (instruction >> 16);
         }
