@@ -15,6 +15,7 @@
 #include "chr.h"
 #include "bgmap.h"
 #include "palette.h"
+#include "framebuffer.h"
 
 namespace VIP
 {
@@ -23,8 +24,6 @@ namespace VIP
     public:
         void WriteFrame();
         void DrawObj(const Obj& obj);
-        void DrawChr(const Chr &chr, int xoff, int yoff, int sourceXOffset, int sourceYOffset, int w, int h, bool flipHor, bool flipVert,const Palette &palette);
-        void SetPixel(int x, int y, int val);
         VIP();
         char& operator[](const int offset);
         uint16_t Step(uint32_t cycles);
@@ -33,11 +32,9 @@ namespace VIP
         Obj oam[1024];
         BGMap bgMaps[14];
         World worlds[32];
-        char leftFrameBuffer_0[0x6000];
-    public:
-        char rightFrameBuffer_0[0x6000];
-        char leftFrameBuffer_1[0x6000];
-        char rightFrameBuffer_1[0x6000];
+        
+        Framebuffer leftFrameBuffer[2];
+        Framebuffer rightFrameBuffer[2];
         char columnTable[0x3FF];
         char videoRam[0x80000];
         bool gameStartTriggered;

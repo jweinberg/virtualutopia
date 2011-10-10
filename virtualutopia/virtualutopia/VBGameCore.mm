@@ -80,7 +80,8 @@ uint32_t bmpData[384 * 256];
 {
     //memset(bmpData, 0xFF00FFFF, 384 * 256);
     
-    char * internalData = vb->vip->leftFrameBuffer_0;
+    char * internalDataLeft = (char*)&vb->vip->leftFrameBuffer[0];
+    char * internalDataRight = (char*)&vb->vip->rightFrameBuffer[0];    
     
     for (int x = 0; x < 384; ++x)
     {
@@ -88,20 +89,29 @@ uint32_t bmpData[384 * 256];
         {
             for (int bt = 0; bt < 4; ++bt)
             {
-                uint32_t pixel;
-                char px = (*internalData >> (bt * 2)) & 0x3;
-                if (px == 1)
-                    pixel = 0xFF520052;
-                else if (px == 2)
-                    pixel = 0xFFAD00AD;
-                else if (px == 3)
-                    pixel = 0xFFFF00FF;
-                else if (px == 0)
-                    pixel = 0xFF000000;
+                uint32_t pixel = 0xFF000000;
+                
+                char leftPx = (*internalDataLeft >> (bt * 2)) & 0x3;
+                char rightPx = (*internalDataRight >> (bt * 2)) & 0x3;
+                
+                if (leftPx == 1)
+                    pixel |= 0x00000052;
+                else if (leftPx == 2)
+                    pixel |= 0x000000AD;
+                else if (leftPx == 3)
+                    pixel |= 0x000000FF;
+
+                if (rightPx == 1)
+                    pixel |= 0x00520000;
+                else if (rightPx == 2)
+                    pixel |= 0x00AD0000;
+                else if (rightPx == 3)
+                    pixel |= 0x00FF0000;
                 
                 *(bmpData + (384 * (y * 4 + bt)) + x) = pixel;
             }
-            internalData++;
+            internalDataLeft++;
+            internalDataRight++;
         }
     }
 
@@ -240,6 +250,8 @@ uint32_t bmpData[384 * 256];
             break;
         case OEVBButtonStart:
             vb->nvc->SDHR.STA = 0;
+            break;
+        default:
             break;
     }   
 }

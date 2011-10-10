@@ -25,19 +25,19 @@ namespace VIP
         switch (offset)
         {
             case 0x00000 ... 0x05FFF:
-                return *((char*)&leftFrameBuffer_0 + offset);
+                return *((char*)&leftFrameBuffer[0] + offset);
             case 0x06000 ... 0x07FFF:
                 return *(((char*)&chrRam[0]) + (offset - 0x06000));
             case 0x08000 ... 0x0DFFF:
-                return *((char*)&leftFrameBuffer_1 + (offset - 0x08000));
+                return *((char*)&leftFrameBuffer[1] + (offset - 0x08000));
             case 0x0E000 ... 0x0FFFF:
                 return *(((char*)&chrRam[512]) + (offset - 0x0E000));
             case 0x10000 ... 0x15FFF:
-                return *((char*)&rightFrameBuffer_0 + (offset - 0x10000));
+                return *((char*)&rightFrameBuffer[0] + (offset - 0x10000));
             case 0x16000 ... 0x17FFF:
                 return *(((char*)&chrRam[1024]) + (offset - 0x16000));
             case 0x18000 ... 0x1DFFF:
-                return *((char*)&rightFrameBuffer_1 + (offset - 0x18000));
+                return *((char*)&rightFrameBuffer[1] + (offset - 0x18000));
             case 0x1E000 ... 0x1FFFF:
                 return *(((char*)&chrRam[1536]) + (offset - 0x1E000));
             case 0x20000 ... 0x3BFFF:
@@ -93,45 +93,6 @@ namespace VIP
         }
     }
     
-    void VIP::DrawChr(const Chr &chr, int xoff, int yoff, int sourceXOffset, int sourceYOffset, int w, int h, bool flipHor, bool flipVert,const Palette &palette)
-    {
-        Chr chrCpy = chr;
-        if (flipHor)
-            chrCpy.FlipHorizontal();
-        if (flipVert)
-            chrCpy.FlipVertical();
-        
-        for (int x = sourceXOffset; x < w; ++x)
-        {
-            for (int y = sourceYOffset; y < h; ++y)
-            {
-                uint8_t colorIdx = chrCpy.data[y] & 0x3;
-                if (colorIdx)
-                    SetPixel(x + xoff, y + yoff, palette[colorIdx]);
-                chrCpy.data[y] >>= 2;
-            }
-        }   
-    }
-    
-    void VIP::SetPixel(int x, int y, int val)
-    {
-        //screen width = 384
-        //screen height = 224
-        
-        //Data is stored by column, not by row
-        
-        //We need to figure out what byte of data to look at, each 'pixel'
-        // is 2 bits, each byte store 4 pixels
-        
-        //One column is 64 bytes of data
-        char * column = leftFrameBuffer_0 + (x * 64);
-        column += (y / 4);
-        
-        int shift = (y % 4) * 2;
-        *column &= ~(0x3 << shift);
-        *column |= (val << shift);
-    }
-    
     void VIP::WriteFrame()
     {
         
@@ -140,7 +101,7 @@ namespace VIP
         uint32_t * bmpdata = (uint32_t*)calloc(384 * 256 * 4, sizeof(char));
         memset(bmpdata, 0xFF, 384 * 256 * 4);
         
-        char * internalData = leftFrameBuffer_0;
+        char * internalData = (char*)&leftFrameBuffer[0];
         
         for (int x = 0; x < 384; ++x)
         {
@@ -193,7 +154,11 @@ namespace VIP
     
     void VIP::DrawObj(const Obj &obj)
     {
-        DrawChr(chrRam[obj.JCA], obj.JX, obj.JY, 0, 0, 8, 8, obj.JHFLP, obj.JVFLP, JPLT[obj.JPLTS]);
+        if (obj.JLON)
+            leftFrameBuffer[0].DrawChr(chrRam[obj.JCA], obj.JX - obj.JP, obj.JY, 0, 0, 8, 8, obj.JHFLP, obj.JVFLP, JPLT[obj.JPLTS]);
+        if (obj.JRON)
+            rightFrameBuffer[0].DrawChr(chrRam[obj.JCA], obj.JX + obj.JP, obj.JY, 0, 0, 8, 8, obj.JHFLP, obj.JVFLP, JPLT[obj.JPLTS]);
+            
     }
     
     void VIP::Draw()
@@ -223,20 +188,28 @@ namespace VIP
             {
                 const World &world = worlds[n];
              
-                if (!world.LON)
-                    continue;
-                const BGMap &map = bgMaps[world.BGMAP_BASE];
-                                
+                int xWorlds = pow(2, world.SCX);
+                //int yWorlds = pow(2, world.SCY);
+                
                 int x = 0;
                 do
                 {
                     int y = 0;
                     do
                     {
-                        const BGMapData &data = map.chars[((y + world.MY)/8) * 64 + ((x + world.MX)/8)];
-                        const Chr& chr = chrRam[data.charNum];  
+                        int yChar = ((y + world.MY)/8);
+                        int xChar = ((x + world.MX)/8);
                         
-                        DrawChr(chr, x + world.GX, y + world.GY, 0, 0, MIN(8, world.W - x), MIN(8, world.H - y), data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
+                        
+                        const BGMap &map = bgMaps[world.BGMAP_BASE + ((yChar / 64) * xWorlds) + (xChar / 64)];
+                        
+                        
+                        const BGMapData &data = map.chars[yChar * 64 + xChar];
+                        const Chr& chr = chrRam[data.charNum];  
+                        if (world.LON)
+                            leftFrameBuffer[0].DrawChr(chr, x + world.GX - world.GP, y + world.GY, 0, 0, MIN(8, world.W - x), MIN(8, world.H - y), data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
+                        if (world.RON)
+                            rightFrameBuffer[0].DrawChr(chr, x + world.GX - world.GP, y + world.GY, 0, 0, MIN(8, world.W - x), MIN(8, world.H - y), data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
                         y += 8;
                     } while(y < world.H);
                     x += 8;
@@ -355,7 +328,9 @@ namespace VIP
             }
             else if (rowCount == 33 && timeSinceBuffer > 270336)
             {
-                memset(leftFrameBuffer_0, 0, 0x6000);
+                memset((char*)&rightFrameBuffer[0], 0, 0x6000);
+                memset((char*)&leftFrameBuffer[0], 0, 0x6000);
+                
                 Draw();
                 rowCount = -1;
                 frame++;
