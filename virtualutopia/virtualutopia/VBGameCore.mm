@@ -73,7 +73,7 @@ uint32_t bmpData[384 * 256];
 
 - (OEIntSize)bufferSize
 {
-    return OESizeMake(384, 256);
+    return OESizeMake(384, 224);
 }
 
 - (const void *)videoBuffer

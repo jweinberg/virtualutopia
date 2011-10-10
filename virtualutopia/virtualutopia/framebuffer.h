@@ -37,21 +37,22 @@ namespace VIP
             *column |= (val << shift);
         }
         
-        void DrawChr(Chr chr, int xoff, int yoff, int sourceXOffset, int sourceYOffset, int w, int h, bool flipHor, bool flipVert,const Palette &palette)
+        void DrawChr(const Chr &chr, int xoff, int yoff, int sourceXOffset, int sourceYOffset, int w, int h, bool flipHor, bool flipVert,const Palette &palette)
         {
+            Chr chrCpy = chr;
             if (flipHor)
-                chr.FlipHorizontal();
+                chrCpy.FlipHorizontal();
             if (flipVert)
-                chr.FlipVertical();
+                chrCpy.FlipVertical();
             
             for (int x = sourceXOffset; x < w; ++x)
             {
                 for (int y = sourceYOffset; y < h; ++y)
                 {
-                    uint8_t colorIdx = chr.data[y] & 0x3;
+                    uint8_t colorIdx = chrCpy.data[y] & 0x3;
                     if (colorIdx)
                         SetPixel(x + xoff, y + yoff, palette[colorIdx]);
-                    chr.data[y] >>= 2;
+                    chrCpy.data[y] >>= 2;
                 }
             }   
         }
