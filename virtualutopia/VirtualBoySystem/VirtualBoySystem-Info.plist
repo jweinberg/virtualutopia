@@ -26,7 +26,18 @@
 	<string>Copyright © 2011 __MyCompanyName__. All rights reserved.</string>
 	<key>NSPrincipalClass</key>
 	<string>OEVBSystemController</string>
-	<key>OESystemPluginName</key>
-	<string>Nintendo Virtual Boy</string>
+	<key>OESystemName</key>
+	<string>Virtual Boy</string>
+	<key>OESystemIdentifier</key>
+	<string>openemu.system.vb</string>
+	<key>OEArchiveIDs</key>
+	<array>
+		<integer>82</integer>
+	</array>
+	<key>OEFileSuffixes</key>
+	<array>
+		<string>vb</string>
+		<string>bin</string>
+	</array>
 </dict>
 </plist>

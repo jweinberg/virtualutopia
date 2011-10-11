@@ -40,7 +40,7 @@
 			<false/>
 		</dict>
 	</array>
-	<key>OESystemPluginName</key>
-	<string>Nintendo Virtual Boy</string>
+	<key>OESystemIdentifier</key>
+	<string>openemu.system.vb</string>
 </dict>
 </plist>

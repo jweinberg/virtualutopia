@@ -203,13 +203,12 @@ namespace VIP
                         
                         const BGMap &map = bgMaps[world.BGMAP_BASE + ((yChar / 64) * xWorlds) + (xChar / 64)];
                         
-                        
-                        const BGMapData &data = map.chars[yChar * 64 + xChar];
+                        const BGMapData &data = map.chars[(yChar % 64) * 64 + (xChar % 64)];
                         const Chr& chr = chrRam[data.charNum];  
                         if (world.LON)
-                            leftFrameBuffer[0].DrawChr(chr, x + world.GX - world.GP, y + world.GY, 0, 0, MIN(8, (world.W + 1) - x), MIN(8, (world.H + 1) - y), data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
+                            leftFrameBuffer[0].DrawChr(chr, x + world.GX/* - world.GP*/, y + world.GY, 0, 0, MIN(8, (world.W + 1) - x), MIN(8, (world.H + 1) - y), data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
                         if (world.RON)
-                            rightFrameBuffer[0].DrawChr(chr, x + world.GX + world.GP, y + world.GY, 0, 0, MIN(8, (world.W + 1) - x), MIN(8, (world.H + 1) - y), data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
+                            rightFrameBuffer[0].DrawChr(chr, x + world.GX/* + world.GP*/, y + world.GY, 0, 0, MIN(8, (world.W + 1) - x), MIN(8, (world.H + 1) - y), data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
                         y += 8;
                     } while(y <= world.H);
                     x += 8;

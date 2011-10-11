@@ -10,6 +10,7 @@
 #define virtualutopia_framebuffer_h
 
 #include "chr.h"
+#include <assert.h>
 
 namespace VIP
 {
@@ -31,6 +32,8 @@ namespace VIP
             //One column is 64 bytes of data
             char * column = data + (x * 64);
             column += (y / 4);
+            if (column > data + 0x6000)
+                return;
             
             int shift = (y % 4) * 2;
             *column &= ~(0x3 << shift);
