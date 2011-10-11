@@ -41,13 +41,14 @@ namespace CPU
         void step();
         const std::string registerDescription() const;
         uint32_t cycles;
-    private:        
+
         bool debugOutput;
         void decode(const Instruction &anInstruction);
         void bitstringDecode(const Instruction &instruction);
         void floatingPointDecode(const Instruction &instruction);
         void throwException(ExceptionCode exceptionCode);
         void processInterrupt(InterruptCode interruptCode);
+    private:        
         uint32_t programCounter;
         union
         {

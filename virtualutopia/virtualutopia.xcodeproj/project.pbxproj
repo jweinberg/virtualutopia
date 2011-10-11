@@ -299,9 +299,9 @@
 		821438D114146AD100A98E34 /* virtualutopia */ = {
 			isa = PBXGroup;
 			children = (
+				821438D214146AD100A98E34 /* main.cpp */,
 				82E9442D1433A995007F3291 /* NVC */,
 				82E9442714339F62007F3291 /* VIP */,
-				821438D214146AD100A98E34 /* main.cpp */,
 				8242C45814259B4C00B47B75 /* Memory */,
 				82E9442C1433A169007F3291 /* registers.h */,
 				82EB1CAF14422402007A22EA /* vb.cpp */,
@@ -661,7 +661,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "mkdir -p \"$USER_LIBRARY_DIR/Application Support/OpenEmu/Cores\"\nrm -rf \"$USER_LIBRARY_DIR/Application Support/OpenEmu/Cores/VirtualUtopia.oecoreplugin\"\ncp -rf \"$BUILT_PRODUCTS_DIR/VirtualUtopia.oecoreplugin\"{,.dSYM} \"$USER_LIBRARY_DIR/Application Support/OpenEmu/Cores/\"\nrm -rf \"$USER_LIBRARY_DIR/Application Support/OpenEmu/Systems/VirtualBoySystem.oesystemplugin\"\ncp -rf \"$BUILT_PRODUCTS_DIR/VirtualBoySystem.oesystemplugin\" \"$USER_LIBRARY_DIR/Application Support/OpenEmu/Systems/\"\n";
+			shellScript = "mkdir -p \"$USER_LIBRARY_DIR/Application Support/OpenEmu/Systems\"\nmkdir -p \"$USER_LIBRARY_DIR/Application Support/OpenEmu/Cores\"\nrm -rf \"$USER_LIBRARY_DIR/Application Support/OpenEmu/Cores/VirtualUtopia.oecoreplugin\"\ncp -rf \"$BUILT_PRODUCTS_DIR/VirtualUtopia.oecoreplugin\"{,.dSYM} \"$USER_LIBRARY_DIR/Application Support/OpenEmu/Cores/\"\nrm -rf \"$USER_LIBRARY_DIR/Application Support/OpenEmu/Systems/VirtualBoySystem.oesystemplugin\"\ncp -rf \"$BUILT_PRODUCTS_DIR/VirtualBoySystem.oesystemplugin\"{,} \"$USER_LIBRARY_DIR/Application Support/OpenEmu/Systems/\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

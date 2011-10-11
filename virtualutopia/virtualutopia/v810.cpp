@@ -32,7 +32,7 @@ namespace CPU
     {
 #define OPCODE_DECODE(OPCODE, FUNCTION) case OPCODE: FUNCTION(instruction); break;
 
-        switch (instruction.opcode())
+        switch (instruction.opcode)
         {
             OPCODE_DECODE(MOV_1, move);
             OPCODE_DECODE(ADD_1, add); 
@@ -58,14 +58,14 @@ namespace CPU
             OPCODE_DECODE(SHR_2, shiftRightImmediate); 
             OPCODE_DECODE(CLI, clearInterruptDisable);   
             OPCODE_DECODE(SAR_2, shiftArithmeticRightImmediate); 
-            //OPCODE_DECODE(TRAP, nop); 
+            OPCODE_DECODE(TRAP, nop); 
             OPCODE_DECODE(RETI, returnFromTrap);  
             //OPCODE_DECODE(HALT, <#FUNCTION#>);  
             OPCODE_DECODE(LDSR, loadSystemRegister);  
             OPCODE_DECODE(STSR, storeSystemRegister);  
             OPCODE_DECODE(SEI, setInterruptDisable);   
             case Bstr:
-                switch ((BinaryStringMnumonic)instruction.imm5())
+                switch ((BinaryStringMnumonic)instruction.imm5)
                 {
                     OPCODE_DECODE(SCH0BSU, nop); 
                     OPCODE_DECODE(SCH0BSD, nop); 
@@ -99,10 +99,10 @@ namespace CPU
             //OPCODE_DECODE(IN_H, <#FUNCTION#>);  
             //OPCODE_DECODE(CAXI, <#FUNCTION#>);  
             //OPCODE_DECODE(IN_W, FUNCTION);  
-            //OPCODE_DECODE(OUT_B, <#FUNCTION#>); 
-            //OPCODE_DECODE(OUT_H, <#FUNCTION#>); 
+            OPCODE_DECODE(OUT_B, outWrite); 
+            OPCODE_DECODE(OUT_H, outWrite); 
             case Fpp:
-                switch ((FloatingPointMnumonic)instruction.subopcode())
+                switch ((FloatingPointMnumonic)instruction.subopcode)
                 {
                     OPCODE_DECODE(CMPF_S, compareFloat);
                     OPCODE_DECODE(CVT_WS, convertWordToFloat);
@@ -136,7 +136,7 @@ namespace CPU
             OPCODE_DECODE(BGE, branchIfGreaterOrEqual);
             OPCODE_DECODE(BGT, branchIfGreaterThan);
             default:
-                printf("Decoding uknown opcode: (0x%X)\n", instruction.opcode());
+                printf("Decoding uknown opcode: (0x%X)\n", instruction.opcode);
         }
 #undef OPCODE_DECODE
     }
@@ -146,7 +146,7 @@ namespace CPU
         //Some instructions think its FUNNY to assign to reg 0 as an optimization
         generalRegisters[0] = 0;   
         vip.Step(cycles);
-        const Instruction &instruction = memoryManagmentUnit.GetData<Instruction>(programCounter);
+        const Instruction &instruction(memoryManagmentUnit.GetData<uint32_t>(programCounter));
         decode(instruction);
     }
     
@@ -164,7 +164,7 @@ namespace CPU
         systemRegisters.PSW.ID = 1;
         systemRegisters.PSW.AE = 0;
         
-        programCounter = 0xFFFFFE | interruptCode << 4;
+        programCounter = 0xFFFFFE00 | interruptCode << 4;
     }
     
     void v810::throwException(ExceptionCode exceptionCode)

@@ -17,6 +17,11 @@
 #include "palette.h"
 #include "framebuffer.h"
 
+namespace CPU
+{
+    class v810;
+}
+
 namespace VIP
 {
     class VIP
@@ -25,6 +30,7 @@ namespace VIP
         void WriteFrame();
         void DrawObj(const Obj& obj);
         VIP();
+        CPU::v810 *cpu;
         char& operator[](const int offset);
         uint16_t Step(uint32_t cycles);
         void Draw();

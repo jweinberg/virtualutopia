@@ -13,6 +13,7 @@ VB::VB(const std::string &fileName)
     nvc = new NVC::NVC();
     mmu = new MMU(*rom, *vip, *nvc);
     cpu = new CPU::v810(*mmu, *vip);
+    vip->cpu = cpu;
 }
 
 VB::~VB()

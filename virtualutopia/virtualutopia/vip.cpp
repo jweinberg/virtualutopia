@@ -9,6 +9,7 @@
 #include <iostream>
 #include "vip.h"
 #include "world.h"
+#include "v810.h"
 #import <QuartzCore/QuartzCore.h>
 
 namespace VIP
@@ -206,9 +207,9 @@ namespace VIP
                         const BGMapData &data = map.chars[(yChar % 64) * 64 + (xChar % 64)];
                         const Chr& chr = chrRam[data.charNum];  
                         if (world.LON)
-                            leftFrameBuffer[0].DrawChr(chr, x + world.GX/* - world.GP*/, y + world.GY, 0, 0, MIN(8, (world.W + 1) - x), MIN(8, (world.H + 1) - y), data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
+                            leftFrameBuffer[0].DrawChr(chr, x + world.GX - world.GP, y + world.GY, 0, 0, MIN(8, (world.W + 1) - x), MIN(8, (world.H + 1) - y), data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
                         if (world.RON)
-                            rightFrameBuffer[0].DrawChr(chr, x + world.GX/* + world.GP*/, y + world.GY, 0, 0, MIN(8, (world.W + 1) - x), MIN(8, (world.H + 1) - y), data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
+                            rightFrameBuffer[0].DrawChr(chr, x + world.GX + world.GP, y + world.GY, 0, 0, MIN(8, (world.W + 1) - x), MIN(8, (world.H + 1) - y), data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
                         y += 8;
                     } while(y <= world.H);
                     x += 8;
@@ -242,12 +243,18 @@ namespace VIP
                 DPSTTS.LOCK = 0;
                 
                 framesWaited++;
+                bool gameStart = false;
                 if (framesWaited > FRMCYC) //We've triggered a GCLK
                 {
                     framesWaited = 0;
-                    INTPND.GAMESTART = 1;
+                    gameStart = true;
+                }
+                if (INTENB.FRAMESTART)
+                {
+                    cpu->processInterrupt((CPU::InterruptCode)4);
                 }
                 INTPND.FRAMESTART = 1; //Trigger an FCLK
+                INTPND.GAMESTART = gameStart;
                 return 1;
             }
             
@@ -279,7 +286,10 @@ namespace VIP
                 XPSTTS = 0;
                 XPSTTS.SBCOUNT = 27;
                 XPSTTS.XPEN = XPCTRL.XPEN;
-                
+             
+                if (INTENB.XPEND)
+                    cpu->processInterrupt((CPU::InterruptCode)4);
+                INTPND.XPEND = true;
                 rowCount++;
             }
             else if (rowCount == 29 && timeSinceBuffer > 98304)
@@ -291,6 +301,10 @@ namespace VIP
                 DPSTTS.RE = DPCTRL.RE;
                 DPSTTS.SYNCE = DPCTRL.SYNCE;
                 DPSTTS.LOCK = 0;
+                
+                if (INTENB.LFBEND)
+                    cpu->processInterrupt((CPU::InterruptCode)4);
+                INTPND.LFBEND = true;
                 rowCount++;
             }
             else if (rowCount == 30 && timeSinceBuffer > 131072)
@@ -302,6 +316,9 @@ namespace VIP
                 DPSTTS.RE = DPCTRL.RE;
                 DPSTTS.SYNCE = DPCTRL.SYNCE;
                 DPSTTS.LOCK = 0;
+                if (INTENB.RFBEND)
+                    cpu->processInterrupt((CPU::InterruptCode)4);
+                INTPND.RFBEND = true;
                 rowCount++;
             }
             else if (rowCount == 31 && timeSinceBuffer > 163840)
@@ -312,6 +329,10 @@ namespace VIP
                 DPSTTS.SYNCE = DPCTRL.SYNCE;
                 DPSTTS.FCLK = 1;
                 DPSTTS.DPBSY = (frame & 1) ? 0x8 : 0x2;
+                
+                if (INTENB.SBHIT)
+                    cpu->processInterrupt((CPU::InterruptCode)4);
+                INTPND.SBHIT = true;
                 rowCount++;
             }
             else if (rowCount == 32 && timeSinceBuffer > 229376)

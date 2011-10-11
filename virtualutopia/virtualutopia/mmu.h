@@ -24,15 +24,12 @@ public:
     template<typename T>
     struct GetDataProxy
     {
-        MMU & mmu;
+        MMU& mmu;
         GetDataProxy<T>(MMU& _mmu) : mmu(_mmu) {}
         
-        T& operator()(uint32_t address) const
+        const T& operator()(uint32_t address) const
         {
-            T* tp = (T*)(&mmu[address]);
-            if (tp == NULL)
-                return *tp;
-            return *tp;   
+            return *(T*)(&mmu[address]);
         }        
     };    
     
@@ -42,18 +39,18 @@ public:
         MMU& mmu;
         GetDataProxy<T>(MMU& _mmu) : mmu(_mmu) {}
         
-        T* operator()(uint32_t address)
+        const T* operator()(uint32_t address) const
         {
-            T* tp = (T*)(&mmu[address]);
-            return tp;   
+            return (T*)(&mmu[address]);
         }
     };
     
     template <typename T>
-    T& GetData(uint32_t address)
+    const T& GetData(uint32_t address)
     {
-        GetDataProxy<T> p(*this);
-        return p(address);
+        return *(T*)(&(*this)[address]);
+//        const GetDataProxy<T> p(*this);
+//        return p(address);
     }
     
     void Store(uint32_t address, uint8_t byte);
