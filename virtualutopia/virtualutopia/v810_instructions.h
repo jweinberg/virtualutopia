@@ -10,8 +10,8 @@
 //#include "bitstring.h"
 //#include <cmath>
 
-//#define d_printf(A, ...)
-#define d_printf(A, ...) do{ if(debugOutput) { printf("%X: " A, programCounter, ##__VA_ARGS__); } }while(0)
+#define d_printf(A, ...)
+//#define d_printf(A, ...) do{ if(debugOutput) { printf("%X: " A, (0x07000000 + (uint32_t)((char*)programCounter - ((char*)memoryManagmentUnit.rom.data))), ##__VA_ARGS__); } }while(0)
 
 enum FlagCondition
 {
@@ -502,7 +502,7 @@ void xorImmediate(const Instruction &instruction)
 void jump(const Instruction& instruction)
 {
     d_printf("JMP: PC <- GR[%d](0x%X)\n", instruction.reg1, generalRegisters[instruction.reg1]);
-    programCounter = generalRegisters[instruction.reg1];
+    programCounter = (char*)&memoryManagmentUnit.GetData<uint32_t>(generalRegisters[instruction.reg1]);
     cycles += 3;
 }
 
@@ -826,7 +826,7 @@ void storeSystemRegister(const CPU::Instruction& instruction)
 void jumpAndLink(const Instruction &instruction)
 {
     d_printf("JAL\n");
-    generalRegisters[31] = programCounter + 4;
+    generalRegisters[31] = (0x07000000 + (uint32_t)(((char*)programCounter + 4) - ((char*)memoryManagmentUnit.rom.data)));
     int32_t relativeJump = sign_extend(26, instruction.disp26);
     programCounter += relativeJump;
     cycles += 3;
@@ -866,12 +866,12 @@ void returnFromTrap(const Instruction& instruction)
     d_printf("RETI\n");
     if (systemRegisters.PSW.NP)
     {
-        programCounter = systemRegisters.FEPC;
+        programCounter = (char*)&memoryManagmentUnit.GetData<uint32_t>(systemRegisters.FEPC);
         systemRegisters.PSW = systemRegisters.FEPSW;
     }
     else
     {
-        programCounter = systemRegisters.EIPC;
+        programCounter = (char*)&memoryManagmentUnit.GetData<uint32_t>(systemRegisters.EIPC);
         systemRegisters.PSW = systemRegisters.EIPSW;            
     }
     cycles += 10;

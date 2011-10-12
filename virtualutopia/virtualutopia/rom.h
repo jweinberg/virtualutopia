@@ -11,7 +11,7 @@
 #include <string>
 
 class ROM {
-private:
+public:
     char *data;
     long fileLength;
 public:

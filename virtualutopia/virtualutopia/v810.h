@@ -49,7 +49,7 @@ namespace CPU
         void throwException(ExceptionCode exceptionCode);
         void processInterrupt(InterruptCode interruptCode);
     private:        
-        uint32_t programCounter;
+        char *programCounter;
         union
         {
             int32_t generalRegisters[32];

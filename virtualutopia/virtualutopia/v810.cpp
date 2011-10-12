@@ -23,7 +23,7 @@ namespace CPU
     
     void v810::reset()
     {   
-        programCounter = 0xFFFFFFF0;
+        programCounter = (char*)&memoryManagmentUnit.GetData<uint32_t>(0xFFFFFFF0);
         systemRegisters.PSW = 0x00008000;
         generalRegisters[0] = 0;
     }
@@ -58,7 +58,7 @@ namespace CPU
             OPCODE_DECODE(SHR_2, shiftRightImmediate); 
             OPCODE_DECODE(CLI, clearInterruptDisable);   
             OPCODE_DECODE(SAR_2, shiftArithmeticRightImmediate); 
-            OPCODE_DECODE(TRAP, nop); 
+            //OPCODE_DECODE(TRAP, nop); 
             OPCODE_DECODE(RETI, returnFromTrap);  
             //OPCODE_DECODE(HALT, <#FUNCTION#>);  
             OPCODE_DECODE(LDSR, loadSystemRegister);  
@@ -137,6 +137,7 @@ namespace CPU
             OPCODE_DECODE(BGT, branchIfGreaterThan);
             default:
                 printf("Decoding uknown opcode: (0x%X)\n", instruction.opcode);
+                exit(-1);
         }
 #undef OPCODE_DECODE
     }
@@ -146,7 +147,7 @@ namespace CPU
         //Some instructions think its FUNNY to assign to reg 0 as an optimization
         generalRegisters[0] = 0;   
         vip.Step(cycles);
-        const Instruction &instruction(memoryManagmentUnit.GetData<uint32_t>(programCounter));
+        const Instruction &instruction(*(uint32_t*)programCounter);
         decode(instruction);
     }
     
@@ -157,14 +158,14 @@ namespace CPU
         if (systemRegisters.PSW.ID) return;
         if (systemRegisters.PSW.IntLevel > interruptCode) return;
         
-        systemRegisters.EIPC = programCounter;
+        systemRegisters.EIPC = (0x07000000 + (uint32_t)((char*)programCounter - ((char*)memoryManagmentUnit.rom.data)));
         systemRegisters.EIPSW = systemRegisters.PSW;
         systemRegisters.ECR.EICC = interruptCode;
         systemRegisters.PSW.EP = 1;
         systemRegisters.PSW.ID = 1;
         systemRegisters.PSW.AE = 0;
         
-        programCounter = 0xFFFFFE00 | interruptCode << 4;
+        programCounter = (char*)&memoryManagmentUnit.GetData<uint32_t>(0xFFFFFE00 | interruptCode << 4);
     }
     
     void v810::throwException(ExceptionCode exceptionCode)
@@ -174,24 +175,24 @@ namespace CPU
         {
             memoryManagmentUnit.StoreWord(0x0, 0xFFFF0000 | exceptionCode);
             memoryManagmentUnit.StoreWord(0x4, systemRegisters.PSW);
-            memoryManagmentUnit.StoreWord(0x8, programCounter);
+            memoryManagmentUnit.StoreWord(0x8, 0x07000000 + (uint32_t)((char*)programCounter - ((char*)memoryManagmentUnit.rom.data)));
             return;
         }
         
         //Duplexed Exception
         if (systemRegisters.PSW.EP)
         {
-            systemRegisters.FEPC = programCounter;
+            systemRegisters.FEPC = (0x07000000 + (uint32_t)((char*)programCounter - ((char*)memoryManagmentUnit.rom.data)));
             systemRegisters.FEPSW = systemRegisters.PSW;
             systemRegisters.ECR.FECC = exceptionCode;
             systemRegisters.PSW.NP = 1;
             systemRegisters.PSW.ID = 1;
             systemRegisters.PSW.AE = 0;
-            programCounter = 0xFFFFFFD0;
+            programCounter = (char*)&memoryManagmentUnit.GetData<uint32_t>(0xFFFFFFD0);
         }
         else
         {
-            systemRegisters.EIPC = programCounter;
+            systemRegisters.EIPC = (0x07000000 + (uint32_t)((char*)programCounter - ((char*)memoryManagmentUnit.rom.data)));
             systemRegisters.EIPSW = systemRegisters.PSW;
             systemRegisters.ECR.EICC = exceptionCode;
             systemRegisters.PSW.EP = 1;
@@ -199,7 +200,7 @@ namespace CPU
             systemRegisters.PSW.AE = 0;
             
             //TODO: Lookup the proper handler, this is DIV0
-            programCounter = 0xFFFFFF80;
+            programCounter = (char*)&memoryManagmentUnit.GetData<uint32_t>(0xFFFFFF80);
         }
         
     }

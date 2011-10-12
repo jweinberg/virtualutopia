@@ -46,7 +46,7 @@ public:
     };
     
     template <typename T>
-    const T& GetData(uint32_t address)
+    T& GetData(uint32_t address)
     {
         return *(T*)(&(*this)[address]);
 //        const GetDataProxy<T> p(*this);
@@ -79,6 +79,7 @@ private:
         //assert(false);
         return vip[0];
     }
+public:
     const ROM &rom;
     NVC::NVC &nvc;
     VIP::VIP &vip;
