@@ -49,12 +49,13 @@ namespace CPU
         void throwException(ExceptionCode exceptionCode);
         void processInterrupt(InterruptCode interruptCode);
     private:        
-        char *programCounter;
         union
         {
             int32_t generalRegisters[32];
             float generalRegistersFloat[32];
         };
+        char *programCounter;
+
         
         struct
         {

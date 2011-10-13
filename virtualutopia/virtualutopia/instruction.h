@@ -177,17 +177,9 @@ namespace CPU
                     case JAL:
                         disp26 = ((instruction & 0x3FF) << 16) | (instruction >> 16);
                         break;
+                    default:
+                        break;
                 }
-                //reg1(_instruction & 0x1F),
-                //reg2((_instruction >> 5) & 0x1F),
-                //imm16(instruction >> 16),
-                //disp9(instruction & 0x1FF),
-                //subopcode(instruction >> 26),
-                //disp26(((instruction & 0x3FF) << 16) | (instruction >> 16))
-                
-                
-                
-                
             }
     };
 }
