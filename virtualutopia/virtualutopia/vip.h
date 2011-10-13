@@ -28,6 +28,7 @@ namespace VIP
     {
     public:
         void WriteFrame();
+        void VIP::DumpCHR();
         void DrawObj(const Obj& obj);
         VIP();
         CPU::v810 *cpu;
@@ -114,7 +115,7 @@ namespace VIP
         
         Framebuffer leftFrameBuffer[2];
         Framebuffer rightFrameBuffer[2];
-        char columnTable[0x3FF];
+        char columnTable[0x400];
         char videoRam[0x80000];
         bool gameStartTriggered;
         uint8_t framesWaited;

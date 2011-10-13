@@ -34,7 +34,7 @@ int main (int argc, const char * argv[])
     tcsetattr(STDIN_FILENO, TCSANOW, &ttystate);
     
     
-    VB vb("/Users/jweinberg/tet.vb");
+    VB vb("/Users/jweinberg/b2.vb");
     
     bool wait = true;
     int steps = 0;

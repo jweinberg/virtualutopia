@@ -12,25 +12,25 @@
 namespace VIP
 {
 
-    template<typename T, int min, int max>
-    class ClampedInt
-    {
-        T s;
-    public:
-        void operator =(T& _s) const
-        { 
-            s = _s;
-        }
-      
-        operator T() const 
-        { 
-            if (s < min)
-                return min;
-            else if (s > max)
-                return max;
-            return s;
-        }
-    };
+//    template<typename T, int min, int max>
+//    class ClampedInt
+//    {
+//        T s;
+//    public:
+//        void operator =(T& _s) const
+//        { 
+//            s = _s;
+//        }
+//      
+//        operator T() const 
+//        { 
+//            if (s < min)
+//                return min;
+//            else if (s > max)
+//                return max;
+//            return s;
+//        }
+//    };
     
     
     struct World
@@ -59,21 +59,21 @@ namespace VIP
                 uint16_t RON:1;
                 uint16_t LON:1;
                 
-                ClampedInt<int16_t, -512, 511> GX;
-                ClampedInt<int16_t, -512, 511> GP;
-                ClampedInt<int16_t, 0, 223> GY;
+                int16_t GX;
+                int16_t GP;
+                int16_t GY;
                 int16_t MX;
                 int16_t MP;
                 int16_t MY;
-                ClampedInt<int16_t, 0, 383>  W;
-                ClampedInt<int16_t, 0, 223>  H;
+                int16_t W;
+                int16_t H;
                 int16_t reserved_1:4;
                 int16_t PARAM_BASE:12;
                 int16_t OVERPLANE_CHARACTER;
                 
                 int16_t reserved_2[5];
             };
-            int16_t data[4];
+            int16_t data[16];
         };
         
         WorldType Type()
@@ -87,7 +87,7 @@ namespace VIP
             {
                 case 0:
                     return kNormalType;
-                case 1:
+                case 1:    
                     return kHBiasType;
                 case 2:
                     return kAffineType;

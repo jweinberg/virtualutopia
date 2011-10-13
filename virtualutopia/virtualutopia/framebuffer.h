@@ -42,20 +42,22 @@ namespace VIP
         
         void DrawChr(const Chr &chr, int xoff, int yoff, int sourceXOffset, int sourceYOffset, int w, int h, bool flipHor, bool flipVert,const Palette &palette)
         {
+            if (xoff < 0 || yoff < 0 || xoff >= 384 || yoff >= 256)
+                return;
+            
             Chr chrCpy = chr;
             if (flipHor)
                 chrCpy.FlipHorizontal();
             if (flipVert)
                 chrCpy.FlipVertical();
             
-            for (int x = sourceXOffset; x < w; ++x)
+            for (int x = 0; x < w; ++x)
             {
-                for (int y = sourceYOffset; y < h; ++y)
+                for (int y = 0; y < h; ++y)
                 {
-                    uint8_t colorIdx = chrCpy.data[y] & 0x3;
+                    uint8_t colorIdx = (chrCpy.data[y + sourceYOffset] >> ((x + sourceXOffset) * 2)) & 0x3;
                     if (colorIdx)
                         SetPixel(x + xoff, y + yoff, palette[colorIdx]);
-                    chrCpy.data[y] >>= 2;
                 }
             }   
         }

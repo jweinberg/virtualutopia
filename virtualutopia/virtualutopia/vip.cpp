@@ -21,6 +21,66 @@ namespace VIP
         DPSTTS.FCLK = 1;
     }
     
+    void VIP::DumpCHR()
+    {
+        //Draw as 64x32
+        
+        CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+        
+        uint32_t * bmpdata = (uint32_t*)calloc(64 * 8 * 32 * 8 * 4, sizeof(char));
+        memset(bmpdata, 0xFF, 64 * 8 * 32 * 8 * 4);
+        
+        uint16_t * internalData = (uint16_t*)chrRam[0].data;
+        
+        
+        
+        for (int y = 0; y < 16384; ++y)
+        {
+            for (int x = 0; x < 8; ++x)
+            {
+                uint32_t pixel;
+                char px = (*internalData >> (x * 2)) & 0x3;
+                if (px == 1)
+                    pixel = 0xFF520052;
+                else if (px == 2)
+                    pixel = 0xFFAD00AD;
+                else if (px == 3)
+                    pixel = 0xFFFF00FF;
+                else if (px == 0)
+                    pixel = 0xFF000000;
+                
+                *(bmpdata + (8 * y + x)) = pixel;
+                
+          }
+          internalData++;
+        }
+        
+        CGContextRef context = CGBitmapContextCreate(bmpdata,
+                                                     8, 
+                                                     16384, 8, 32, colorSpace, kCGImageAlphaPremultipliedLast);
+        
+        
+        CGImageRef image = CGBitmapContextCreateImage(context);
+        
+        static int f = 0;
+        CFStringRef str = CFStringCreateWithFormat(NULL, NULL, CFSTR("/Users/jweinberg/chr.png"), f++); 
+        CFURLRef url = CFURLCreateWithFileSystemPath(NULL, str, kCFURLPOSIXPathStyle, false);
+        
+        CGImageDestinationRef destination = CGImageDestinationCreateWithURL(url, kUTTypePNG, 1, NULL);
+        CGImageDestinationAddImage(destination, image, NULL);
+        
+        CGImageDestinationFinalize(destination);
+        
+        
+        CFRelease(destination);
+        CFRelease(url);
+        CFRelease(str);
+        
+        CGColorSpaceRelease(colorSpace);
+        CGContextRelease(context);
+        free(bmpdata);
+    }
+    
     void VIP::WriteFrame()
     {
         
@@ -90,7 +150,9 @@ namespace VIP
     }
     
     void VIP::Draw()
-    {    
+    {
+        volatile static bool test = false;
+        volatile static int testVal = 31;
         objSearchIndex = 3;
         //Draw the worlds, starting with the lowest priority
         for (int n = 31; n >= 0; --n)
@@ -112,12 +174,12 @@ namespace VIP
                 if (objSearchIndex)
                     objSearchIndex--;   
             }
-            else if (type == World::kNormalType)
+            else if (type == World::kNormalType && (test ? testVal == n : true))
             {
                 const World &world = worlds[n];
              
                 int xWorlds = (int)pow(2, world.SCX);
-                //int yWorlds = pow(2, world.SCY);
+                int yWorlds = (int)pow(2, world.SCY);
                 
                 int x = 0;
                 do
@@ -125,21 +187,39 @@ namespace VIP
                     int y = 0;
                     do
                     {
-                        int yChar = ((y + world.MY)/8);
-                        int xChar = ((x + world.MX)/8);
-                        
-                        
-                        const BGMap &map = bgMaps[world.BGMAP_BASE + ((yChar / 64) * xWorlds) + (xChar / 64)];
-                        
-                        const BGMapData &data = map.chars[(yChar % 64) * 64 + (xChar % 64)];
-                        const Chr& chr = chrRam[data.charNum];  
                         if (world.LON)
-                            leftFrameBuffer[0].DrawChr(chr, x + world.GX - world.GP, y + world.GY, 0, 0, MIN(8, (world.W + 1) - x), MIN(8, (world.H + 1) - y), data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
+                        {
+                            int srcY = (y + world.MY) % (xWorlds * 512);
+                            int srcX = (x + world.MX - world.MP) % (yWorlds * 512);
+                            int xWorld = srcX / 512;
+                            int yWorld = srcY / 512;
+                            int xChar = (srcX % 512) / 8;
+                            int yChar = (srcY % 512) / 8;                            
+                            
+                            const BGMap &map = bgMaps[world.BGMAP_BASE + (yWorld * xWorlds) + xWorld];
+                            
+                            const BGMapData &data = map.chars[yChar * 64 + xChar];
+                            const Chr& chr = chrRam[data.charNum];  
+                            leftFrameBuffer[0].DrawChr(chr, x + world.GX - world.GP, y + world.GY, srcX % 8, srcY % 8, 1, 1, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
+                        }
                         if (world.RON)
-                            rightFrameBuffer[0].DrawChr(chr, x + world.GX + world.GP, y + world.GY, 0, 0, MIN(8, (world.W + 1) - x), MIN(8, (world.H + 1) - y), data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
-                        y += 8;
+                        {
+                            int srcY = (y + world.MY) % (xWorlds * 512);
+                            int srcX = (x + world.MX + world.MP) % (yWorlds * 512);
+                            int xWorld = srcX / 512;
+                            int yWorld = srcY / 512;
+                            int xChar = (srcX % 512) / 8;
+                            int yChar = (srcY % 512) / 8;                            
+                            
+                            const BGMap &map = bgMaps[world.BGMAP_BASE + (yWorld * xWorlds) + xWorld];
+                            
+                            const BGMapData &data = map.chars[yChar * 64 + xChar];
+                            const Chr& chr = chrRam[data.charNum];  
+                            rightFrameBuffer[0].DrawChr(chr, x + world.GX + world.GP, y + world.GY, srcX % 8, srcY % 8, 1, 1, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
+                        }
+                        y++;
                     } while(y <= world.H);
-                    x += 8;
+                    x++;
                 } while(x <= world.W);
                 
             }

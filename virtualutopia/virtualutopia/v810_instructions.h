@@ -801,7 +801,7 @@ inline void moveAddImmediate(const Instruction& instruction)
 
 inline void storeWord(const Instruction& instruction)
 {
-    uint32_t address = (generalRegisters[instruction.reg1] + sign_extend(16, instruction.disp16)) & 0xFFFFFFFC;
+    uint32_t address = (generalRegisters[instruction.reg1] + (int16_t)instruction.disp16) & 0xFFFFFFFC;
     d_printf("ST.W: [GR[%d](0x%X) + %d](0x%X) <- [GR[%d](0x%X)\n", instruction.reg1, generalRegisters[instruction.reg1], sign_extend(16, instruction.disp16) & 0xFFFFFFFC, address, instruction.reg2, generalRegisters[instruction.reg2]);
 
     memoryManagmentUnit.StoreWord(address, generalRegisters[instruction.reg2]);
@@ -811,7 +811,7 @@ inline void storeWord(const Instruction& instruction)
 
 inline void storeHWord(const Instruction& instruction)
 {
-    uint32_t address = (generalRegisters[instruction.reg1] + sign_extend(16, instruction.disp16)) & 0xFFFFFFFE;
+    uint32_t address = (generalRegisters[instruction.reg1] + (int16_t)instruction.disp16) & 0xFFFFFFFE;
     d_printf("ST.H: [GR[%d](0x%X) + %d](0x%X) <- [GR[%d](0x%X)\n", instruction.reg1, generalRegisters[instruction.reg1], sign_extend(16, instruction.disp16) & 0xFFFFFFFE, address, instruction.reg2, generalRegisters[instruction.reg2]);
 
     memoryManagmentUnit.StoreHWord(address, generalRegisters[instruction.reg2] & 0xFFFF);
@@ -821,7 +821,7 @@ inline void storeHWord(const Instruction& instruction)
 
 inline void storeByte(const Instruction& instruction)
 {
-    uint32_t address = (generalRegisters[instruction.reg1] + sign_extend(16, instruction.disp16));
+    uint32_t address = (generalRegisters[instruction.reg1] + (int16_t)instruction.disp16);
     d_printf("ST.B: [GR[%d](0x%X) + %d](0x%X) <- [GR[%d](0x%X)\n", instruction.reg1, generalRegisters[instruction.reg1], sign_extend(16, instruction.disp16), address, instruction.reg2, generalRegisters[instruction.reg2]);
 
 
@@ -835,7 +835,7 @@ inline void loadByte(const Instruction& instruction)
     d_printf("LD.B: GR[%d] <- [GR[%d](0x%X) + %d\n", instruction.reg2, instruction.reg1, generalRegisters[instruction.reg1], sign_extend(16, instruction.disp16));
 
     uint32_t address = (generalRegisters[instruction.reg1] + (int16_t)instruction.disp16);
-    generalRegisters[instruction.reg2] = memoryManagmentUnit.GetData<uint8_t>(address);
+    generalRegisters[instruction.reg2] = sign_extend(8, memoryManagmentUnit.GetData<int8_t>(address));
     programCounter += 4;    
     cycles += 3;
 }
@@ -846,7 +846,7 @@ inline void loadHWord(const Instruction& instruction)
     address &= 0xFFFFFFFE;
     d_printf("LD.H: GR[%d] <- [GR[%d](0x%X) + %d\n", instruction.reg2, instruction.reg1, generalRegisters[instruction.reg1], sign_extend(16, instruction.disp16));
     
-    generalRegisters[instruction.reg2] = memoryManagmentUnit.GetData<uint16_t>(address);
+    generalRegisters[instruction.reg2] = sign_extend(16, memoryManagmentUnit.GetData<int16_t>(address));
     programCounter += 4;    
     cycles += 3;
 }
@@ -856,7 +856,7 @@ inline void loadWord(const Instruction& instruction)
     uint32_t address = (generalRegisters[instruction.reg1] + (int16_t)instruction.disp16) & 0xFFFFFFFC;
     d_printf("LD.W: GR[%d] <- [GR[%d](0x%X) + %d\n", instruction.reg2, instruction.reg1, generalRegisters[instruction.reg1], sign_extend(16, instruction.disp16));
     
-    generalRegisters[instruction.reg2] = memoryManagmentUnit.GetData<uint32_t>(address);
+    generalRegisters[instruction.reg2] = memoryManagmentUnit.GetData<int32_t>(address);
     programCounter += 4;    
     cycles += 3;
 }
