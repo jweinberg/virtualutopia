@@ -16,7 +16,7 @@ namespace CPU
     v810::v810(MMU &_mmu, VIP::VIP &_vip) : memoryManagmentUnit(_mmu), vip(_vip)
     {
         reset();
-        debugOutput = false;
+        debugOutput = true;
         systemRegisters.TKCW = 0x000000E0;
         systemRegisters.PIR = 0x00005346;
     }
@@ -28,8 +28,9 @@ namespace CPU
         generalRegisters[0] = 0;
     }
     
-    void v810::decode(const Instruction &instruction)
+    void v810::decode(uint32_t data)
     {
+        const Instruction &instruction(data);
 #define OPCODE_DECODE(OPCODE, FUNCTION) case OPCODE: FUNCTION(instruction); break;
 
         switch (instruction.opcode)
@@ -65,7 +66,7 @@ namespace CPU
             OPCODE_DECODE(STSR, storeSystemRegister);  
             OPCODE_DECODE(SEI, setInterruptDisable);   
             case Bstr:
-                switch ((BinaryStringMnumonic)instruction.imm5)
+                switch ((BinaryStringMnumonic)instruction.reg1)
                 {
                     OPCODE_DECODE(SCH0BSU, nop); 
                     OPCODE_DECODE(SCH0BSD, nop); 
@@ -147,8 +148,7 @@ namespace CPU
         //Some instructions think its FUNNY to assign to reg 0 as an optimization
         generalRegisters[0] = 0;   
         vip.Step(cycles);
-        const Instruction &instruction(*(uint32_t*)programCounter);
-        decode(instruction);
+        decode(*(uint32_t*)programCounter);
     }
     
     void v810::processInterrupt(InterruptCode interruptCode)

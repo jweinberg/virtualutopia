@@ -9,8 +9,6 @@
 #ifndef virtualutopia_registers_h
 #define virtualutopia_registers_h
 
-#ifndef REGISTER_BITFIELD
-
 #define REGISTER_BITFIELD(NAME, ...) \
 struct \
 {\
@@ -19,6 +17,5 @@ struct \
     uint32_t &operator =(const uint32_t& val) { *(uint32_t*)this = val; return *(uint32_t*)this; }\
 } NAME
 
-#endif
 
 #endif

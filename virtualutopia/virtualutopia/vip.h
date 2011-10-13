@@ -31,7 +31,80 @@ namespace VIP
         void DrawObj(const Obj& obj);
         VIP();
         CPU::v810 *cpu;
-        char& operator[](const int offset);
+        inline char& operator[](const int offset)
+        {
+            switch (offset)
+            {
+                case 0x00000 ... 0x05FFF:
+                    return *((char*)&leftFrameBuffer[0] + offset);
+                case 0x06000 ... 0x07FFF:
+                    return *(((char*)&chrRam[0]) + (offset - 0x06000));
+                case 0x08000 ... 0x0DFFF:
+                    return *((char*)&leftFrameBuffer[1] + (offset - 0x08000));
+                case 0x0E000 ... 0x0FFFF:
+                    return *(((char*)&chrRam[512]) + (offset - 0x0E000));
+                case 0x10000 ... 0x15FFF:
+                    return *((char*)&rightFrameBuffer[0] + (offset - 0x10000));
+                case 0x16000 ... 0x17FFF:
+                    return *(((char*)&chrRam[1024]) + (offset - 0x16000));
+                case 0x18000 ... 0x1DFFF:
+                    return *((char*)&rightFrameBuffer[1] + (offset - 0x18000));
+                case 0x1E000 ... 0x1FFFF:
+                    return *(((char*)&chrRam[1536]) + (offset - 0x1E000));
+                case 0x20000 ... 0x3BFFF:
+                    return *(((char*)&bgMaps[0]) + (offset - 0x20000));
+                case 0x3D800 ... 0x3DBFF:
+                    return *(((char*)&worlds[0]) + (offset - 0x3D800));
+                case 0x3DC00 ... 0x3DFFF:
+                    return *(((char*)&columnTable[0]) + (offset - 0x3DC00));
+                case 0x3E000 ... 0x3FFFF:
+                    return *(((char*)&oam[0]) + (offset - 0x3E000));
+                case 0x5F800:
+                    return *(char*)&INTPND;
+                case 0x5F802:
+                    return *(char*)&INTENB;
+                case 0x5F804:
+                    return *(char*)&INTCLR;
+                case 0x5F820:
+                    return *(char*)&DPSTTS;
+                case 0x5F822:
+                    return *(char*)&DPCTRL;
+                case 0x5F824:
+                    return *(char*)&BRTA;
+                case 0x5F826:
+                    return *(char*)&BRTB;
+                case 0x5F828:
+                    return *(char*)&BRTC;
+                case 0x5F82A:
+                    return *(char*)&REST;
+                case 0x5F830:
+                    return *(char*)&CTA;
+                case 0x5F840:
+                    return *(char*)&XPSTTS;
+                case 0x5F842:
+                    return *(char*)&XPCTRL;
+                case 0x5F844:
+                    return *(char*)&VER;
+                case 0x5F848:
+                    return *(char*)&SPT0;
+                case 0x5F85A:
+                    return *(char*)&SPT1;
+                case 0x5F84C:
+                    return *(char*)&SPT2;
+                case 0x5F84E:
+                    return *(char*)&SPT3;
+                case 0x5F860 ... 0x5F867:
+                    return *(((char*)&GPLT[0]) + (offset - 0x5F860));
+                case 0x5F868 ... 0x5F86F:
+                    return *(((char*)&JPLT[0]) + (offset - 0x5F868));
+                case 0x78000 ... 0x7FFFF:
+                    return *(((char*)&chrRam[0]) + (offset - 0x78000));
+                default:
+                    return videoRam[offset];
+            }
+        }
+        
+
         uint16_t Step(uint32_t cycles);
         void Draw();
         Chr chrRam[2048];
@@ -88,6 +161,8 @@ namespace VIP
         );
         
 #pragma mark - 4.2 Image Display Registers
+
+        
         REGISTER_BITFIELD(DPSTTS,
             uint16_t padding_0:1;
             uint16_t DISP:1;
@@ -99,6 +174,7 @@ namespace VIP
             uint16_t LOCK:1;
             uint16_t padding_1:5;
         );
+        
         REGISTER_BITFIELD(DPCTRL,
             uint16_t DPRST:1;
             uint16_t DISP:1;

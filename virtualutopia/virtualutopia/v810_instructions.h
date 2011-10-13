@@ -10,8 +10,58 @@
 //#include "bitstring.h"
 //#include <cmath>
 
+#ifndef v810_instructions_guard
+#define v810_instructions_guard
 #define d_printf(A, ...)
 //#define d_printf(A, ...) do{ if(debugOutput) { printf("%X: " A, (0x07000000 + (uint32_t)((char*)programCounter - ((char*)memoryManagmentUnit.rom.data))), ##__VA_ARGS__); } }while(0)
+
+struct OrNoter
+{
+    OrNoter() {}
+    const uint32_t operator()(uint32_t a, uint32_t b) const { return a | (~b); };
+};
+
+struct XorNoter
+{
+    XorNoter() {}
+    const uint32_t operator()(uint32_t a, uint32_t b) const { return a | (~b); };
+};
+
+struct Noter
+{
+    Noter() {}
+    const uint32_t operator()(uint32_t a, uint32_t b) const { return ~b; };
+};
+
+struct Mover
+{
+    Mover() {}
+    const uint32_t operator()(uint32_t a, uint32_t b) const { return b; };
+};
+
+struct Xorer
+{
+    Xorer() {}
+    const uint32_t operator()(uint32_t a, uint32_t b) const { return a & b; };
+};
+
+struct AndNoter
+{
+    AndNoter() {}
+    const uint32_t operator()(uint32_t a, uint32_t b) const { return a & (~b); };
+};
+
+struct Ander
+{
+    Ander() {}
+    const uint32_t operator()(uint32_t a, uint32_t b) const { return a & b; };
+};
+
+struct Orer
+{
+    Orer() {}
+    const uint32_t operator()(uint32_t a, uint32_t b) const { return a & b; };
+};
 
 enum FlagCondition
 {
@@ -34,7 +84,7 @@ enum FlagCondition
 }; 
 
 //Move Form I
-void move(const Instruction& instruction)
+inline void move(const Instruction& instruction)
 {
     d_printf("MOV: GR[%d] <- GR[%d](0x%X)\n", instruction.reg2, instruction.reg1, generalRegisters[instruction.reg1]);
     generalRegisters[instruction.reg2] = generalRegisters[instruction.reg1];
@@ -43,16 +93,16 @@ void move(const Instruction& instruction)
 }
 
 //Move Form II
-void moveImmediate(const Instruction& instruction)
+inline void moveImmediate(const Instruction& instruction)
 {
-    d_printf("MOV: GR[%d] <- (0x%X)\n", instruction.reg2, sign_extend(5, instruction.imm5));
-    generalRegisters[instruction.reg2] = sign_extend(5, instruction.imm5);
+    d_printf("MOV: GR[%d] <- (0x%X)\n", instruction.reg2, sign_extend(5, instruction.reg1));
+    generalRegisters[instruction.reg2] = sign_extend(5, instruction.reg1);
     programCounter += 2;
     cycles += 1;
 }
 
 //Add Form I
-void add(const Instruction& instruction)
+inline void add(const Instruction& instruction)
 {
     d_printf("ADD: GR[%d] <- GR[%d](0x%X) + GR[%d](0x%X)\n", instruction.reg2, instruction.reg2, generalRegisters[instruction.reg2], instruction.reg1, generalRegisters[instruction.reg1]);
     int32_t a = generalRegisters[instruction.reg1];
@@ -71,10 +121,10 @@ void add(const Instruction& instruction)
 }
 
 //Add Form II
-void addImmediate5(const Instruction& instruction)
+inline void addImmediate5(const Instruction& instruction)
 {
-    d_printf("ADD: GR[%d] <- GR[%d](0x%X) + 0x%X\n", instruction.reg2, instruction.reg2, generalRegisters[instruction.reg2], sign_extend(5, instruction.imm5));
-    int32_t a = sign_extend(5, instruction.imm5);
+    d_printf("ADD: GR[%d] <- GR[%d](0x%X) + 0x%X\n", instruction.reg2, instruction.reg2, generalRegisters[instruction.reg2], sign_extend(5, instruction.reg1));
+    int32_t a = sign_extend(5, instruction.reg1);
     int32_t b = generalRegisters[instruction.reg2];
     int64_t r = a+b;
     int32_t truncatedResult = (int32_t)r;
@@ -90,7 +140,7 @@ void addImmediate5(const Instruction& instruction)
 }
 
 
-void addImmediate(const Instruction& instruction)
+inline void addImmediate(const Instruction& instruction)
 {
     d_printf("ADDI: GR[%d] <- GR[%d](0x%X) + 0x%X\n", instruction.reg2, instruction.reg1, generalRegisters[instruction.reg1], sign_extend(16, instruction.imm16));
     
@@ -110,7 +160,7 @@ void addImmediate(const Instruction& instruction)
 
 
 //Subtract
-void subtract(const Instruction& instruction)
+inline void subtract(const Instruction& instruction)
 {
     d_printf("SUB: GR[%d] <- GR[%d](0x%X) - GR[%d](0x%X)\n", instruction.reg2, instruction.reg2, generalRegisters[instruction.reg2], instruction.reg1, generalRegisters[instruction.reg1]);
     int32_t a = generalRegisters[instruction.reg1];
@@ -127,7 +177,7 @@ void subtract(const Instruction& instruction)
     cycles += 1;
 }
 
-void divide(const Instruction& instruction)
+inline void divide(const Instruction& instruction)
 {
     d_printf("DIV: GR[%d] <- GR[%d](0x%X) / GR[%d](0x%X)\n", instruction.reg2, instruction.reg2, generalRegisters[instruction.reg2], instruction.reg1, generalRegisters[instruction.reg1]);
     int32_t a = generalRegisters[instruction.reg1];
@@ -152,7 +202,7 @@ void divide(const Instruction& instruction)
     cycles += 38;
 }
 
-void divideUnsigned(const Instruction& instruction)
+inline void divideUnsigned(const Instruction& instruction)
 {
     d_printf("DIVU: GR[%d] <- GR[%d](0x%X) / GR[%d](0x%X)\n", instruction.reg2, instruction.reg2, generalRegisters[instruction.reg2], instruction.reg1, generalRegisters[instruction.reg1]);
     uint32_t a = generalRegisters[instruction.reg1];
@@ -177,7 +227,7 @@ void divideUnsigned(const Instruction& instruction)
     cycles += 36;
 }
 
-void multiply(const Instruction& instruction)
+inline void multiply(const Instruction& instruction)
 {
     d_printf("MUL: GR[%d] <- GR[%d](0x%X) * GR[%d](0x%X)\n", instruction.reg2, instruction.reg2, generalRegisters[instruction.reg2], instruction.reg1, generalRegisters[instruction.reg1]);
     int32_t a = generalRegisters[instruction.reg1];
@@ -195,7 +245,7 @@ void multiply(const Instruction& instruction)
     cycles += 13;
 }
 
-void multiplyUnsigned(const Instruction& instruction)
+inline void multiplyUnsigned(const Instruction& instruction)
 {
     d_printf("MULU: GR[%d] <- GR[%d](0x%X) * GR[%d](0x%X)\n", instruction.reg2, instruction.reg2, generalRegisters[instruction.reg2], instruction.reg1, generalRegisters[instruction.reg1]);
     uint32_t a = generalRegisters[instruction.reg1];
@@ -214,7 +264,7 @@ void multiplyUnsigned(const Instruction& instruction)
 }
 
 //Compare Form I
-void compare(const Instruction& instruction)
+inline void compare(const Instruction& instruction)
 {
     int32_t a = generalRegisters[instruction.reg1];
     int32_t b = generalRegisters[instruction.reg2];
@@ -232,9 +282,9 @@ void compare(const Instruction& instruction)
 }
 
 //Compare Form II
-void compareImmediate(const Instruction &instruction)
+inline void compareImmediate(const Instruction &instruction)
 {
-    int32_t a = sign_extend(5, instruction.imm5);
+    int32_t a = sign_extend(5, instruction.reg1);
     int32_t b = generalRegisters[instruction.reg2];
     
     d_printf("CMP: 0x%X and GR[%d](0x%X)\n", a, instruction.reg2, b);
@@ -251,11 +301,11 @@ void compareImmediate(const Instruction &instruction)
 }
 
 //Set Flag Condition
-void setFlag(const Instruction &instruction)
+inline void setFlag(const Instruction &instruction)
 {
-    d_printf("SETF: GR[%d] <- Condition (0x%X)\n", instruction.reg2, instruction.imm5);
+    d_printf("SETF: GR[%d] <- Condition (0x%X)\n", instruction.reg2, instruction.reg1);
     bool conditionMet = false;
-    switch ((FlagCondition)instruction.imm5) {
+    switch ((FlagCondition)instruction.reg1) {
         case kFlagOverflow:
             conditionMet = (systemRegisters.PSW.OV == 1);
             break;
@@ -312,7 +362,7 @@ void setFlag(const Instruction &instruction)
 }
 
 //Shift Left Form I
-void shiftLeft(const Instruction& instruction)
+inline void shiftLeft(const Instruction& instruction)
 {
     d_printf("SHL: GR[%d] <- GR[%d](0x%X) << GR[%d](0x%X)\n", instruction.reg2, instruction.reg2, generalRegisters[instruction.reg2], instruction.reg1, generalRegisters[instruction.reg1]);
     int32_t s = generalRegisters[instruction.reg1];
@@ -321,7 +371,7 @@ void shiftLeft(const Instruction& instruction)
     generalRegisters[instruction.reg2] = result;
     
     systemRegisters.PSW.OV = 0;
-    systemRegisters.PSW.CY = instruction.imm5 ? (a >> (32-s)) & 1 : 0;
+    systemRegisters.PSW.CY = instruction.reg1 ? (a >> (32-s)) & 1 : 0;
     systemRegisters.PSW.S = result < 0;
     systemRegisters.PSW.Z = result == 0;
     programCounter += 2;
@@ -329,16 +379,16 @@ void shiftLeft(const Instruction& instruction)
 }
 
 //Shift Left Form II
-void shiftLeftImmediate(const Instruction& instruction)
+inline void shiftLeftImmediate(const Instruction& instruction)
 {
-    d_printf("SHL: GR[%d] <- GR[%d](0x%X) << 0x%X\n", instruction.reg2, instruction.reg2, generalRegisters[instruction.reg2], instruction.imm5);
-    int32_t s = instruction.imm5;
+    d_printf("SHL: GR[%d] <- GR[%d](0x%X) << 0x%X\n", instruction.reg2, instruction.reg2, generalRegisters[instruction.reg2], instruction.reg1);
+    int32_t s = instruction.reg1;
     int32_t a = generalRegisters[instruction.reg2];
     int32_t result = a << s;
     generalRegisters[instruction.reg2] = result;
     
     systemRegisters.PSW.OV = 0;
-    systemRegisters.PSW.CY = instruction.imm5 ? (a >> (32-s)) & 1 : 0;
+    systemRegisters.PSW.CY = s ? (a >> (32-s)) & 1 : 0;
     systemRegisters.PSW.S = result < 0;
     systemRegisters.PSW.Z = result == 0;
     programCounter += 2;
@@ -346,7 +396,7 @@ void shiftLeftImmediate(const Instruction& instruction)
 }
 
 //Shift Right Form I
-void shiftRight(const Instruction& instruction)
+inline void shiftRight(const Instruction& instruction)
 {
     d_printf("SHR: GR[%d] <- GR[%d](0x%X) >> GR[%d](0x%X)\n", instruction.reg2, instruction.reg2, generalRegisters[instruction.reg2], instruction.reg1, generalRegisters[instruction.reg1]);
     uint32_t s = generalRegisters[instruction.reg1];
@@ -355,7 +405,7 @@ void shiftRight(const Instruction& instruction)
     generalRegisters[instruction.reg2] = result;
     
     systemRegisters.PSW.OV = 0;
-    systemRegisters.PSW.CY = instruction.imm5 ? (a >> (a-1)) & 1 : 0;
+    systemRegisters.PSW.CY = instruction.reg1 ? (a >> (a-1)) & 1 : 0;
     systemRegisters.PSW.S = result < 0;
     systemRegisters.PSW.Z = result == 0;
     programCounter += 2;
@@ -363,16 +413,16 @@ void shiftRight(const Instruction& instruction)
 }
 
 //Shift Right Form II
-void shiftRightImmediate(const Instruction &instruction)
+inline void shiftRightImmediate(const Instruction &instruction)
 {
-    d_printf("SHR: GR[%d] <- GR[%d](0x%X) >> 0x%X\n", instruction.reg2, instruction.reg2, generalRegisters[instruction.reg2], instruction.imm5);
-    uint32_t s = instruction.imm5;
+    d_printf("SHR: GR[%d] <- GR[%d](0x%X) >> 0x%X\n", instruction.reg2, instruction.reg2, generalRegisters[instruction.reg2], instruction.reg1);
+    uint32_t s = instruction.reg1;
     uint32_t a = generalRegisters[instruction.reg2];
     int32_t result = a >> s;
     generalRegisters[instruction.reg2] = result;
     
     systemRegisters.PSW.OV = 0;
-    systemRegisters.PSW.CY = instruction.imm5 ? (a >> (a-1)) & 1 : 0;
+    systemRegisters.PSW.CY = instruction.reg1 ? (a >> (a-1)) & 1 : 0;
     systemRegisters.PSW.S = result < 0;
     systemRegisters.PSW.Z = result == 0;
     programCounter += 2;
@@ -380,7 +430,7 @@ void shiftRightImmediate(const Instruction &instruction)
 }
 
 //Shift Arithmetic Right (signed shift)
-void shiftArithmeticRight(const Instruction& instruction)
+inline void shiftArithmeticRight(const Instruction& instruction)
 {
     d_printf("SAR: GR[%d] <- GR[%d](0x%X) >>>  GR[%d](0x%X)\n", instruction.reg2, instruction.reg2, generalRegisters[instruction.reg2], instruction.reg1, generalRegisters[instruction.reg1]);
     int32_t s = generalRegisters[instruction.reg1];
@@ -389,30 +439,30 @@ void shiftArithmeticRight(const Instruction& instruction)
     generalRegisters[instruction.reg2] = result;
     
     systemRegisters.PSW.OV = 0;
-    systemRegisters.PSW.CY = instruction.imm5 ? (a >> (a-1)) & 1 : 0;
+    systemRegisters.PSW.CY = instruction.reg1 ? (a >> (a-1)) & 1 : 0;
     systemRegisters.PSW.S = result < 0;
     systemRegisters.PSW.Z = result == 0;
     programCounter += 2;
     cycles += 1;
 }
 
-void shiftArithmeticRightImmediate(const Instruction& instruction)
+inline void shiftArithmeticRightImmediate(const Instruction& instruction)
 {
-    d_printf("SAR: GR[%d] <- GR[%d](0x%X) >>> 0x%X\n", instruction.reg2, instruction.reg2, generalRegisters[instruction.reg2], instruction.imm5);
-    int32_t s = instruction.imm5;
+    d_printf("SAR: GR[%d] <- GR[%d](0x%X) >>> 0x%X\n", instruction.reg2, instruction.reg2, generalRegisters[instruction.reg2], instruction.reg1);
+    int32_t s = instruction.reg1;
     int32_t a = generalRegisters[instruction.reg2];
     int32_t result = a >> s;
     generalRegisters[instruction.reg2] = result;
     
     systemRegisters.PSW.OV = 0;
-    systemRegisters.PSW.CY = instruction.imm5 ? (a >> (a-1)) & 1 : 0;
+    systemRegisters.PSW.CY = instruction.reg1 ? (a >> (a-1)) & 1 : 0;
     systemRegisters.PSW.S = result < 0;
     systemRegisters.PSW.Z = result == 0;
     programCounter += 2;  
     cycles += 1;
 }
 
-void logicalOr(const Instruction& instruction)
+inline void logicalOr(const Instruction& instruction)
 {
     d_printf("OR: GR[%d] <- GR[%d](0x%X) | GR[%d](0x%X)\n", instruction.reg2, instruction.reg2, generalRegisters[instruction.reg2], instruction.reg1, generalRegisters[instruction.reg1]);
     int32_t result = generalRegisters[instruction.reg2] | generalRegisters[instruction.reg1];
@@ -424,7 +474,7 @@ void logicalOr(const Instruction& instruction)
     cycles += 1;
 }
 
-void logicalXor(const Instruction& instruction)
+inline void logicalXor(const Instruction& instruction)
 {
     d_printf("XOR: GR[%d] <- GR[%d](0x%X) ^ GR[%d](0x%X)\n", instruction.reg2, instruction.reg2, generalRegisters[instruction.reg2], instruction.reg1, generalRegisters[instruction.reg1]);
     int32_t result = generalRegisters[instruction.reg2] ^ generalRegisters[instruction.reg1];
@@ -436,7 +486,7 @@ void logicalXor(const Instruction& instruction)
     cycles += 1;
 }
 
-void logicalAnd(const Instruction& instruction)
+inline void logicalAnd(const Instruction& instruction)
 {
     d_printf("AND: GR[%d] <- GR[%d](0x%X) & GR[%d](0x%X)\n", instruction.reg2, instruction.reg2, generalRegisters[instruction.reg2], instruction.reg1, generalRegisters[instruction.reg1]);
     int32_t result = generalRegisters[instruction.reg2] & generalRegisters[instruction.reg1];
@@ -448,7 +498,7 @@ void logicalAnd(const Instruction& instruction)
     cycles += 1;
 }
 
-void logicalNot(const Instruction& instruction)
+inline void logicalNot(const Instruction& instruction)
 {
     d_printf("NOT: GR[%d] <- ~GR[%d](0x%X)\n", instruction.reg2, instruction.reg1, generalRegisters[instruction.reg1]);
     int32_t result = ~generalRegisters[instruction.reg1];
@@ -460,20 +510,20 @@ void logicalNot(const Instruction& instruction)
     cycles += 1;
 }
 
-void andImmediate(const Instruction &instruction)
+inline void andImmediate(const Instruction &instruction)
 {
     d_printf("ANDI: GR[%d] <- GR[%d](0x%X) & 0x%X\n", instruction.reg2, instruction.reg1, generalRegisters[instruction.reg1], instruction.imm16);
-    generalRegisters[instruction.reg2] = generalRegisters[instruction.reg1] & instruction.imm16;
-    
+    uint32_t res = generalRegisters[instruction.reg1] & instruction.imm16;
+    generalRegisters[instruction.reg2] = res;
     systemRegisters.PSW.OV = 0;
     systemRegisters.PSW.S = 0;
-    systemRegisters.PSW.Z = (generalRegisters[instruction.reg2] == 0) ? 1 : 0;
+    systemRegisters.PSW.Z = (res == 0) ? 1 : 0;
     
     programCounter += 4;
     cycles += 1;
 }
 
-void orImmediate(const Instruction &instruction)
+inline void orImmediate(const Instruction &instruction)
 {
     d_printf("ORI: GR[%d] <- GR[%d](0x%X) | 0x%X\n", instruction.reg2, instruction.reg1, generalRegisters[instruction.reg1], instruction.imm16);
     generalRegisters[instruction.reg2] = generalRegisters[instruction.reg1] | instruction.imm16;
@@ -486,7 +536,7 @@ void orImmediate(const Instruction &instruction)
     cycles += 1;
 }
 
-void xorImmediate(const Instruction &instruction)
+inline void xorImmediate(const Instruction &instruction)
 {
     d_printf("XORI: GR[%d] <- GR[%d](0x%X) ^ 0x%X\n", instruction.reg2, instruction.reg1, generalRegisters[instruction.reg1], instruction.imm16);
     generalRegisters[instruction.reg2] = generalRegisters[instruction.reg1] ^ instruction.imm16;
@@ -499,14 +549,14 @@ void xorImmediate(const Instruction &instruction)
     cycles += 1;
 }
 
-void jump(const Instruction& instruction)
+inline void jump(const Instruction& instruction)
 {
     d_printf("JMP: PC <- GR[%d](0x%X)\n", instruction.reg1, generalRegisters[instruction.reg1]);
     programCounter = (char*)&memoryManagmentUnit.GetData<uint32_t>(generalRegisters[instruction.reg1]);
     cycles += 3;
 }
 
-void jumpRelative(const Instruction &instruction)
+inline void jumpRelative(const Instruction &instruction)
 {
     int32_t relativeJump = sign_extend(26, instruction.disp26);
     d_printf("JMP: PC <- PC + 0x%X\n", relativeJump);
@@ -514,7 +564,7 @@ void jumpRelative(const Instruction &instruction)
     cycles += 3;
 }
 
-void branchIfNoOverflow(const Instruction& instruction)
+inline void branchIfNoOverflow(const Instruction& instruction)
 {
     d_printf("%s\n", "BNV");
     if (systemRegisters.PSW.OV == 0)
@@ -529,7 +579,7 @@ void branchIfNoOverflow(const Instruction& instruction)
     }
 }
 
-void branchIfOverflow(const Instruction& instruction)
+inline void branchIfOverflow(const Instruction& instruction)
 {
     d_printf("%s\n", "BV");
     if (systemRegisters.PSW.OV)
@@ -544,7 +594,7 @@ void branchIfOverflow(const Instruction& instruction)
     }
 }
 
-void branchIfZero(const Instruction& instruction)
+inline void branchIfZero(const Instruction& instruction)
 {
     d_printf("%s\n", "BZ");
     if (systemRegisters.PSW.Z)
@@ -559,7 +609,7 @@ void branchIfZero(const Instruction& instruction)
     }
 }
 
-void branchIfNotZero(const Instruction& instruction)
+inline void branchIfNotZero(const Instruction& instruction)
 {
     d_printf("%s\n", "BNZ");
     if (systemRegisters.PSW.Z == 0)
@@ -575,7 +625,7 @@ void branchIfNotZero(const Instruction& instruction)
 }
 
 
-void branchIfLessThan(const Instruction& instruction)
+inline void branchIfLessThan(const Instruction& instruction)
 {
     d_printf("%s\n", "BLT");
     if ((systemRegisters.PSW.S ^ systemRegisters.PSW.OV) == 1)
@@ -590,7 +640,7 @@ void branchIfLessThan(const Instruction& instruction)
     }
 }
 
-void branchIfNotHigher(const Instruction& instruction)
+inline void branchIfNotHigher(const Instruction& instruction)
 {
     d_printf("%s\n", "BNH");
     if ((systemRegisters.PSW.Z | systemRegisters.PSW.CY) == 1)
@@ -605,7 +655,7 @@ void branchIfNotHigher(const Instruction& instruction)
     }
 }
 
-void branchIfNegative(const Instruction& instruction)
+inline void branchIfNegative(const Instruction& instruction)
 {
     d_printf("%s\n", "BN");
     if (systemRegisters.PSW.S)
@@ -620,7 +670,7 @@ void branchIfNegative(const Instruction& instruction)
     }
 }
 
-void branchIfPositive(const Instruction& instruction)
+inline void branchIfPositive(const Instruction& instruction)
 {
     d_printf("%s\n", "BP");
     if (systemRegisters.PSW.S == 0)
@@ -636,7 +686,7 @@ void branchIfPositive(const Instruction& instruction)
 }
 
 
-void branchIfHigher(const Instruction& instruction)
+inline void branchIfHigher(const Instruction& instruction)
 {
     d_printf("%s\n", "BH");
     if ((systemRegisters.PSW.Z | systemRegisters.PSW.CY) == 0)
@@ -651,7 +701,7 @@ void branchIfHigher(const Instruction& instruction)
     }
 }
 
-void branchIfGreaterOrEqual(const Instruction& instruction)
+inline void branchIfGreaterOrEqual(const Instruction& instruction)
 {
     d_printf("BGE\n");
     if ((systemRegisters.PSW.S ^ systemRegisters.PSW.OV) == 0)
@@ -666,7 +716,7 @@ void branchIfGreaterOrEqual(const Instruction& instruction)
     }
 }
 
-void branchIfGreaterThan(const Instruction& instruction)
+inline void branchIfGreaterThan(const Instruction& instruction)
 {
     d_printf("BGT\n");
     if (((systemRegisters.PSW.S ^ systemRegisters.PSW.OV) | systemRegisters.PSW.Z) == 0)
@@ -681,7 +731,7 @@ void branchIfGreaterThan(const Instruction& instruction)
     }
 }
 
-void branchIfLessOrEqual(const Instruction& instruction)
+inline void branchIfLessOrEqual(const Instruction& instruction)
 {
     d_printf("BLE\n");
     if (((systemRegisters.PSW.S ^ systemRegisters.PSW.OV) | systemRegisters.PSW.Z) == 1)
@@ -696,7 +746,7 @@ void branchIfLessOrEqual(const Instruction& instruction)
     }
 }
 
-void branchIfCarry(const Instruction& instruction)
+inline void branchIfCarry(const Instruction& instruction)
 {
     d_printf("BC\n");
     if (systemRegisters.PSW.CY)
@@ -711,7 +761,7 @@ void branchIfCarry(const Instruction& instruction)
     }
 }
 
-void branchIfNoCarry(const Instruction& instruction)
+inline void branchIfNoCarry(const Instruction& instruction)
 {
     d_printf("BNC\n");
     if (systemRegisters.PSW.CY == 0)
@@ -726,14 +776,14 @@ void branchIfNoCarry(const Instruction& instruction)
     }
 }
 
-void branch(const Instruction& instruction)
+inline void branch(const Instruction& instruction)
 {
     d_printf("BR\n");
     programCounter += sign_extend(9, instruction.disp9);
     cycles += 3;
 }
 
-void moveHigh(const Instruction& instruction)
+inline void moveHigh(const Instruction& instruction)
 {
     d_printf("MOVEHI: GR[%d] <- GR[%d](0x%X) + 0x%X\n", instruction.reg2, instruction.reg1, generalRegisters[instruction.reg1], (instruction.imm16 << 16));
     generalRegisters[instruction.reg2] = generalRegisters[instruction.reg1] + (instruction.imm16 << 16);
@@ -741,7 +791,7 @@ void moveHigh(const Instruction& instruction)
     cycles += 1;
 }
 
-void moveAddImmediate(const Instruction& instruction)
+inline void moveAddImmediate(const Instruction& instruction)
 {
     d_printf("MOVEA: GR[%d] <- GR[%d](0x%X) + 0x%X\n", instruction.reg2, instruction.reg1, generalRegisters[instruction.reg1], sign_extend(16, instruction.imm16));
     generalRegisters[instruction.reg2] = generalRegisters[instruction.reg1] + sign_extend(16, instruction.imm16);
@@ -749,25 +799,27 @@ void moveAddImmediate(const Instruction& instruction)
     cycles += 1;
 }
 
-void storeWord(const Instruction& instruction)
+inline void storeWord(const Instruction& instruction)
 {
     uint32_t address = (generalRegisters[instruction.reg1] + sign_extend(16, instruction.disp16)) & 0xFFFFFFFC;
     d_printf("ST.W: [GR[%d](0x%X) + %d](0x%X) <- [GR[%d](0x%X)\n", instruction.reg1, generalRegisters[instruction.reg1], sign_extend(16, instruction.disp16) & 0xFFFFFFFC, address, instruction.reg2, generalRegisters[instruction.reg2]);
 
     memoryManagmentUnit.StoreWord(address, generalRegisters[instruction.reg2]);
     programCounter += 4;
+    cycles += 1;
 }
 
-void storeHWord(const Instruction& instruction)
+inline void storeHWord(const Instruction& instruction)
 {
     uint32_t address = (generalRegisters[instruction.reg1] + sign_extend(16, instruction.disp16)) & 0xFFFFFFFE;
     d_printf("ST.H: [GR[%d](0x%X) + %d](0x%X) <- [GR[%d](0x%X)\n", instruction.reg1, generalRegisters[instruction.reg1], sign_extend(16, instruction.disp16) & 0xFFFFFFFE, address, instruction.reg2, generalRegisters[instruction.reg2]);
 
     memoryManagmentUnit.StoreHWord(address, generalRegisters[instruction.reg2] & 0xFFFF);
     programCounter += 4;
+    cycles += 1;
 }
 
-void storeByte(const Instruction& instruction)
+inline void storeByte(const Instruction& instruction)
 {
     uint32_t address = (generalRegisters[instruction.reg1] + sign_extend(16, instruction.disp16));
     d_printf("ST.B: [GR[%d](0x%X) + %d](0x%X) <- [GR[%d](0x%X)\n", instruction.reg1, generalRegisters[instruction.reg1], sign_extend(16, instruction.disp16), address, instruction.reg2, generalRegisters[instruction.reg2]);
@@ -775,55 +827,61 @@ void storeByte(const Instruction& instruction)
 
     memoryManagmentUnit.Store(address, generalRegisters[instruction.reg2] & 0xFF);
     programCounter += 4;
+    cycles += 1;
 }
 
-void loadByte(const Instruction& instruction)
+inline void loadByte(const Instruction& instruction)
 {
     d_printf("LD.B: GR[%d] <- [GR[%d](0x%X) + %d\n", instruction.reg2, instruction.reg1, generalRegisters[instruction.reg1], sign_extend(16, instruction.disp16));
 
-    uint32_t address = (generalRegisters[instruction.reg1] + sign_extend(16, instruction.disp16));
+    uint32_t address = (generalRegisters[instruction.reg1] + (int16_t)instruction.disp16);
     generalRegisters[instruction.reg2] = memoryManagmentUnit.GetData<uint8_t>(address);
     programCounter += 4;    
+    cycles += 3;
 }
 
-void loadHWord(const Instruction& instruction)
+inline void loadHWord(const Instruction& instruction)
 {
-    uint32_t address = (generalRegisters[instruction.reg1] + sign_extend(16, instruction.disp16));
+    uint32_t address = (generalRegisters[instruction.reg1] + (int16_t)instruction.disp16);
     address &= 0xFFFFFFFE;
     d_printf("LD.H: GR[%d] <- [GR[%d](0x%X) + %d\n", instruction.reg2, instruction.reg1, generalRegisters[instruction.reg1], sign_extend(16, instruction.disp16));
     
     generalRegisters[instruction.reg2] = memoryManagmentUnit.GetData<uint16_t>(address);
     programCounter += 4;    
+    cycles += 3;
 }
 
-void loadWord(const Instruction& instruction)
+inline void loadWord(const Instruction& instruction)
 {
-    uint32_t address = (generalRegisters[instruction.reg1] + sign_extend(16, instruction.disp16)) & 0xFFFFFFFC;
+    uint32_t address = (generalRegisters[instruction.reg1] + (int16_t)instruction.disp16) & 0xFFFFFFFC;
     d_printf("LD.W: GR[%d] <- [GR[%d](0x%X) + %d\n", instruction.reg2, instruction.reg1, generalRegisters[instruction.reg1], sign_extend(16, instruction.disp16));
     
     generalRegisters[instruction.reg2] = memoryManagmentUnit.GetData<uint32_t>(address);
     programCounter += 4;    
+    cycles += 3;
 }
 
-void loadSystemRegister(const CPU::Instruction& instruction)
+inline void loadSystemRegister(const CPU::Instruction& instruction)
 {
     d_printf("LDSR\n");
     //TODO: Prevent writing to write disabled registers
     uint8_t regID = instruction.reg1;
     systemRegisters[regID] = generalRegisters[instruction.reg2];
     programCounter += 2;
+    cycles += 1;
 }
 
-void storeSystemRegister(const CPU::Instruction& instruction)
+inline void storeSystemRegister(const CPU::Instruction& instruction)
 {
     d_printf("STSR\n");
     //TODO: Prevent reading from reserved registers
     uint8_t regID = instruction.reg1;
     generalRegisters[instruction.reg2] = systemRegisters[regID];
     programCounter += 2;   
+    cycles += 1;
 }
 
-void jumpAndLink(const Instruction &instruction)
+inline void jumpAndLink(const Instruction &instruction)
 {
     d_printf("JAL\n");
     generalRegisters[31] = (0x07000000 + (uint32_t)(((char*)programCounter + 4) - ((char*)memoryManagmentUnit.rom.data)));
@@ -832,20 +890,20 @@ void jumpAndLink(const Instruction &instruction)
     cycles += 3;
 }
 
-void outWrite(const Instruction& instruction)
+inline void outWrite(const Instruction& instruction)
 {
     d_printf("OUT.W\n");
     programCounter += 4;
 }
 
-void nop(const Instruction& instruction)
+inline void nop(const Instruction& instruction)
 {
     d_printf("NOP\n");
     programCounter += 2;
     cycles += 1;
 }
 
-void setInterruptDisable(const Instruction& instruction)
+inline void setInterruptDisable(const Instruction& instruction)
 {
     d_printf("SEI\n");
     systemRegisters.PSW.ID = 1;
@@ -853,7 +911,7 @@ void setInterruptDisable(const Instruction& instruction)
     cycles += 1;
 }
 
-void clearInterruptDisable(const Instruction& instruction)
+inline void clearInterruptDisable(const Instruction& instruction)
 {
     d_printf("CLI\n");
     systemRegisters.PSW.ID = 0;
@@ -861,7 +919,7 @@ void clearInterruptDisable(const Instruction& instruction)
     cycles += 1;
 }
 
-void returnFromTrap(const Instruction& instruction)
+inline void returnFromTrap(const Instruction& instruction)
 {
     d_printf("RETI\n");
     if (systemRegisters.PSW.NP)
@@ -877,7 +935,7 @@ void returnFromTrap(const Instruction& instruction)
     cycles += 10;
 }
 
-void compareFloat(const Instruction& instruction)
+inline void compareFloat(const Instruction& instruction)
 {
     d_printf("CMPF.S\n");
     float f = generalRegistersFloat[instruction.reg2] - generalRegistersFloat[instruction.reg1];
@@ -890,7 +948,7 @@ void compareFloat(const Instruction& instruction)
 //        systemRegisters.PSW.FRO = 
 }
 
-void convertWordToFloat(const Instruction& instruction)
+inline void convertWordToFloat(const Instruction& instruction)
 {
     d_printf("CVT.WS\n");
     float f = generalRegisters[instruction.reg1];
@@ -905,7 +963,7 @@ void convertWordToFloat(const Instruction& instruction)
     cycles += 5;
 }
 
-void convertFloatToWord(const Instruction& instruction)
+inline void convertFloatToWord(const Instruction& instruction)
 {
     d_printf("CVT.SW\n");
     float f = generalRegistersFloat[instruction.reg1];
@@ -925,7 +983,7 @@ void convertFloatToWord(const Instruction& instruction)
     cycles += 9;
 }
 
-void addFloat(const Instruction &instruction)
+inline void addFloat(const Instruction &instruction)
 {
     d_printf("ADDF.S\n");
     
@@ -941,7 +999,7 @@ void addFloat(const Instruction &instruction)
     cycles += 9;
 }
 
-void subtractFloat(const Instruction &instruction)
+inline void subtractFloat(const Instruction &instruction)
 {
     d_printf("SUBF.S\n");
     
@@ -957,7 +1015,7 @@ void subtractFloat(const Instruction &instruction)
     cycles += 12;
 }
 
-void multiplyFloat(const Instruction &instruction)
+inline void multiplyFloat(const Instruction &instruction)
 {
     d_printf("MULF.S\n");
     
@@ -973,7 +1031,7 @@ void multiplyFloat(const Instruction &instruction)
     cycles += 8;
 }
 
-void divideFloat(const Instruction &instruction)
+inline void divideFloat(const Instruction &instruction)
 {
     d_printf("DIVF.S\n");
     
@@ -989,7 +1047,7 @@ void divideFloat(const Instruction &instruction)
     cycles += 44;
 }
 
-void truncateFloat(const Instruction& instruction)
+inline void truncateFloat(const Instruction& instruction)
 {
     d_printf("TRNC.SW\n");
     float f = generalRegistersFloat[instruction.reg1];
@@ -1009,7 +1067,7 @@ void truncateFloat(const Instruction& instruction)
     cycles += 8;
 }
 
-void exchangeByte(const Instruction& instruction)
+inline void exchangeByte(const Instruction& instruction)
 {
     d_printf("XB\n");
     
@@ -1020,7 +1078,7 @@ void exchangeByte(const Instruction& instruction)
     cycles += 1;
 }
 
-void exchangeHalfWord(const Instruction &instruction)
+inline void exchangeHalfWord(const Instruction &instruction)
 {
     d_printf("XH\n");
     int32_t val = generalRegisters[instruction.reg2];
@@ -1030,7 +1088,7 @@ void exchangeHalfWord(const Instruction &instruction)
     cycles += 1;
 }
 
-void reverseWord(const Instruction &instruction)
+inline void reverseWord(const Instruction &instruction)
 {
     d_printf("REV\n");
     int32_t word = generalRegisters[instruction.reg1];
@@ -1047,7 +1105,7 @@ void reverseWord(const Instruction &instruction)
     cycles += 1;
 }
 
-void multiplyHalfWord(const Instruction &instruction)
+inline void multiplyHalfWord(const Instruction &instruction)
 {
     d_printf("MPYHW\n");
     
@@ -1057,7 +1115,7 @@ void multiplyHalfWord(const Instruction &instruction)
     cycles += 9;
 }
 
-void moveBitString(const Instruction& instruction)
+inline void moveBitString(const Instruction& instruction)
 {
     d_printf("MOVBSU\n");
     uint32_t startAddress = generalRegisters[30];
@@ -1072,11 +1130,6 @@ void moveBitString(const Instruction& instruction)
     uint32_t data;
     uint8_t bits;
     
-    struct Mover
-    {
-        Mover() {}
-        const uint32_t operator()(uint32_t a, uint32_t b) const { return b; };
-    };
     
     while (source.HasData())
     {
@@ -1089,7 +1142,7 @@ void moveBitString(const Instruction& instruction)
     programCounter += 4;
 }
 
-void andBitString(const Instruction& instruction)
+inline void andBitString(const Instruction& instruction)
 {
     d_printf("ANDBSU\n");
     uint32_t startAddress = generalRegisters[30];
@@ -1104,12 +1157,6 @@ void andBitString(const Instruction& instruction)
     uint32_t data;
     uint8_t bits;
     
-    struct Ander
-    {
-        Ander() {}
-        const uint32_t operator()(uint32_t a, uint32_t b) const { return a & b; };
-    };
-    
     while (source.HasData())
     {
         source.Read(data, bits);
@@ -1121,7 +1168,7 @@ void andBitString(const Instruction& instruction)
     programCounter += 4;
 }
 
-void orBitString(const Instruction& instruction)
+inline void orBitString(const Instruction& instruction)
 {
     d_printf("ORBSU\n");
     uint32_t startAddress = generalRegisters[30];
@@ -1136,12 +1183,6 @@ void orBitString(const Instruction& instruction)
     uint32_t data;
     uint8_t bits;
     
-    struct Orer
-    {
-        Orer() {}
-        const uint32_t operator()(uint32_t a, uint32_t b) const { return a & b; };
-    };
-    
     while (source.HasData())
     {
         source.Read(data, bits);
@@ -1153,7 +1194,7 @@ void orBitString(const Instruction& instruction)
     programCounter += 4;
 }
 
-void xorBitString(const Instruction& instruction)
+inline void xorBitString(const Instruction& instruction)
 {
     d_printf("XORBSU\n");
     uint32_t startAddress = generalRegisters[30];
@@ -1168,12 +1209,6 @@ void xorBitString(const Instruction& instruction)
     uint32_t data;
     uint8_t bits;
     
-    struct Xorer
-    {
-        Xorer() {}
-        const uint32_t operator()(uint32_t a, uint32_t b) const { return a & b; };
-    };
-    
     while (source.HasData())
     {
         source.Read(data, bits);
@@ -1185,7 +1220,7 @@ void xorBitString(const Instruction& instruction)
     programCounter += 4;
 }
 
-void andNotBitString(const Instruction& instruction)
+inline void andNotBitString(const Instruction& instruction)
 {
     d_printf("ANDNBSU\n");
     uint32_t startAddress = generalRegisters[30];
@@ -1200,12 +1235,7 @@ void andNotBitString(const Instruction& instruction)
     uint32_t data;
     uint8_t bits;
     
-    struct AndNoter
-    {
-        AndNoter() {}
-        const uint32_t operator()(uint32_t a, uint32_t b) const { return a & (~b); };
-    };
-    
+
     while (source.HasData())
     {
         source.Read(data, bits);
@@ -1217,7 +1247,7 @@ void andNotBitString(const Instruction& instruction)
     programCounter += 4;
 }
 
-void orNotBitString(const Instruction& instruction)
+inline void orNotBitString(const Instruction& instruction)
 {
     d_printf("ORNBSU\n");
     uint32_t startAddress = generalRegisters[30];
@@ -1231,12 +1261,7 @@ void orNotBitString(const Instruction& instruction)
     
     uint32_t data;
     uint8_t bits;
-    
-    struct OrNoter
-    {
-        OrNoter() {}
-        const uint32_t operator()(uint32_t a, uint32_t b) const { return a | (~b); };
-    };
+
     
     while (source.HasData())
     {
@@ -1249,7 +1274,7 @@ void orNotBitString(const Instruction& instruction)
     programCounter += 4;
 }
 
-void xorNotBitString(const Instruction& instruction)
+inline void xorNotBitString(const Instruction& instruction)
 {
     d_printf("XORNBSU\n");
     uint32_t startAddress = generalRegisters[30];
@@ -1263,12 +1288,6 @@ void xorNotBitString(const Instruction& instruction)
     
     uint32_t data;
     uint8_t bits;
-    
-    struct XorNoter
-    {
-        XorNoter() {}
-        const uint32_t operator()(uint32_t a, uint32_t b) const { return a | (~b); };
-    };
     
     while (source.HasData())
     {
@@ -1281,7 +1300,7 @@ void xorNotBitString(const Instruction& instruction)
     programCounter += 4;
 }
 
-void notBitString(const Instruction& instruction)
+inline void notBitString(const Instruction& instruction)
 {
     d_printf("XORNBSU\n");
     uint32_t startAddress = generalRegisters[30];
@@ -1296,12 +1315,6 @@ void notBitString(const Instruction& instruction)
     uint32_t data;
     uint8_t bits;
     
-    struct Noter
-    {
-        Noter() {}
-        const uint32_t operator()(uint32_t a, uint32_t b) const { return ~b; };
-    };
-    
     while (source.HasData())
     {
         source.Read(data, bits);
@@ -1312,3 +1325,6 @@ void notBitString(const Instruction& instruction)
     
     programCounter += 4;
 }
+
+
+#endif

@@ -34,11 +34,14 @@ int main (int argc, const char * argv[])
     tcsetattr(STDIN_FILENO, TCSANOW, &ttystate);
     
     
-    VB vb("/Users/jweinberg/b2.vb");
+    VB vb("/Users/jweinberg/tet.vb");
     
     bool wait = true;
     int steps = 0;
     while (1)
+    {
+        vb.cpu->step();
+    }
     {
         if (wait && steps == 0)
         {

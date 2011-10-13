@@ -43,7 +43,7 @@ namespace CPU
         uint32_t cycles;
 
         bool debugOutput;
-        void decode(const Instruction &anInstruction);
+        void decode(uint32_t data);
         void bitstringDecode(const Instruction &instruction);
         void floatingPointDecode(const Instruction &instruction);
         void throwException(ExceptionCode exceptionCode);

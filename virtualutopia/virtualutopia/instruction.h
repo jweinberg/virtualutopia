@@ -134,24 +134,31 @@ namespace CPU
     
     class Instruction 
     {
-    private:
-        const uint32_t instruction;
     public:
-        const OpcodeMnumonic opcode;
         union
         {
-            uint8_t reg1;
-            uint8_t imm5;
+            const uint32_t instruction;
+            struct
+            {
+                struct
+                {
+                    uint16_t reg1:5;
+                    uint16_t reg2:5;
+                    uint16_t store:6;
+                };
+                union
+                {
+                    uint16_t imm16;
+                    uint16_t disp16;
+                };
+            };
         };
-        uint8_t reg2;
-        union
-        {
-            uint16_t imm16;
-            uint16_t disp16;
-        };
-        uint16_t disp9;
-        uint8_t subopcode;
+    public:
         uint32_t disp26;
+        uint16_t disp9;
+        const OpcodeMnumonic opcode;
+        uint8_t subopcode;
+
     public:
         Instruction(const uint32_t _instruction) : 
             instruction(_instruction),
@@ -161,25 +168,7 @@ namespace CPU
                 {
                     case Fpp:
                         subopcode = instruction >> 26;
-                    //Form V
-                    //Form VI
-                    case LD_B ... OUT_H:
-                    case OUT_W:
-                    case MOVEA:
-                    case ADDI:
-                    case ORI:
-                    case ANDI:
-                    case XORI:
-                    case MOVHI:
-                        imm16 = instruction >> 16;
-                    //Form I
-                    //Form II
-                    case MOV_1 ... NOT:
-                    case MOV_2 ... Bstr:
-                        reg1 = instruction & 0x1F;
-                        reg2 = (instruction >> 5) & 0x1F;
                         break;
-                    //Form III
                     case BV ... BGT:
                         disp9 = instruction & 0x1FF;
                         break;

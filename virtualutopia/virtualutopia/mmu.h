@@ -37,7 +37,7 @@ public:
     struct GetDataProxy<T*>
     {
         MMU& mmu;
-        GetDataProxy<T>(MMU& _mmu) : mmu(_mmu) {}
+        GetDataProxy<T*>(MMU& _mmu) : mmu(_mmu) {}
         
         const T* operator()(uint32_t address) const
         {
@@ -46,7 +46,7 @@ public:
     };
     
     template <typename T>
-    T& GetData(uint32_t address)
+    inline T& GetData(uint32_t address)
     {
         return *(T*)(&(*this)[address]);
 //        const GetDataProxy<T> p(*this);
