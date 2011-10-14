@@ -169,7 +169,8 @@ namespace VIP
                 int stopIndex = (objSearchIndex > 0) ? objControl[objSearchIndex - 1] : 0;
                 for (int objIdx = objControl[objSearchIndex]; objIdx >= stopIndex; --objIdx)
                 {
-                    DrawObj(oam[objIdx]);
+                     if (test ? testVal == n : true)
+                         DrawObj(oam[objIdx]);
                 }
                 if (objSearchIndex)
                     objSearchIndex--;   
@@ -190,8 +191,12 @@ namespace VIP
                         int srcX = (x + world.MX - world.MP) % (yWorlds * 512);
                         int xWorld = srcX / 512;
                         int xChar = (srcX & 0x1FF) / 8;
-                        int xOff = srcX % 8;
+                        int xOff = srcX & 7;
                         int y = 0;
+                        
+                        int w = 8 - xOff;
+                        w = MIN(w, world.W + 1 - x);
+                        
                         do
                         {
                             int srcY = (y + world.MY) % (xWorlds * 512);
@@ -203,7 +208,10 @@ namespace VIP
                             const BGMapData &data = map.chars[yChar * 64 + xChar];
                             const Chr& chr = chrRam[data.charNum];  
                             
-                            leftFrameBuffer[0].DrawChr(chr, x + world.GX - world.GP, y + world.GY, xOff, yOff, 8 - xOff, 8 - yOff, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
+                            int h = 8 - yOff;
+                            h = MIN(h, world.H + 1 - y);
+                            
+                            leftFrameBuffer[0].DrawChr(chr, x + world.GX - world.GP, y + world.GY, xOff, yOff, w, h, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
                             y += (8 - yOff);
                         } while(y <= world.H);
                         x += (8 - xOff);
@@ -219,6 +227,10 @@ namespace VIP
                         int xChar = (srcX & 0x1FF) / 8;
                         int xOff = srcX & 7;
                         int y = 0;
+                        
+                        int w = 8 - xOff;
+                        w = MIN(w, world.W + 1 - x);
+                        
                         do
                         {
                             int srcY = (y + world.MY) % (xWorlds * 512);
@@ -230,7 +242,9 @@ namespace VIP
                             const BGMapData &data = map.chars[yChar * 64 + xChar];
                             const Chr& chr = chrRam[data.charNum];  
                             
-                            rightFrameBuffer[0].DrawChr(chr, x + world.GX + world.GP, y + world.GY, xOff, yOff, 8 - xOff, 8 - yOff, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
+                            int h = 8 - yOff;
+                            h = MIN(h, world.H + 1 - y);
+                            rightFrameBuffer[0].DrawChr(chr, x + world.GX + world.GP, y + world.GY, xOff, yOff, w, h, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
                             y += (8 - yOff);
                         } while(y <= world.H);
                         x += (8 - xOff);
