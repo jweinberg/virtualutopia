@@ -28,7 +28,7 @@ namespace VIP
     {
     public:
         void WriteFrame();
-        void VIP::DumpCHR();
+        void DumpCHR();
         void DrawObj(const Obj& obj);
         VIP();
         CPU::v810 *cpu;
