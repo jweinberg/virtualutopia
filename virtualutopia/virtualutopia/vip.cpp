@@ -178,8 +178,8 @@ namespace VIP
             {
                 const World &world = worlds[n];
              
-                int xWorlds = (int)pow(2, world.SCX);
-                int yWorlds = (int)pow(2, world.SCY);
+                int xWorlds = 1 << world.SCX;
+                int yWorlds = 1 << world.SCY;;
                 
                 
                 if (world.LON)
@@ -189,15 +189,15 @@ namespace VIP
                     {
                         int srcX = (x + world.MX - world.MP) % (yWorlds * 512);
                         int xWorld = srcX / 512;
-                        int xChar = (srcX % 512) / 8;
+                        int xChar = (srcX & 0x1FF) / 8;
                         int xOff = srcX % 8;
                         int y = 0;
                         do
                         {
                             int srcY = (y + world.MY) % (xWorlds * 512);
                             int yWorld = srcY / 512;
-                            int yChar = (srcY % 512) / 8;                            
-                            int yOff = srcY % 8;
+                            int yChar = (srcY & 0x1FF) / 8;                            
+                            int yOff = srcY & 7;
                             
                             const BGMap &map = bgMaps[world.BGMAP_BASE + (yWorld * xWorlds) + xWorld];
                             const BGMapData &data = map.chars[yChar * 64 + xChar];
@@ -216,15 +216,15 @@ namespace VIP
                     {
                         int srcX = (x + world.MX + world.MP) % (yWorlds * 512);
                         int xWorld = srcX / 512;
-                        int xChar = (srcX % 512) / 8;
-                        int xOff = srcX % 8;
+                        int xChar = (srcX & 0x1FF) / 8;
+                        int xOff = srcX & 7;
                         int y = 0;
                         do
                         {
                             int srcY = (y + world.MY) % (xWorlds * 512);
                             int yWorld = srcY / 512;
-                            int yChar = (srcY % 512) / 8;                            
-                            int yOff = srcY % 8;
+                            int yChar = (srcY & 0x1FF) / 8;                            
+                            int yOff = srcY & 7;
                             
                             const BGMap &map = bgMaps[world.BGMAP_BASE + (yWorld * xWorlds) + xWorld];
                             const BGMapData &data = map.chars[yChar * 64 + xChar];

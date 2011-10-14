@@ -43,19 +43,20 @@ namespace VIP
             *column |= (val << shift);
         }
         
-        void DrawChr(const Chr &chr, int xoff, int yoff, int sourceXOffset, int sourceYOffset, int w, int h, bool flipHor, bool flipVert,const Palette &palette)
+        inline void DrawChr(const Chr &chr, int xoff, int yoff, int sourceXOffset, int sourceYOffset, int w, int h, bool flipHor, bool flipVert,const Palette &palette)
         {
-            Chr chrCpy = chr;
-            if (flipHor)
-                chrCpy.FlipHorizontal();
-            if (flipVert)
-                chrCpy.FlipVertical();
-            
-            for (int x = 0; x < w; ++x)
-            {
-                for (int y = 0; y < h; ++y)
+            const uint16_t * const data = chr.data;
+
+            for (int y = 0; y < h; ++y)
+            {                   
+                int yIdx = y + sourceYOffset;
+                if (flipVert) yIdx = 7 - yIdx;
+                uint16_t row = data[yIdx];
+                for (int x = 0; x < w; ++x)
                 {
-                    uint8_t colorIdx = (chrCpy.data[y + sourceYOffset] >> ((x + sourceXOffset) * 2)) & 0x3;
+                    int xIdx = x + sourceXOffset;
+                    if (flipHor) xIdx = 7 - xIdx;
+                    uint8_t colorIdx = (row >> (xIdx * 2)) & 0x3;
                     if (colorIdx)
                         SetPixel(x + xoff, y + yoff, palette[colorIdx]);
                 }
