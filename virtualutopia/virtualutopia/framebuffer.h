@@ -24,6 +24,9 @@ namespace VIP
             //screen width = 384
             //screen height = 224
             
+            if (x < 0 || y < 0 || x >= 384 || y >= 256)
+                return;
+            
             //Data is stored by column, not by row
             
             //We need to figure out what byte of data to look at, each 'pixel'
@@ -42,9 +45,6 @@ namespace VIP
         
         void DrawChr(const Chr &chr, int xoff, int yoff, int sourceXOffset, int sourceYOffset, int w, int h, bool flipHor, bool flipVert,const Palette &palette)
         {
-            if (xoff < 0 || yoff < 0 || xoff >= 384 || yoff >= 256)
-                return;
-            
             Chr chrCpy = chr;
             if (flipHor)
                 chrCpy.FlipHorizontal();

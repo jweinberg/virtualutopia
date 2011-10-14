@@ -181,47 +181,61 @@ namespace VIP
                 int xWorlds = (int)pow(2, world.SCX);
                 int yWorlds = (int)pow(2, world.SCY);
                 
-                int x = 0;
-                do
+                
+                if (world.LON)
                 {
-                    int y = 0;
+                    int x = 0;
                     do
                     {
-                        if (world.LON)
+                        int srcX = (x + world.MX - world.MP) % (yWorlds * 512);
+                        int xWorld = srcX / 512;
+                        int xChar = (srcX % 512) / 8;
+                        int xOff = srcX % 8;
+                        int y = 0;
+                        do
                         {
                             int srcY = (y + world.MY) % (xWorlds * 512);
-                            int srcX = (x + world.MX - world.MP) % (yWorlds * 512);
-                            int xWorld = srcX / 512;
                             int yWorld = srcY / 512;
-                            int xChar = (srcX % 512) / 8;
                             int yChar = (srcY % 512) / 8;                            
+                            int yOff = srcY % 8;
                             
                             const BGMap &map = bgMaps[world.BGMAP_BASE + (yWorld * xWorlds) + xWorld];
-                            
                             const BGMapData &data = map.chars[yChar * 64 + xChar];
                             const Chr& chr = chrRam[data.charNum];  
-                            leftFrameBuffer[0].DrawChr(chr, x + world.GX - world.GP, y + world.GY, srcX % 8, srcY % 8, 1, 1, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
-                        }
-                        if (world.RON)
+                            
+                            leftFrameBuffer[0].DrawChr(chr, x + world.GX - world.GP, y + world.GY, xOff, yOff, 8 - xOff, 8 - yOff, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
+                            y += (8 - yOff);
+                        } while(y <= world.H);
+                        x += (8 - xOff);
+                    } while(x <= world.W);
+                }
+                if (world.RON)
+                {
+                    int x = 0;
+                    do
+                    {
+                        int srcX = (x + world.MX + world.MP) % (yWorlds * 512);
+                        int xWorld = srcX / 512;
+                        int xChar = (srcX % 512) / 8;
+                        int xOff = srcX % 8;
+                        int y = 0;
+                        do
                         {
                             int srcY = (y + world.MY) % (xWorlds * 512);
-                            int srcX = (x + world.MX + world.MP) % (yWorlds * 512);
-                            int xWorld = srcX / 512;
                             int yWorld = srcY / 512;
-                            int xChar = (srcX % 512) / 8;
                             int yChar = (srcY % 512) / 8;                            
+                            int yOff = srcY % 8;
                             
                             const BGMap &map = bgMaps[world.BGMAP_BASE + (yWorld * xWorlds) + xWorld];
-                            
                             const BGMapData &data = map.chars[yChar * 64 + xChar];
                             const Chr& chr = chrRam[data.charNum];  
-                            rightFrameBuffer[0].DrawChr(chr, x + world.GX + world.GP, y + world.GY, srcX % 8, srcY % 8, 1, 1, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
-                        }
-                        y++;
-                    } while(y <= world.H);
-                    x++;
-                } while(x <= world.W);
-                
+                            
+                            rightFrameBuffer[0].DrawChr(chr, x + world.GX + world.GP, y + world.GY, xOff, yOff, 8 - xOff, 8 - yOff, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
+                            y += (8 - yOff);
+                        } while(y <= world.H);
+                        x += (8 - xOff);
+                    } while(x <= world.W);
+                }
             }
         }
        //WriteFrame();
