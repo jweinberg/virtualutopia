@@ -87,13 +87,13 @@ namespace VIP
                 case 0x5F844:
                     return *(char*)&VER;
                 case 0x5F848:
-                    return *(char*)&SPT0;
+                    return *(char*)&objControl[0];
                 case 0x5F85A:
-                    return *(char*)&SPT1;
+                    return *(char*)&objControl[1];
                 case 0x5F84C:
-                    return *(char*)&SPT2;
+                    return *(char*)&objControl[2];
                 case 0x5F84E:
-                    return *(char*)&SPT3;
+                    return *(char*)&objControl[3];
                 case 0x5F860 ... 0x5F867:
                     return *(((char*)&GPLT[0]) + (offset - 0x5F860));
                 case 0x5F868 ... 0x5F86F:
@@ -212,17 +212,12 @@ namespace VIP
         );
         uint16_t VER;
         
-        union
+        struct ObjControlVal
         {
-            struct
-            {
-                uint16_t SPT0;
-                uint16_t SPT1;
-                uint16_t SPT2;
-                uint16_t SPT3;
-            };
-            uint16_t objControl[4];
-        };
+            uint16_t SPT : 10;
+            uint16_t reserved : 6;
+        } objControl[4];
+
         Palette GPLT[4];
         Palette JPLT[4];
         uint16_t BKCOL;

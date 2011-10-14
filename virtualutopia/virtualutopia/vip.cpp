@@ -166,8 +166,10 @@ namespace VIP
                 continue;
             else if (type == World::kObjType)
             {
-                int stopIndex = (objSearchIndex > 0) ? objControl[objSearchIndex - 1] : 0;
-                for (int objIdx = objControl[objSearchIndex]; objIdx >= stopIndex; --objIdx)
+                int stopIndex = (objSearchIndex > 0) ? objControl[objSearchIndex - 1].SPT : 0;
+                if (stopIndex == 1023)
+                    stopIndex = 0;
+                for (int objIdx = objControl[objSearchIndex].SPT; objIdx >= stopIndex; --objIdx)
                 {
                      if (test ? testVal == n : true)
                          DrawObj(oam[objIdx]);
