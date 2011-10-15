@@ -15,14 +15,14 @@ namespace VIP
     {
         int16_t JX;
         int16_t JP:14;
-        int16_t JRON:1;
-        int16_t JLON:1;
+        bool JRON:1;
+        bool JLON:1;
         int16_t JY;
-        int16_t JCA:11;
+        uint16_t JCA:11;
         int16_t reserved:1;
-        int16_t JVFLP:1;
-        int16_t JHFLP:1;
-        int16_t JPLTS:2;
+        bool JVFLP:1;
+        bool JHFLP:1;
+        uint16_t JPLTS:2;
     };
 }
 

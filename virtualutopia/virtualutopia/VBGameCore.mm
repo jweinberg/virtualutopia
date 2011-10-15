@@ -14,7 +14,6 @@
 #include "vip.h"
 #import <OpenGL/gl.h>
 
-uint32_t bmpData[384 * 256];
 @implementation VBGameCore
 
 - (id)init
@@ -79,44 +78,8 @@ uint32_t bmpData[384 * 256];
 - (const void *)videoBuffer
 {
     //memset(bmpData, 0xFF00FFFF, 384 * 256);
-    
-    char * internalDataLeft = (char*)&vb->vip->leftFrameBuffer[0];
-    char * internalDataRight = (char*)&vb->vip->rightFrameBuffer[0];    
-    
-    for (int x = 0; x < 384; ++x)
-    {
-        for (int y = 0; y < 64; ++y)
-        {
-            for (int bt = 0; bt < 4; ++bt)
-            {
-                uint32_t pixel = 0xFF000000;
-                
-                char leftPx = (*internalDataLeft >> (bt * 2)) & 0x3;
-                char rightPx = (*internalDataRight >> (bt * 2)) & 0x3;
-                
-                if (leftPx == 1)
-                    pixel |= 0x00000052;
-                else if (leftPx == 2)
-                    pixel |= 0x000000AD;
-                else if (leftPx == 3)
-                    pixel |= 0x000000FF;
-
-                if (rightPx == 1)
-                    pixel |= 0x00520000;
-                else if (rightPx == 2)
-                    pixel |= 0x00AD0000;
-                else if (rightPx == 3)
-                    pixel |= 0x00FF0000;
-                
-                *(bmpData + (384 * (y * 4 + bt)) + x) = pixel;
-            }
-            internalDataLeft++;
-            internalDataRight++;
-        }
-    }
-
-    
-    return bmpData;
+        
+    return vb->vip->bmpData;
 }
 
 - (GLenum)pixelFormat

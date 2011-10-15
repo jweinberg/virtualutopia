@@ -9,6 +9,18 @@
 #ifndef virtualutopia_cpu_utils_h
 #define virtualutopia_cpu_utils_h
 
+    template <typename T>
+    inline T min(T a, T b)
+    {
+        return (a > b) ? b : a;
+    }
+
+    template <typename T>
+    inline T max(T a, T b)
+    {
+        return (a < b) ? b : a;
+    }
+
     inline int sign(int32_t v)
     {
         return (v >> 31);

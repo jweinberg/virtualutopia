@@ -12,8 +12,9 @@ VB::VB(const std::string &fileName)
     vip = new VIP::VIP();
     nvc = new NVC::NVC();
     mmu = new MMU(*rom, *vip, *nvc);
-    cpu = new CPU::v810(*mmu, *vip);
+    cpu = new CPU::v810(*mmu, *vip, *nvc);
     vip->cpu = cpu;
+    nvc->cpu = cpu;
 }
 
 VB::~VB()

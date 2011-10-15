@@ -36,7 +36,7 @@ namespace CPU
     class v810 
     {
     public:
-        v810(MMU& mmu, VIP::VIP& vip);
+        v810(MMU& mmu, VIP::VIP& vip, NVC::NVC& nvc);
         void reset();
         void step();
         const std::string registerDescription() const;
@@ -103,6 +103,7 @@ namespace CPU
         
         MMU &memoryManagmentUnit;
         VIP::VIP &vip;
+        NVC::NVC &nvc;
 #pragma mark - Instructions
         #include "v810_instructions.h"
     };

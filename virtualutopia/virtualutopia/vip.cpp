@@ -140,16 +140,16 @@ namespace VIP
         free(bmpdata);
     }
     
-    void VIP::DrawObj(const Obj &obj)
+    void VIP::DrawObj(const Obj &obj, int row)
     {
         if (obj.JLON)
-            leftFrameBuffer[0].DrawChr(chrRam[obj.JCA], obj.JX - obj.JP, obj.JY, 0, 0, 8, 8, obj.JHFLP, obj.JVFLP, JPLT[obj.JPLTS]);
+            leftFrameBuffer[0].DrawChr(chrRam[obj.JCA], row, obj.JX - obj.JP, obj.JY, 0, 0, 8, 8, obj.JHFLP, obj.JVFLP, JPLT[obj.JPLTS]);
         if (obj.JRON)
-            rightFrameBuffer[0].DrawChr(chrRam[obj.JCA], obj.JX + obj.JP, obj.JY, 0, 0, 8, 8, obj.JHFLP, obj.JVFLP, JPLT[obj.JPLTS]);
+            rightFrameBuffer[0].DrawChr(chrRam[obj.JCA], row, obj.JX + obj.JP, obj.JY, 0, 0, 8, 8, obj.JHFLP, obj.JVFLP, JPLT[obj.JPLTS]);
             
     }
     
-    void VIP::Draw()
+    void VIP::Draw(int row)
     {
         volatile static bool test = false;
         volatile static int testVal = 31;
@@ -172,7 +172,7 @@ namespace VIP
                 for (int objIdx = objControl[objSearchIndex].SPT; objIdx >= stopIndex; --objIdx)
                 {
                      if (test ? testVal == n : true)
-                         DrawObj(oam[objIdx]);
+                         DrawObj(oam[objIdx], row);
                 }
                 if (objSearchIndex)
                     objSearchIndex--;   
@@ -184,24 +184,28 @@ namespace VIP
                 int xWorlds = 1 << world.SCX;
                 int yWorlds = 1 << world.SCY;;
                 
+                if (world.GY + world.H <= row * 8)
+                    continue;
+                if (world.GY > (row * 8 + 8))
+                    continue;
                 
                 if (world.LON)
                 {
                     int x = 0;
                     do
                     {
-                        int srcX = (x + world.MX - world.MP) % (yWorlds * 512);
+                        int srcX = (x + world.MX - world.MP) % (xWorlds * 512);
                         int xWorld = srcX / 512;
                         int xChar = (srcX & 0x1FF) / 8;
                         int xOff = srcX & 7;
-                        int y = 0;
+                        int y = max<int>((row * 8) - world.GY, 0);
                         
                         int w = 8 - xOff;
                         w = MIN(w, world.W + 1 - x);
                         
                         do
                         {
-                            int srcY = (y + world.MY) % (xWorlds * 512);
+                            int srcY = (y + world.MY) % (yWorlds * 512);
                             int yWorld = srcY / 512;
                             int yChar = (srcY & 0x1FF) / 8;                            
                             int yOff = srcY & 7;
@@ -213,9 +217,9 @@ namespace VIP
                             int h = 8 - yOff;
                             h = MIN(h, world.H + 1 - y);
                             
-                            leftFrameBuffer[0].DrawChr(chr, x + world.GX - world.GP, y + world.GY, xOff, yOff, w, h, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
+                            leftFrameBuffer[0].DrawChr(chr, row, x + world.GX - world.GP, y + world.GY, xOff, yOff, w, h, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
                             y += (8 - yOff);
-                        } while(y <= world.H);
+                        } while(y <= (max<int>((row * 8) - world.GY, 0) + 8) && y <= world.H);
                         x += (8 - xOff);
                     } while(x <= world.W);
                 }
@@ -224,18 +228,18 @@ namespace VIP
                     int x = 0;
                     do
                     {
-                        int srcX = (x + world.MX + world.MP) % (yWorlds * 512);
+                        int srcX = (x + world.MX + world.MP) % (xWorlds * 512);
                         int xWorld = srcX / 512;
                         int xChar = (srcX & 0x1FF) / 8;
                         int xOff = srcX & 7;
-                        int y = 0;
+                        int y = max<int>((row * 8) - world.GY, 0);
                         
                         int w = 8 - xOff;
                         w = MIN(w, world.W + 1 - x);
                         
                         do
                         {
-                            int srcY = (y + world.MY) % (xWorlds * 512);
+                            int srcY = (y + world.MY) % (yWorlds * 512);
                             int yWorld = srcY / 512;
                             int yChar = (srcY & 0x1FF) / 8;                            
                             int yOff = srcY & 7;
@@ -246,9 +250,10 @@ namespace VIP
                             
                             int h = 8 - yOff;
                             h = MIN(h, world.H + 1 - y);
-                            rightFrameBuffer[0].DrawChr(chr, x + world.GX + world.GP, y + world.GY, xOff, yOff, w, h, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
+                            
+                            rightFrameBuffer[0].DrawChr(chr, row, x + world.GX + world.GP, y + world.GY, xOff, yOff, w, h, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
                             y += (8 - yOff);
-                        } while(y <= world.H);
+                        } while(y <= (max<int>((row * 8) - world.GY, 0) + 8) && y <= world.H);
                         x += (8 - xOff);
                     } while(x <= world.W);
                 }
@@ -266,6 +271,10 @@ namespace VIP
         {
             if (rowCount == -1 && timeSinceBuffer > 528)
             {
+                
+                memset((char*)&rightFrameBuffer[0], 0, 0x6000);
+                memset((char*)&leftFrameBuffer[0], 0, 0x6000);
+                
                 rowCount = 0;
                 XPSTTS.OVERTIME = 0;
                 XPSTTS.SBCOUNT = 0;
@@ -302,6 +311,44 @@ namespace VIP
                 XPSTTS = 0;
                 XPSTTS.SBCOUNT = rowCount;
                 XPSTTS.XPEN = XPCTRL.XPEN;
+                if (DPSTTS.DISP)
+                {
+                    Draw(rowCount);
+                }
+                
+                char * internalDataLeft = (char*)&leftFrameBuffer[0];
+                char * internalDataRight = (char*)&rightFrameBuffer[0];    
+                
+                for (int x = 0; x < 384; ++x)
+                {
+                    for (int y = rowCount * 2; y < rowCount * 2 + 2; ++y)
+                    {
+                        for (int bt = 0; bt < 4; ++bt)
+                        {
+                            uint32_t pixel = 0xFF000000;
+                            
+                            char leftPx = (*(internalDataLeft + (x * 64) + y) >> (bt * 2)) & 0x3;
+                            char rightPx = (*(internalDataRight + (x * 64) + y) >> (bt * 2)) & 0x3;
+                            
+                            if (leftPx == 1)
+                                pixel |= BRT[0].val;
+                            else if (leftPx == 2)
+                                pixel |= BRT[1].val;
+                            else if (leftPx == 3)
+                                pixel |= (BRT[2].val + BRT[1].val + BRT[0].val);
+                            
+                            if (rightPx == 1)
+                                pixel |= BRT[0].val << 16;
+                            else if (rightPx == 2)
+                                pixel |= BRT[1].val << 16;
+                            else if (rightPx == 3)
+                                pixel |= (BRT[2].val + BRT[1].val + BRT[0].val) << 16;
+                            
+                            *(bmpData + (384 * (y * 4 + bt)) + x) = pixel;
+                        }
+                    }
+                }
+                
                 rowCount++;
                 lastFrameBuffer = cycles;
             }
@@ -385,10 +432,6 @@ namespace VIP
             }
             else if (rowCount == 33 && timeSinceBuffer > 270336)
             {
-                memset((char*)&rightFrameBuffer[0], 0, 0x6000);
-                memset((char*)&leftFrameBuffer[0], 0, 0x6000);
-                
-                Draw();
                 rowCount = -1;
                 frame++;
                 if (frame < 1 || frame > 2) frame = 1;
@@ -400,5 +443,6 @@ namespace VIP
             }
         }
         return 0;
+
     }
 }

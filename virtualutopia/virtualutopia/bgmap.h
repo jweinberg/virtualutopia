@@ -15,8 +15,8 @@ namespace VIP
     {
         uint16_t charNum:11;
         uint16_t reserved:1;
-        uint16_t BVFLP:1;
-        uint16_t BHFLP:1;
+        bool BVFLP:1;
+        bool BHFLP:1;
         uint16_t GPLTS:2;
     };
 

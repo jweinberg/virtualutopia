@@ -11,6 +11,7 @@
 
 #include "chr.h"
 #include <assert.h>
+#include "cpu_utils.h"
 
 namespace VIP
 {
@@ -19,19 +20,21 @@ namespace VIP
         public:
         char data[0x6000];
         
-        void DrawChr(const Chr &chr, int xoff, int yoff, int sourceXOffset, int sourceYOffset, int w, int h, bool flipHor, bool flipVert,const Palette &palette)
+        void DrawChr(const Chr &chr, uint8_t row, int xoff, int yoff, int sourceXOffset, int sourceYOffset, int w, int h, bool flipHor, bool flipVert,const Palette &palette)
         {
             const uint16_t * const data = chr.data;
             
             //See what is offscreen or not
-            if (xoff + w < 0 || yoff + h < 0 || xoff >= 384 || yoff >= 224)
+            if (xoff + w < 0 || yoff + h < row * 8 || xoff >= 384 || yoff >= min<uint16_t>(224, (row * 8 + 8)))
                 return;
             
             for (int y = 0; y < h; ++y)
             {                   
                 int yPxl = y + yoff;
-                if (yPxl < 0 || yPxl >= 224)
+                if (yPxl < row * 8 || yPxl >= min<uint16_t>(224, (row * 8 + 8)))
+                {
                     continue;
+                }
                 
                 int yIdx = y + sourceYOffset;
                 if (flipVert) yIdx = 7 - yIdx;

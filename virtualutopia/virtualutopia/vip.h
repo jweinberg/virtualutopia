@@ -29,7 +29,7 @@ namespace VIP
     public:
         void WriteFrame();
         void DumpCHR();
-        void DrawObj(const Obj& obj);
+        void DrawObj(const Obj &obj, int row);
         VIP();
         CPU::v810 *cpu;
         inline char& operator[](const int offset)
@@ -71,13 +71,15 @@ namespace VIP
                 case 0x5F822:
                     return *(char*)&DPCTRL;
                 case 0x5F824:
-                    return *(char*)&BRTA;
+                    return *(char*)&BRT[0];
                 case 0x5F826:
-                    return *(char*)&BRTB;
+                    return *(char*)&BRT[1];
                 case 0x5F828:
-                    return *(char*)&BRTC;
+                    return *(char*)&BRT[2];
                 case 0x5F82A:
                     return *(char*)&REST;
+                case 0x5F82E:
+                    return *(char*)&FRMCYC;
                 case 0x5F830:
                     return *(char*)&CTA;
                 case 0x5F840:
@@ -88,7 +90,7 @@ namespace VIP
                     return *(char*)&VER;
                 case 0x5F848:
                     return *(char*)&objControl[0];
-                case 0x5F85A:
+                case 0x5F84A:
                     return *(char*)&objControl[1];
                 case 0x5F84C:
                     return *(char*)&objControl[2];
@@ -96,22 +98,25 @@ namespace VIP
                     return *(char*)&objControl[3];
                 case 0x5F860 ... 0x5F867:
                     return *(((char*)&GPLT[0]) + (offset - 0x5F860));
-                case 0x5F868 ... 0x5F86F:
+                case 0x5F868 ... 0x5F86E:
                     return *(((char*)&JPLT[0]) + (offset - 0x5F868));
                 case 0x78000 ... 0x7FFFF:
                     return *(((char*)&chrRam[0]) + (offset - 0x78000));
                 default:
+                  //  printf("Accessing memory: %x\n", offset);
                     return videoRam[offset];
             }
         }
         
 
         uint16_t Step(uint32_t cycles);
-        void Draw();
+        void Draw(int row);
         Chr chrRam[2048];
         Obj oam[1024];
         BGMap bgMaps[14];
         World worlds[32];
+        
+        uint32_t bmpData[384 * 256];
         
         Framebuffer leftFrameBuffer[2];
         Framebuffer rightFrameBuffer[2];
@@ -120,6 +125,8 @@ namespace VIP
         bool gameStartTriggered;
         uint8_t framesWaited;
         int8_t rowCount;
+        int32_t drawingCounter;
+        int32_t columnCounter;
         uint32_t lastFrameBuffer;
         char frame;
         int8_t objSearchIndex;
@@ -185,9 +192,11 @@ namespace VIP
             uint16_t LOCK:1;
             uint16_t padding_1:5;
         );
-        uint16_t BRTA;
-        uint16_t BRTB;
-        uint16_t BRTC;
+        struct
+        {
+            uint8_t val;
+            uint8_t reserved;
+        } BRT[3];
         uint16_t REST;
         uint16_t FRMCYC;
         uint16_t CTA;

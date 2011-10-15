@@ -12,8 +12,8 @@
 
 #ifndef v810_instructions_guard
 #define v810_instructions_guard
-#define d_printf(A, ...)
-//#define d_printf(A, ...) do{ if(debugOutput) { printf("%X: " A, (0x07000000 + (uint32_t)((char*)programCounter - ((char*)memoryManagmentUnit.rom.data))), ##__VA_ARGS__); } }while(0)
+//#define d_printf(A, ...)
+#define d_printf(A, ...) do{ if(debugOutput) { printf("%X: " A, (0x07000000 + (uint32_t)((char*)programCounter - ((char*)memoryManagmentUnit.rom.data))), ##__VA_ARGS__); } }while(0)
 
 struct OrNoter
 {
@@ -42,7 +42,7 @@ struct Mover
 struct Xorer
 {
     Xorer() {}
-    const uint32_t operator()(uint32_t a, uint32_t b) const { return a & b; };
+    const uint32_t operator()(uint32_t a, uint32_t b) const { return a ^ b; };
 };
 
 struct AndNoter
@@ -60,7 +60,7 @@ struct Ander
 struct Orer
 {
     Orer() {}
-    const uint32_t operator()(uint32_t a, uint32_t b) const { return a & b; };
+    const uint32_t operator()(uint32_t a, uint32_t b) const { return a | b; };
 };
 
 enum FlagCondition
@@ -1109,7 +1109,7 @@ inline void multiplyHalfWord(const Instruction &instruction)
 {
     d_printf("MPYHW\n");
     
-    generalRegisters[instruction.reg2] = generalRegisters[instruction.reg2] * generalRegisters[instruction.reg1];
+    generalRegisters[instruction.reg2] = (int32_t)(int16_t)(generalRegisters[instruction.reg2] & 0xFFFF) * (int32_t)(int16_t)(generalRegisters[instruction.reg1] & 0xFFFF);
     
     programCounter += 4;
     cycles += 9;
@@ -1134,7 +1134,7 @@ inline void moveBitString(const Instruction& instruction)
     while (source.HasData())
     {
         source.Read(data, bits);
-        dest.SetNext<Mover>(data, bits);
+        dest.SetNext(Mover(), data, bits);
     }
     
     assert(!source.HasData() && !dest.HasData());
@@ -1160,7 +1160,7 @@ inline void andBitString(const Instruction& instruction)
     while (source.HasData())
     {
         source.Read(data, bits);
-        dest.SetNext<Ander>(data, bits);
+        dest.SetNext(Ander(), data, bits);
     }
     
     assert(!source.HasData() && !dest.HasData());
@@ -1186,8 +1186,14 @@ inline void orBitString(const Instruction& instruction)
     while (source.HasData())
     {
         source.Read(data, bits);
-        dest.SetNext<Orer>(data, bits);
+        dest.SetNext(Orer(), data, bits);
     }
+    
+    generalRegisters[30] = source.currentLocation;
+    generalRegisters[29] = dest.currentLocation;
+    generalRegisters[28] = source.stringLength;
+    generalRegisters[27] = source.offset;
+    generalRegisters[26] = dest.offset;
     
     assert(!source.HasData() && !dest.HasData());
     
@@ -1212,7 +1218,7 @@ inline void xorBitString(const Instruction& instruction)
     while (source.HasData())
     {
         source.Read(data, bits);
-        dest.SetNext<Xorer>(data, bits);
+        dest.SetNext(Xorer(), data, bits);
     }
     
     assert(!source.HasData() && !dest.HasData());
@@ -1239,7 +1245,7 @@ inline void andNotBitString(const Instruction& instruction)
     while (source.HasData())
     {
         source.Read(data, bits);
-        dest.SetNext<AndNoter>(data, bits);
+        dest.SetNext(AndNoter(), data, bits);
     }
     
     assert(!source.HasData() && !dest.HasData());
@@ -1266,7 +1272,7 @@ inline void orNotBitString(const Instruction& instruction)
     while (source.HasData())
     {
         source.Read(data, bits);
-        dest.SetNext<OrNoter>(data, bits);
+        dest.SetNext(OrNoter(), data, bits);
     }
     
     assert(!source.HasData() && !dest.HasData());
@@ -1292,7 +1298,7 @@ inline void xorNotBitString(const Instruction& instruction)
     while (source.HasData())
     {
         source.Read(data, bits);
-        dest.SetNext<XorNoter>(data, bits);
+        dest.SetNext(XorNoter(), data, bits);
     }
     
     assert(!source.HasData() && !dest.HasData());
@@ -1318,7 +1324,7 @@ inline void notBitString(const Instruction& instruction)
     while (source.HasData())
     {
         source.Read(data, bits);
-        dest.SetNext<Noter>(data, bits);
+        dest.SetNext(Noter(), data, bits);
     }
     
     assert(!source.HasData() && !dest.HasData());

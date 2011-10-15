@@ -76,7 +76,7 @@ private:
             case 0x07000000 ... 0x07FFFFFF: //Cartridge ROM
                 return rom[virtualAddress];
         }
-        //assert(false);
+        assert(false);
         return vip[0];
     }
 public:
