@@ -23,29 +23,38 @@ namespace VIP
         void DrawChr(const Chr &chr, uint8_t row, int xoff, int yoff, int sourceXOffset, int sourceYOffset, int w, int h, bool flipHor, bool flipVert,const Palette &palette)
         {
             const uint16_t * const data = chr.data;
+            const uint8_t expandedRow = row * 8;
             
             //See what is offscreen or not
-            if (xoff + w < 0 || yoff + h < row * 8 || xoff >= 384 || yoff >= min<uint16_t>(224, (row * 8 + 8)))
+            if (xoff + w < 0 || yoff + h < expandedRow || xoff >= 384 || yoff >= (expandedRow + 8))
                 return;
             
-            for (int y = 0; y < h; ++y)
+            int yOver = (expandedRow + 8) - (yoff + h);
+            uint8_t y = 0;
+            if (yOver > -h && yOver < 0)
+                h += yOver;
+            
+            int xOver = 384 - (xoff + w);
+            uint8_t xStart = 0;
+            if (xOver > -w && xOver < 0)
+                w += xOver;
+            
+            if (xoff < 0)
+                xStart = -xoff;
+            
+            if (yoff < expandedRow) 
+                y = -(yoff - expandedRow);
+            
+            for (; y < h; ++y)
             {                   
-                int yPxl = y + yoff;
-                if (yPxl < row * 8 || yPxl >= min<uint16_t>(224, (row * 8 + 8)))
-                {
-                    continue;
-                }
-                
-                int yIdx = y + sourceYOffset;
+                uint16_t yPxl = y + yoff;    
+                uint8_t yIdx = y + sourceYOffset;
                 if (flipVert) yIdx = 7 - yIdx;
                 uint16_t row = data[yIdx];
-                for (int x = 0; x < w; ++x)
+                for (uint8_t x = xStart; x < w; ++x)
                 {
-                    int xPxl = x + xoff;
-                    if (xPxl < 0 || xPxl >= 384)
-                        continue;
-
-                    int xIdx = x + sourceXOffset;
+                    uint16_t xPxl = x + xoff;
+                    uint8_t xIdx = x + sourceXOffset;
                     if (flipHor) xIdx = 7 - xIdx;
                     uint8_t colorIdx = (row >> (xIdx * 2)) & 0x3;
                     if (colorIdx)
@@ -53,7 +62,7 @@ namespace VIP
                         char * column = this->data + (xPxl * 64);
                         column += (yPxl / 4);
                         
-                        int shift = (yPxl % 4) * 2;
+                        uint8_t shift = (yPxl & 3) * 2;
                         *column &= ~(0x3 << shift);
                         *column |= (palette[colorIdx] << shift);
                     }
