@@ -23,9 +23,10 @@ namespace CPU
     
     void v810::reset()
     {   
-        programCounter = (char*)&memoryManagmentUnit.GetData<uint32_t>(0xFFFFFFF0);
+        programCounter = (char*)&memoryManagmentUnit.read<uint32_t>(0xFFFFFFF0);
         systemRegisters.PSW = 0x00008000;
         generalRegisters[0] = 0;
+        nvc.Reset();
     }
     
     void v810::decode(uint32_t data)
@@ -33,7 +34,7 @@ namespace CPU
         const Instruction &instruction(data);
 #define OPCODE_DECODE(OPCODE, FUNCTION) case OPCODE: FUNCTION(instruction); break;
 
-        switch (instruction.opcode)
+        switch (instruction.opcode())
         {
             OPCODE_DECODE(MOV_1, move);
             OPCODE_DECODE(ADD_1, add); 
@@ -80,6 +81,9 @@ namespace CPU
                     OPCODE_DECODE(ANDNBSU, andNotBitString); 
                     OPCODE_DECODE(XORNBSU, xorBitString); 
                     OPCODE_DECODE(NOTBSU, notBitString);  
+                    default:
+                        printf("Decoding uknown opcode: (0x%X)\n", instruction.opcode());
+                        exit(-1);
                 }
                 break;
             OPCODE_DECODE(MOVEA, moveAddImmediate); 
@@ -103,7 +107,7 @@ namespace CPU
             OPCODE_DECODE(OUT_B, outWrite); 
             OPCODE_DECODE(OUT_H, outWrite); 
             case Fpp:
-                switch ((FloatingPointMnumonic)instruction.subopcode)
+                switch ((FloatingPointMnumonic)instruction.subopcode())
                 {
                     OPCODE_DECODE(CMPF_S, compareFloat);
                     OPCODE_DECODE(CVT_WS, convertWordToFloat);
@@ -117,6 +121,9 @@ namespace CPU
                     OPCODE_DECODE(REV, reverseWord);
                     OPCODE_DECODE(TRNC_SW, truncateFloat);
                     OPCODE_DECODE(MPYHW, multiplyHalfWord);
+                    default:
+                        printf("Decoding uknown fppcode: (0x%X)\n", instruction.subopcode());
+                        exit(-1);
                 }
                 break;
             OPCODE_DECODE(OUT_W, outWrite);  
@@ -137,7 +144,7 @@ namespace CPU
             OPCODE_DECODE(BGE, branchIfGreaterOrEqual);
             OPCODE_DECODE(BGT, branchIfGreaterThan);
             default:
-                printf("Decoding uknown opcode: (0x%X)\n", instruction.opcode);
+                printf("Decoding uknown opcode: (0x%X)\n", instruction.opcode());
                 exit(-1);
         }
 #undef OPCODE_DECODE
@@ -147,10 +154,12 @@ namespace CPU
     {    
         //Some instructions think its FUNNY to assign to reg 0 as an optimization
         generalRegisters[0] = 0;   
+//        nvc.SCR.STAT = 1;
+//        nvc.SDHR.STA = 1;
 //        if (!nvc.SCR.DIS && (nvc.SDHR != 0 || nvc.SDLR & 0xF8))
 //            processInterrupt((InterruptCode)0);
 //        
-      //  nvc.Step(cycles);
+        //nvc.Step(cycles);
         vip.Step(cycles);
         decode(*(uint32_t*)programCounter);
     }
@@ -169,7 +178,7 @@ namespace CPU
         systemRegisters.PSW.ID = 1;
         systemRegisters.PSW.AE = 0;
         
-        programCounter = (char*)&memoryManagmentUnit.GetData<uint32_t>(0xFFFFFE00 | interruptCode << 4);
+        programCounter = (char*)&memoryManagmentUnit.read<uint32_t>(0xFFFFFE00 | interruptCode << 4);
     }
     
     void v810::throwException(ExceptionCode exceptionCode)
@@ -177,9 +186,9 @@ namespace CPU
         //Fatal exception
         if (systemRegisters.PSW.NP)
         {
-            memoryManagmentUnit.StoreWord(0x0, 0xFFFF0000 | exceptionCode);
-            memoryManagmentUnit.StoreWord(0x4, systemRegisters.PSW);
-            memoryManagmentUnit.StoreWord(0x8, 0x07000000 + (uint32_t)((char*)programCounter - ((char*)memoryManagmentUnit.rom.data)));
+            memoryManagmentUnit.store((uint32_t)(0xFFFF0000 | exceptionCode), (uint32_t)0x0);
+            memoryManagmentUnit.store(systemRegisters.PSW, 0x4);
+            memoryManagmentUnit.store(0x07000000 + (uint32_t)((char*)programCounter - ((char*)memoryManagmentUnit.rom.data)), 0x8);
             return;
         }
         
@@ -192,7 +201,7 @@ namespace CPU
             systemRegisters.PSW.NP = 1;
             systemRegisters.PSW.ID = 1;
             systemRegisters.PSW.AE = 0;
-            programCounter = (char*)&memoryManagmentUnit.GetData<uint32_t>(0xFFFFFFD0);
+            programCounter = (char*)&memoryManagmentUnit.read<uint32_t>(0xFFFFFFD0);
         }
         else
         {
@@ -204,7 +213,7 @@ namespace CPU
             systemRegisters.PSW.AE = 0;
             
             //TODO: Lookup the proper handler, this is DIV0
-            programCounter = (char*)&memoryManagmentUnit.GetData<uint32_t>(0xFFFFFF80);
+            programCounter = (char*)&memoryManagmentUnit.read<uint32_t>(0xFFFFFF80);
         }
         
     }

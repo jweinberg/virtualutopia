@@ -23,11 +23,24 @@ namespace NVC
         NVC()
         {
         }
-        
+        void Reset();
         CPU::v810 *cpu;
         uint32_t lastTimer;
         uint16_t timerCount;
         void Step(uint32_t cycles);
+        
+        template <typename T>
+        inline const T& read(uint32_t address) const
+        {
+            return *(T*)&((*this)[address]);
+        }
+
+        template <typename T>
+        inline void store(T& val, uint32_t address) const
+        {
+            *(T*)&((*this)[address]) = val;
+        }
+        
         inline char &operator[](uint32_t address) const
         {
             switch (address)

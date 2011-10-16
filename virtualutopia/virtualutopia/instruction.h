@@ -154,32 +154,32 @@ namespace CPU
             };
         };
     public:
-        uint32_t disp26;
-        uint16_t disp9;
-        const OpcodeMnumonic opcode;
-        uint8_t subopcode;
+        const uint32_t disp26() const
+        {
+            return ((instruction & 0x3FF) << 16) | (instruction >> 16);
+        }
+
+        const uint16_t disp9() const
+        {
+            return instruction & 0x1FF;
+        }
+        
+        const uint8_t subopcode() const
+        {
+            return instruction >> 26;
+        }
+        
+        const OpcodeMnumonic opcode() const
+        {
+            return (OpcodeMnumonic)((instruction & 0xE000) == 0x8000 ? (instruction & 0xFFFF) >> 9 : (instruction & 0xFFFF) >> 10);
+        }
 
     public:
         Instruction(const uint32_t _instruction) : 
-            instruction(_instruction),
-            opcode((OpcodeMnumonic)((instruction & 0xFFFF) >> (((instruction >> 13) & 0x7) == 4 ? 9 : 10)))
+            instruction(_instruction)
             {
-                switch (opcode)
-                {
-                    case Fpp:
-                        subopcode = instruction >> 26;
-                        break;
-                    case BV ... BGT:
-                        disp9 = instruction & 0x1FF;
-                        break;
-                    //Form IV
-                    case JR:
-                    case JAL:
-                        disp26 = ((instruction & 0x3FF) << 16) | (instruction >> 16);
-                        break;
-                    default:
-                        break;
-                }
+//                if (opcode & 0x
+//                ((OpcodeMnumonic)((instruction & 0xFFFF) >> (((instruction >> 13) & 0x7) == 4 ? 9 : 10)));
             }
     };
 }

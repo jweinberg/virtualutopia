@@ -23,7 +23,7 @@ namespace CPU
             assert(length > 0 && length <= 32);
             assert(stringLength >= length);
             
-            uint32_t currentWord = mmu.GetData<uint32_t>(currentLocation);
+            uint32_t currentWord = mmu.read<uint32_t>(currentLocation);
             currentWord = op(currentWord, bits);
             
             
@@ -41,12 +41,12 @@ namespace CPU
 //            
 //            currentWord &= ~mask;
 //            currentWord |= (bits << offset); 
-            mmu.StoreWord(currentLocation, currentWord);
+            mmu.store(currentWord, currentLocation);
             
             if (leftover)
             {
                 currentLocation += 4;
-                currentWord = mmu.GetData<uint32_t>(currentLocation);
+                currentWord = mmu.read<uint32_t>(currentLocation);
                 currentWord = op(currentWord, bits);
                 bits = (bits >> bitsLeft);
                 mask = 0xFFFFFFFF << leftover;
@@ -54,7 +54,7 @@ namespace CPU
                 currentWord |= bits;
                 offset = leftover;
                 
-                mmu.StoreWord(currentLocation, currentWord);
+                mmu.store(currentWord, currentLocation);
             }
             else
             {
@@ -68,7 +68,7 @@ namespace CPU
         
         inline void Read(uint32_t &data, uint8_t &readLength)
         {
-            uint32_t readWord = mmu.GetData<uint32_t>(currentLocation);
+            uint32_t readWord = mmu.read<uint32_t>(currentLocation);
             currentLocation += 4;
             
             readLength = min<uint32_t>(stringLength, 32);
@@ -93,7 +93,7 @@ namespace CPU
             
             if (leftover)
             {
-                uint32_t nextWord = mmu.GetData<uint32_t>(currentLocation);
+                uint32_t nextWord = mmu.read<uint32_t>(currentLocation);
                 currentLocation += 4;
                 mask = 0xFFFFFFFF << leftover;
                 nextWord &= ~mask;

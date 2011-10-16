@@ -30,6 +30,6 @@ const std::string ROM::romName() const
 {
     const int nameMaxLength = 0x07FFFDF3 - 0x07FFFDE0;
     char nameBuffer[nameMaxLength+1] = {0};
-    memcpy(nameBuffer, &(*this)[0x07FFFDE0], nameMaxLength);
+    memcpy(nameBuffer, &(*this).read<char>(0x07FFFDE0), nameMaxLength);
     return std::string(nameBuffer);
 }

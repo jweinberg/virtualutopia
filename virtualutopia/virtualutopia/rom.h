@@ -19,6 +19,12 @@ public:
     ~ROM();
     
     const std::string romName() const;
+    template <typename T>
+    const T& read(uint32_t address) const
+    {
+        return *((T*)&(*this)[address]);
+    }
+    
     inline char& operator[](uint32_t address) const
     {
         //The data is mirrored from 0x07000000 to 0x07FFFFFF

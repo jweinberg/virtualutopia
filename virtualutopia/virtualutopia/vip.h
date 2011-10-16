@@ -32,6 +32,19 @@ namespace VIP
         void DrawObj(const Obj &obj, int row);
         VIP();
         CPU::v810 *cpu;
+        
+        template <typename T>
+        inline const T& read(const int offset)
+        {
+            return *((T*)&(*this)[offset]);
+        }
+        
+        template <typename T>
+        inline void store(T& val, const int offset)
+        {
+            *((T*)&(*this)[offset]) = val;
+        }
+        
         inline char& operator[](const int offset)
         {
             switch (offset)

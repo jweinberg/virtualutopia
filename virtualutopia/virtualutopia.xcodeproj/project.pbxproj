@@ -811,6 +811,11 @@
 		821438DA14146AD100A98E34 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_ENABLE_SSE3_EXTENSIONS = YES;
+				GCC_ENABLE_SSE41_EXTENSIONS = YES;
+				GCC_ENABLE_SSE42_EXTENSIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_UNROLL_LOOPS = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WARNING_CFLAGS = "";
 			};
@@ -850,6 +855,7 @@
 				GCC_ENABLE_SSE42_EXTENSIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "VirtualUtopia/VirtualUtopia-Prefix.pch";
+				GCC_THREADSAFE_STATICS = NO;
 				GCC_UNROLL_LOOPS = YES;
 				INFOPLIST_FILE = "VirtualUtopia/VirtualUtopia-Info.plist";
 				INSTALL_PATH = "$(HOME)/Library/Bundles";
@@ -869,6 +875,7 @@
 				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "VirtualUtopia/VirtualUtopia-Prefix.pch";
+				GCC_THREADSAFE_STATICS = NO;
 				GCC_UNROLL_LOOPS = YES;
 				INFOPLIST_FILE = "VirtualUtopia/VirtualUtopia-Info.plist";
 				INSTALL_PATH = "$(HOME)/Library/Bundles";

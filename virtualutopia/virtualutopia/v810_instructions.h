@@ -552,13 +552,13 @@ inline void xorImmediate(const Instruction &instruction)
 inline void jump(const Instruction& instruction)
 {
     d_printf("JMP: PC <- GR[%d](0x%X)\n", instruction.reg1, generalRegisters[instruction.reg1]);
-    programCounter = (char*)&memoryManagmentUnit.GetData<uint32_t>(generalRegisters[instruction.reg1]);
+    programCounter = (char*)&memoryManagmentUnit.read<uint32_t>(generalRegisters[instruction.reg1]);
     cycles += 3;
 }
 
 inline void jumpRelative(const Instruction &instruction)
 {
-    int32_t relativeJump = sign_extend(26, instruction.disp26);
+    int32_t relativeJump = sign_extend(26, instruction.disp26());
     d_printf("JMP: PC <- PC + 0x%X\n", relativeJump);
     programCounter += relativeJump;
     cycles += 3;
@@ -569,7 +569,7 @@ inline void branchIfNoOverflow(const Instruction& instruction)
     d_printf("%s\n", "BNV");
     if (systemRegisters.PSW.OV == 0)
     {
-        programCounter += sign_extend(9, instruction.disp9);
+        programCounter += sign_extend(9, instruction.disp9());
         cycles += 3;
     }
     else
@@ -584,7 +584,7 @@ inline void branchIfOverflow(const Instruction& instruction)
     d_printf("%s\n", "BV");
     if (systemRegisters.PSW.OV)
     {
-        programCounter += sign_extend(9, instruction.disp9);
+        programCounter += sign_extend(9, instruction.disp9());
         cycles += 3;
     }
     else
@@ -599,7 +599,7 @@ inline void branchIfZero(const Instruction& instruction)
     d_printf("%s\n", "BZ");
     if (systemRegisters.PSW.Z)
     {
-        programCounter += sign_extend(9, instruction.disp9);
+        programCounter += sign_extend(9, instruction.disp9());
         cycles += 3;
     }
     else
@@ -614,7 +614,7 @@ inline void branchIfNotZero(const Instruction& instruction)
     d_printf("%s\n", "BNZ");
     if (systemRegisters.PSW.Z == 0)
     {
-        programCounter += sign_extend(9, instruction.disp9);
+        programCounter += sign_extend(9, instruction.disp9());
         cycles += 3;
     }
     else
@@ -630,7 +630,7 @@ inline void branchIfLessThan(const Instruction& instruction)
     d_printf("%s\n", "BLT");
     if ((systemRegisters.PSW.S ^ systemRegisters.PSW.OV) == 1)
     {
-        programCounter += sign_extend(9, instruction.disp9);
+        programCounter += sign_extend(9, instruction.disp9());
         cycles += 3;
     }
     else
@@ -645,7 +645,7 @@ inline void branchIfNotHigher(const Instruction& instruction)
     d_printf("%s\n", "BNH");
     if ((systemRegisters.PSW.Z | systemRegisters.PSW.CY) == 1)
     {
-        programCounter += sign_extend(9, instruction.disp9);
+        programCounter += sign_extend(9, instruction.disp9());
         cycles += 3;
     }
     else
@@ -660,7 +660,7 @@ inline void branchIfNegative(const Instruction& instruction)
     d_printf("%s\n", "BN");
     if (systemRegisters.PSW.S)
     {
-        programCounter += sign_extend(9, instruction.disp9);
+        programCounter += sign_extend(9, instruction.disp9());
         cycles += 3;
     }
     else
@@ -675,7 +675,7 @@ inline void branchIfPositive(const Instruction& instruction)
     d_printf("%s\n", "BP");
     if (systemRegisters.PSW.S == 0)
     {
-        programCounter += sign_extend(9, instruction.disp9);
+        programCounter += sign_extend(9, instruction.disp9());
         cycles += 3;
     }
     else
@@ -691,7 +691,7 @@ inline void branchIfHigher(const Instruction& instruction)
     d_printf("%s\n", "BH");
     if ((systemRegisters.PSW.Z | systemRegisters.PSW.CY) == 0)
     {
-        programCounter += sign_extend(9, instruction.disp9);
+        programCounter += sign_extend(9, instruction.disp9());
         cycles += 3;
     }
     else
@@ -706,7 +706,7 @@ inline void branchIfGreaterOrEqual(const Instruction& instruction)
     d_printf("BGE\n");
     if ((systemRegisters.PSW.S ^ systemRegisters.PSW.OV) == 0)
     {
-        programCounter += sign_extend(9, instruction.disp9);
+        programCounter += sign_extend(9, instruction.disp9());
         cycles += 3;
     }
     else
@@ -721,7 +721,7 @@ inline void branchIfGreaterThan(const Instruction& instruction)
     d_printf("BGT\n");
     if (((systemRegisters.PSW.S ^ systemRegisters.PSW.OV) | systemRegisters.PSW.Z) == 0)
     {
-        programCounter += sign_extend(9, instruction.disp9);
+        programCounter += sign_extend(9, instruction.disp9());
         cycles += 3;
     }
     else
@@ -736,7 +736,7 @@ inline void branchIfLessOrEqual(const Instruction& instruction)
     d_printf("BLE\n");
     if (((systemRegisters.PSW.S ^ systemRegisters.PSW.OV) | systemRegisters.PSW.Z) == 1)
     {
-        programCounter += sign_extend(9, instruction.disp9);
+        programCounter += sign_extend(9, instruction.disp9());
         cycles += 3;
     }
     else
@@ -751,7 +751,7 @@ inline void branchIfCarry(const Instruction& instruction)
     d_printf("BC\n");
     if (systemRegisters.PSW.CY)
     {
-        programCounter += sign_extend(9, instruction.disp9);
+        programCounter += sign_extend(9, instruction.disp9());
         cycles += 3;
     }
     else
@@ -766,7 +766,7 @@ inline void branchIfNoCarry(const Instruction& instruction)
     d_printf("BNC\n");
     if (systemRegisters.PSW.CY == 0)
     {
-        programCounter += sign_extend(9, instruction.disp9);
+        programCounter += sign_extend(9, instruction.disp9());
         cycles += 3;
     }
     else
@@ -779,7 +779,7 @@ inline void branchIfNoCarry(const Instruction& instruction)
 inline void branch(const Instruction& instruction)
 {
     d_printf("BR\n");
-    programCounter += sign_extend(9, instruction.disp9);
+    programCounter += sign_extend(9, instruction.disp9());
     cycles += 3;
 }
 
@@ -804,7 +804,7 @@ inline void storeWord(const Instruction& instruction)
     uint32_t address = (generalRegisters[instruction.reg1] + (int16_t)instruction.disp16) & 0xFFFFFFFC;
     d_printf("ST.W: [GR[%d](0x%X) + %d](0x%X) <- [GR[%d](0x%X)\n", instruction.reg1, generalRegisters[instruction.reg1], sign_extend(16, instruction.disp16) & 0xFFFFFFFC, address, instruction.reg2, generalRegisters[instruction.reg2]);
 
-    memoryManagmentUnit.StoreWord(address, generalRegisters[instruction.reg2]);
+    memoryManagmentUnit.store<uint32_t>(generalRegisters[instruction.reg2], address);
     programCounter += 4;
     cycles += 1;
 }
@@ -814,7 +814,8 @@ inline void storeHWord(const Instruction& instruction)
     uint32_t address = (generalRegisters[instruction.reg1] + (int16_t)instruction.disp16) & 0xFFFFFFFE;
     d_printf("ST.H: [GR[%d](0x%X) + %d](0x%X) <- [GR[%d](0x%X)\n", instruction.reg1, generalRegisters[instruction.reg1], sign_extend(16, instruction.disp16) & 0xFFFFFFFE, address, instruction.reg2, generalRegisters[instruction.reg2]);
 
-    memoryManagmentUnit.StoreHWord(address, generalRegisters[instruction.reg2] & 0xFFFF);
+    
+    memoryManagmentUnit.store<uint16_t>(generalRegisters[instruction.reg2] & 0xFFFF, address);
     programCounter += 4;
     cycles += 1;
 }
@@ -825,7 +826,7 @@ inline void storeByte(const Instruction& instruction)
     d_printf("ST.B: [GR[%d](0x%X) + %d](0x%X) <- [GR[%d](0x%X)\n", instruction.reg1, generalRegisters[instruction.reg1], sign_extend(16, instruction.disp16), address, instruction.reg2, generalRegisters[instruction.reg2]);
 
 
-    memoryManagmentUnit.Store(address, generalRegisters[instruction.reg2] & 0xFF);
+    memoryManagmentUnit.store<uint8_t>(generalRegisters[instruction.reg2] & 0xFF, address);
     programCounter += 4;
     cycles += 1;
 }
@@ -835,7 +836,7 @@ inline void loadByte(const Instruction& instruction)
     d_printf("LD.B: GR[%d] <- [GR[%d](0x%X) + %d\n", instruction.reg2, instruction.reg1, generalRegisters[instruction.reg1], sign_extend(16, instruction.disp16));
 
     uint32_t address = (generalRegisters[instruction.reg1] + (int16_t)instruction.disp16);
-    generalRegisters[instruction.reg2] = sign_extend(8, memoryManagmentUnit.GetData<int8_t>(address));
+    generalRegisters[instruction.reg2] = sign_extend(8, memoryManagmentUnit.read<int8_t>(address));
     programCounter += 4;    
     cycles += 3;
 }
@@ -846,7 +847,7 @@ inline void loadHWord(const Instruction& instruction)
     address &= 0xFFFFFFFE;
     d_printf("LD.H: GR[%d] <- [GR[%d](0x%X) + %d\n", instruction.reg2, instruction.reg1, generalRegisters[instruction.reg1], sign_extend(16, instruction.disp16));
     
-    generalRegisters[instruction.reg2] = sign_extend(16, memoryManagmentUnit.GetData<int16_t>(address));
+    generalRegisters[instruction.reg2] = sign_extend(16, memoryManagmentUnit.read<int16_t>(address));
     programCounter += 4;    
     cycles += 3;
 }
@@ -856,7 +857,7 @@ inline void loadWord(const Instruction& instruction)
     uint32_t address = (generalRegisters[instruction.reg1] + (int16_t)instruction.disp16) & 0xFFFFFFFC;
     d_printf("LD.W: GR[%d] <- [GR[%d](0x%X) + %d\n", instruction.reg2, instruction.reg1, generalRegisters[instruction.reg1], sign_extend(16, instruction.disp16));
     
-    generalRegisters[instruction.reg2] = memoryManagmentUnit.GetData<int32_t>(address);
+    generalRegisters[instruction.reg2] = memoryManagmentUnit.read<int32_t>(address);
     programCounter += 4;    
     cycles += 3;
 }
@@ -885,7 +886,7 @@ inline void jumpAndLink(const Instruction &instruction)
 {
     d_printf("JAL\n");
     generalRegisters[31] = (0x07000000 + (uint32_t)(((char*)programCounter + 4) - ((char*)memoryManagmentUnit.rom.data)));
-    int32_t relativeJump = sign_extend(26, instruction.disp26);
+    int32_t relativeJump = sign_extend(26, instruction.disp26());
     programCounter += relativeJump;
     cycles += 3;
 }
@@ -924,12 +925,12 @@ inline void returnFromTrap(const Instruction& instruction)
     d_printf("RETI\n");
     if (systemRegisters.PSW.NP)
     {
-        programCounter = (char*)&memoryManagmentUnit.GetData<uint32_t>(systemRegisters.FEPC);
+        programCounter = (char*)&memoryManagmentUnit.read<uint32_t>(systemRegisters.FEPC);
         systemRegisters.PSW = systemRegisters.FEPSW;
     }
     else
     {
-        programCounter = (char*)&memoryManagmentUnit.GetData<uint32_t>(systemRegisters.EIPC);
+        programCounter = (char*)&memoryManagmentUnit.read<uint32_t>(systemRegisters.EIPC);
         systemRegisters.PSW = systemRegisters.EIPSW;            
     }
     cycles += 10;
