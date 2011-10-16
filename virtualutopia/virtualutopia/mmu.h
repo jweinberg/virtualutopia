@@ -64,8 +64,6 @@ public:
             case 0x06000000 ... 0x06FFFFFF: //Cartridge RAM
                 *(T*)&gamepackRam[(virtualAddress & 0xFFFFFF) & 0x1FFFF] = val;
                 break;
-            default:
-                assert(false);
         }
     }
 public:

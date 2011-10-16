@@ -262,10 +262,11 @@ namespace VIP
        //WriteFrame();
     }
     
-    uint16_t VIP::Step(uint32_t cycles)
+    uint16_t VIP::Step(int32_t cycles)
     {
         //There are 400,000 cycles in one frame (1 cycle = 50ns, 1 frame = 20ms)
         uint32_t timeSinceBuffer = cycles - lastFrameBuffer;
+        
         
         if (rowCount < 28)
         {
@@ -290,27 +291,43 @@ namespace VIP
                 
                 framesWaited++;
                 bool gameStart = false;
+                
                 if (framesWaited > FRMCYC) //We've triggered a GCLK
                 {
                     framesWaited = 0;
                     gameStart = true;
                 }
-                if (INTENB.FRAMESTART)
+
+                INTPND.FRAMESTART |= true; //Trigger an FCLK
+                INTPND.GAMESTART |= gameStart;
+
+                if (INTENB.FRAMESTART || INTENB.GAMESTART)
                 {
                     cpu->processInterrupt((CPU::InterruptCode)4);
                 }
-                INTPND.FRAMESTART = 1; //Trigger an FCLK
-                INTPND.GAMESTART = gameStart;
+
                 return 1;
             }
             
-            if (!XPSTTS.SBOUT) XPSTTS.SBOUT = 1;
+            if (timeSinceBuffer > sbOutResetTime)
+                XPSTTS.SBOUT = 0;
             
             if (timeSinceBuffer > 2560)
             {
                 XPSTTS = 0;
                 XPSTTS.SBCOUNT = rowCount;
                 XPSTTS.XPEN = XPCTRL.XPEN;
+                XPSTTS.SBOUT = 1;
+                
+                sbOutResetTime = timeSinceBuffer + 1120; //56 microseconds
+                
+                if (XPSTTS.SBCOUNT == XPCTRL.SBCMP)
+                {
+                    INTPND.SBHIT |= true;
+                    if (INTENB.SBHIT)
+                        cpu->processInterrupt((CPU::InterruptCode)4);
+                }
+                
                 if (DPSTTS.DISP)
                 {
                     Draw(rowCount);
@@ -371,9 +388,9 @@ namespace VIP
                 XPSTTS.SBCOUNT = 27;
                 XPSTTS.XPEN = XPCTRL.XPEN;
              
-                if (INTENB.XPEND)
-                    cpu->processInterrupt((CPU::InterruptCode)4);
-                INTPND.XPEND = true;
+                INTPND.XPEND |= true;
+                if (INTENB.XPEND) cpu->processInterrupt((CPU::InterruptCode)4);
+                
                 rowCount++;
             }
             else if (rowCount == 29 && timeSinceBuffer > 98304)
@@ -386,9 +403,9 @@ namespace VIP
                 DPSTTS.SYNCE = DPCTRL.SYNCE;
                 DPSTTS.LOCK = 0;
                 
-                if (INTENB.LFBEND)
-                    cpu->processInterrupt((CPU::InterruptCode)4);
-                INTPND.LFBEND = true;
+                INTPND.LFBEND |= true;                
+                if (INTENB.LFBEND) cpu->processInterrupt((CPU::InterruptCode)4);
+
                 rowCount++;
             }
             else if (rowCount == 30 && timeSinceBuffer > 131072)
@@ -400,9 +417,10 @@ namespace VIP
                 DPSTTS.RE = DPCTRL.RE;
                 DPSTTS.SYNCE = DPCTRL.SYNCE;
                 DPSTTS.LOCK = 0;
-                if (INTENB.RFBEND)
-                    cpu->processInterrupt((CPU::InterruptCode)4);
-                INTPND.RFBEND = true;
+                
+                INTPND.RFBEND |= true;
+                if (INTENB.RFBEND) cpu->processInterrupt((CPU::InterruptCode)4);
+
                 rowCount++;
             }
             else if (rowCount == 31 && timeSinceBuffer > 163840)
@@ -414,9 +432,6 @@ namespace VIP
                 DPSTTS.FCLK = 1;
                 DPSTTS.DPBSY = (frame & 1) ? 0x8 : 0x2;
                 
-                if (INTENB.SBHIT)
-                    cpu->processInterrupt((CPU::InterruptCode)4);
-                INTPND.SBHIT = true;
                 rowCount++;
             }
             else if (rowCount == 32 && timeSinceBuffer > 229376)

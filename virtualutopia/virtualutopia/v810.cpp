@@ -178,6 +178,7 @@ namespace CPU
         systemRegisters.PSW.ID = 1;
         systemRegisters.PSW.AE = 0;
         
+        systemRegisters.PSW.IntLevel = min(interruptCode+1, 16);
         programCounter = (char*)&memoryManagmentUnit.read<uint32_t>(0xFFFFFE00 | interruptCode << 4);
     }
     

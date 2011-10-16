@@ -42,6 +42,8 @@ namespace VIP
         template <typename T>
         inline void store(T& val, const int offset)
         {
+            if (offset == 0x5F804)
+                INTPND &= ~val;
             *((T*)&(*this)[offset]) = val;
         }
         
@@ -122,14 +124,15 @@ namespace VIP
         }
         
 
-        uint16_t Step(uint32_t cycles);
+        uint16_t Step(int32_t cycles);
         void Draw(int row);
-        Chr chrRam[2048];
-        Obj oam[1024];
-        BGMap bgMaps[14];
         World worlds[32];
         
+        Chr chrRam[2048];
+        Obj oam[1024];
+        
         uint32_t bmpData[384 * 256];
+        BGMap bgMaps[14];
         
         Framebuffer leftFrameBuffer[2];
         Framebuffer rightFrameBuffer[2];
@@ -140,6 +143,9 @@ namespace VIP
         int8_t rowCount;
         int32_t drawingCounter;
         int32_t columnCounter;
+        int32_t sbOutResetTime;
+        
+        
         uint32_t lastFrameBuffer;
         char frame;
         int8_t objSearchIndex;
