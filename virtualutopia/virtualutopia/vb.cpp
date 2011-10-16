@@ -15,6 +15,8 @@ VB::VB(const std::string &fileName)
     cpu = new CPU::v810(*mmu, *vip, *nvc);
     vip->cpu = cpu;
     nvc->cpu = cpu;
+    
+    cpu->reset();
 }
 
 VB::~VB()

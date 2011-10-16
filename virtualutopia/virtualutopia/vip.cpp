@@ -167,7 +167,7 @@ namespace VIP
             else if (type == World::kObjType)
             {
                 int stopIndex = (objSearchIndex > 0) ? objControl[objSearchIndex - 1].SPT : 0;
-                if (stopIndex == 1023)
+                if (stopIndex >= objControl[objSearchIndex].SPT)
                     stopIndex = 0;
                 for (int objIdx = objControl[objSearchIndex].SPT; objIdx >= stopIndex; --objIdx)
                 {
@@ -290,16 +290,11 @@ namespace VIP
                 DPSTTS.LOCK = 0;
                 
                 framesWaited++;
-                bool gameStart = false;
-                
                 if (framesWaited > FRMCYC) //We've triggered a GCLK
-                {
                     framesWaited = 0;
-                    gameStart = true;
-                }
 
                 INTPND.FRAMESTART |= true; //Trigger an FCLK
-                INTPND.GAMESTART |= gameStart;
+                INTPND.GAMESTART |= (framesWaited == 0);
 
                 if (INTENB.FRAMESTART || INTENB.GAMESTART)
                 {

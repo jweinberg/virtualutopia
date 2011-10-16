@@ -25,6 +25,7 @@ public:
     inline const T& read(uint32_t virtualAddress)
     {
         virtualAddress = virtualAddress & 0x07FFFFFF;
+        nvc.ApplyReadWait(virtualAddress);
         switch (virtualAddress)
         {
             case 0x0 ... 0xFFFFFF: //Display RAM, VIP
@@ -47,6 +48,7 @@ public:
     inline void store(T val, uint32_t virtualAddress)
     {
         virtualAddress = virtualAddress & 0x07FFFFFF;
+        nvc.ApplyWriteWait(virtualAddress);
         switch (virtualAddress)
         {
             case 0x0 ... 0xFFFFFF: //Display RAM, VIP

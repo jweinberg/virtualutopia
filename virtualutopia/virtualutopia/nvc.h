@@ -29,7 +29,8 @@ namespace NVC
         CPU::v810 *cpu;
         uint32_t lastTimer;
         void Step(uint32_t cycles);
-        
+        void ApplyReadWait(uint32_t address);
+        void ApplyWriteWait(uint32_t address);
         template <typename T>
         inline const T& read(uint32_t address) const
         {
@@ -149,7 +150,12 @@ namespace NVC
                           uint8_t INT:1;
                           );
                           
-        uint8_t WCR;
+        REGISTER_BITFIELD(WCR,
+                          uint8_t ROM1W:1;
+                          uint8_t EXP1W:1;
+                          uint8_t padding:6;
+                          );
+        
         REGISTER_BITFIELD(TCR, 
                           uint8_t T_ENB:1;
                           uint8_t Z_STAT:1;
