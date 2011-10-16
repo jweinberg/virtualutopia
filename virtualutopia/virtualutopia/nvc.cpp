@@ -22,21 +22,16 @@ void NVC::NVC::Reset()
 
 void NVC::NVC::Step(uint32_t cycles)
 {
-    if (TCR.Z_STAT_CLR && timerCount != 0)
-        TCR.Z_STAT = 0;
     if (TCR.T_ENB)
     {
         if ((cycles-lastTimer) > (TCR.T_CLK_SEL ? 400 : 2000))
         {
             if (timerCount)
                 timerCount--;
-            TLR = timerCount&0xFF;
-            THR = ((timerCount >> 8) & 0xFF);
             lastTimer=cycles;
-            if (timerCount == 0) {
-                timerCount = 2000; //reset counter
-                TLR = timerCount&0xFF;
-                THR = ((timerCount >> 8) & 0xFF);
+            if (timerCount == 0) 
+            {
+                timerCount = internalTimerCount; //reset counter
                 
                 TCR.Z_STAT = 1;
                 if (TCR.TIM_Z_INT)

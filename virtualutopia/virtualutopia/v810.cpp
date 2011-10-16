@@ -82,7 +82,7 @@ namespace CPU
                     OPCODE_DECODE(XORNBSU, xorBitString); 
                     OPCODE_DECODE(NOTBSU, notBitString);  
                     default:
-                        printf("Decoding uknown opcode: (0x%X)\n", instruction.opcode());
+                        printf("Decoding uknown bstr: (0x%X)\n", instruction.reg1);
                         exit(-1);
                 }
                 break;
@@ -100,10 +100,10 @@ namespace CPU
             OPCODE_DECODE(ST_B, storeByte);  
             OPCODE_DECODE(ST_H, storeHWord);  
             OPCODE_DECODE(ST_W, storeWord);  
-            //OPCODE_DECODE(IN_B, <#FUNCTION#>);  
-            //OPCODE_DECODE(IN_H, <#FUNCTION#>);  
-            //OPCODE_DECODE(CAXI, <#FUNCTION#>);  
-            //OPCODE_DECODE(IN_W, FUNCTION);  
+            OPCODE_DECODE(IN_B, outWrite);  
+            OPCODE_DECODE(IN_H, outWrite);  
+            OPCODE_DECODE(CAXI, outWrite);  
+            OPCODE_DECODE(IN_W, outWrite);  
             OPCODE_DECODE(OUT_B, outWrite); 
             OPCODE_DECODE(OUT_H, outWrite); 
             case Fpp:
@@ -159,7 +159,7 @@ namespace CPU
 //        if (!nvc.SCR.DIS && (nvc.SDHR != 0 || nvc.SDLR & 0xF8))
 //            processInterrupt((InterruptCode)0);
 //        
-        //nvc.Step(cycles);
+        nvc.Step(cycles);
         vip.Step(cycles);
         decode(*(uint32_t*)programCounter);
     }

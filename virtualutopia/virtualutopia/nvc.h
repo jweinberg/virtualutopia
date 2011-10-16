@@ -10,6 +10,8 @@
 #define virtualutopia_nvc_h
 
 #include "registers.h"
+#include <assert.h>
+
 namespace CPU
 {
     class v810;
@@ -26,19 +28,87 @@ namespace NVC
         void Reset();
         CPU::v810 *cpu;
         uint32_t lastTimer;
-        uint16_t timerCount;
         void Step(uint32_t cycles);
         
         template <typename T>
         inline const T& read(uint32_t address) const
         {
-            return *(T*)&((*this)[address]);
+            switch (address)
+            {
+                case 0x2000000:
+                    return *((T*)&CCR);
+                case 0x2000004:
+                    return *((T*)&CCSR);
+                case 0x2000008:
+                    return *((T*)&CDTR);
+                case 0x200000C:
+                    return *((T*)&CDRR);
+                case 0x2000010:
+                    return *((T*)&SDLR);
+                case 0x2000014:
+                    return *((T*)&SDHR);
+                case 0x2000018:
+                    return *((T*)&TLR);
+                case 0x200001C:
+                    return *((T*)&THR);
+                case 0x2000020:
+                    return *((T*)&TCR);
+                case 0x2000028:
+                    return *((T*)&SCR);
+            }
+            assert(false);
         }
 
         template <typename T>
-        inline void store(T& val, uint32_t address) const
+        inline void store(T& val, uint32_t address)
         {
-            *(T*)&((*this)[address]) = val;
+            switch (address)
+            {
+                case 0x2000000:
+                    *((T*)&CCR) = val;
+                    break;
+                case 0x2000004:
+                    *((T*)&CCSR) = val;
+                    break;
+                case 0x2000008:
+                    *((T*)&CDTR) = val;
+                    break;
+                case 0x200000C:
+                    *((T*)&CDRR) = val;
+                    break;
+                case 0x2000010:
+                    *((T*)&SDLR) = val;
+                    break;
+                case 0x2000014:
+                    *((T*)&SDHR) = val;
+                    break;
+                case 0x2000018:
+                    *((T*)&internalTLR) = val;
+                    break;
+                case 0x200001C:
+                    *((T*)&internalTHR) = val;
+                    break;
+                case 0x2000020:
+                {
+                    _TCR *incomingTCR = (_TCR*)&val;
+                    if (incomingTCR->T_ENB)
+                        timerCount = internalTimerCount;
+                    
+                    TCR.T_ENB = incomingTCR->T_ENB;
+                    TCR.TIM_Z_INT = incomingTCR->TIM_Z_INT;
+                    TCR.T_CLK_SEL = incomingTCR->T_CLK_SEL;
+                    if (!(TCR.T_ENB && timerCount > 0) && incomingTCR->Z_STAT_CLR)
+                        TCR.Z_STAT = 0;
+                    break;
+                }
+                case 0x2000024:
+                    *((T*)&WCR) = val;
+                case 0x2000028:
+                    *((T*)&SCR) = val;
+                    break;
+                //default:
+                 //   assert(false);
+            }
         }
         
         inline char &operator[](uint32_t address) const
@@ -88,9 +158,25 @@ namespace NVC
                           uint8_t T_CLK_SEL:1;
                           uint8_t padding:3;
                         );
-        uint8_t THR;
-        uint8_t TLR;
-        
+        union
+        {
+            struct
+            {
+                uint8_t TLR;
+                uint8_t THR;
+            };
+            uint16_t timerCount;
+        };
+
+        union
+        {
+            struct
+            {
+                uint8_t internalTHR;
+                uint8_t internalTLR;
+            };
+            uint16_t internalTimerCount;
+        };
         REGISTER_BITFIELD(SDHR,
                           uint8_t LR:1;
                           uint8_t LL:1;

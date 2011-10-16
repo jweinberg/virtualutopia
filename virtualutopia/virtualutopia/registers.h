@@ -10,7 +10,7 @@
 #define virtualutopia_registers_h
 
 #define REGISTER_BITFIELD(NAME, ...) \
-struct \
+struct _##NAME \
 {\
     __VA_ARGS__\
     operator uint32_t&() { return *(uint32_t*)this; }\
