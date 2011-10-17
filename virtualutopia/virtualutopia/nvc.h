@@ -54,6 +54,8 @@ namespace NVC
                     return *((T*)&THR);
                 case 0x2000020:
                     return *((T*)&TCR);
+                case 0x2000024:
+                    return *((T*)&WCR);
                 case 0x2000028:
                     return *((T*)&SCR);
             }

@@ -81,7 +81,7 @@ namespace CPU
                     OPCODE_DECODE(XORNBSU, xorBitString); 
                     OPCODE_DECODE(NOTBSU, notBitString);  
                     default:
-                        printf("Decoding uknown bstr: (0x%X)\n", instruction.reg1);
+                        printf("%X: Decoding uknown bstr: (0x%X)\n", (0x07000000 + (uint32_t)((char*)programCounter - ((char*)memoryManagmentUnit.rom.data))), instruction.reg1);
                         exit(-1);
                 }
                 break;
@@ -121,7 +121,7 @@ namespace CPU
                     OPCODE_DECODE(TRNC_SW, truncateFloat);
                     OPCODE_DECODE(MPYHW, multiplyHalfWord);
                     default:
-                        printf("Decoding uknown fppcode: (0x%X)\n", instruction.subopcode());
+                        printf("%X: Decoding uknown fppcode: (0x%X)\n", (0x07000000 + (uint32_t)((char*)programCounter - ((char*)memoryManagmentUnit.rom.data))), instruction.subopcode());
                         exit(-1);
                 }
                 break;
@@ -143,7 +143,7 @@ namespace CPU
             OPCODE_DECODE(BGE, branchIfGreaterOrEqual);
             OPCODE_DECODE(BGT, branchIfGreaterThan);
             default:
-                printf("Decoding uknown opcode: (0x%X)\n", instruction.opcode());
+                printf("%X: Decoding uknown opcode: (0x%X)\n", (0x07000000 + (uint32_t)((char*)programCounter - ((char*)memoryManagmentUnit.rom.data))),  instruction.opcode());
                 exit(-1);
         }
 #undef OPCODE_DECODE

@@ -37,10 +37,10 @@ namespace CPU
             else
                 leftover = length - bitsLeft;
             
-//            mask = (mask << offset);
-//            
-//            currentWord &= ~mask;
-//            currentWord |= (bits << offset); 
+            mask = (mask << offset);
+            
+            currentWord &= ~mask;
+            currentWord |= (bits << offset); 
             mmu.store(currentWord, currentLocation);
             
             if (leftover)

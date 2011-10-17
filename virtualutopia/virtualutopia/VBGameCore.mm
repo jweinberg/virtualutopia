@@ -78,8 +78,8 @@
 - (const void *)videoBuffer
 {
     //memset(bmpData, 0xFF00FFFF, 384 * 256);
-        
-    return vb->vip->bmpData;
+    memcpy(bmpData,  vb->vip->bmpData, sizeof(uint32_t) * 384 * 256);
+    return bmpData;
 }
 
 - (GLenum)pixelFormat

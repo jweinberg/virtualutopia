@@ -12,6 +12,7 @@
 @interface VBGameCore : OEGameCore <OEVBSystemResponderClient>
 {
     VB *vb;
+    uint32_t bmpData[384 * 256];
 }
 
 @end

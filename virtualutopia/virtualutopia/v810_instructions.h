@@ -885,9 +885,13 @@ inline void storeSystemRegister(const CPU::Instruction& instruction)
 inline void jumpAndLink(const Instruction &instruction)
 {
     d_printf("JAL\n");
-    generalRegisters[31] = (0x07000000 + (uint32_t)(((char*)programCounter + 4) - ((char*)memoryManagmentUnit.rom.data)));
+    uint32_t currentPC = (0x07000000 + (uint32_t)(((char*)programCounter + 4) - ((char*)memoryManagmentUnit.rom.data)));
+    generalRegisters[31] = currentPC;
+    currentPC -= 4;
     int32_t relativeJump = sign_extend(26, instruction.disp26());
-    programCounter += relativeJump;
+    currentPC += relativeJump;
+    
+    programCounter = (char*)&memoryManagmentUnit.read<uint32_t>(currentPC);
     cycles += 3;
 }
 
@@ -1140,7 +1144,13 @@ inline void moveBitString(const Instruction& instruction)
     
     assert(!source.HasData() && !dest.HasData());
     
-    programCounter += 4;
+    generalRegisters[30] = source.currentLocation;
+    generalRegisters[29] = dest.currentLocation;
+    generalRegisters[28] = source.stringLength;
+    generalRegisters[27] = source.offset;
+    generalRegisters[26] = dest.offset;
+    
+    programCounter += 2;
 }
 
 inline void andBitString(const Instruction& instruction)
@@ -1165,8 +1175,12 @@ inline void andBitString(const Instruction& instruction)
     }
     
     assert(!source.HasData() && !dest.HasData());
-    
-    programCounter += 4;
+    generalRegisters[30] = source.currentLocation;
+    generalRegisters[29] = dest.currentLocation;
+    generalRegisters[28] = source.stringLength;
+    generalRegisters[27] = source.offset;
+    generalRegisters[26] = dest.offset;
+    programCounter += 2;
 }
 
 inline void orBitString(const Instruction& instruction)
@@ -1198,7 +1212,7 @@ inline void orBitString(const Instruction& instruction)
     
     assert(!source.HasData() && !dest.HasData());
     
-    programCounter += 4;
+    programCounter += 2;
 }
 
 inline void xorBitString(const Instruction& instruction)
@@ -1223,8 +1237,12 @@ inline void xorBitString(const Instruction& instruction)
     }
     
     assert(!source.HasData() && !dest.HasData());
-    
-    programCounter += 4;
+    generalRegisters[30] = source.currentLocation;
+    generalRegisters[29] = dest.currentLocation;
+    generalRegisters[28] = source.stringLength;
+    generalRegisters[27] = source.offset;
+    generalRegisters[26] = dest.offset;
+    programCounter += 2;
 }
 
 inline void andNotBitString(const Instruction& instruction)
@@ -1250,8 +1268,12 @@ inline void andNotBitString(const Instruction& instruction)
     }
     
     assert(!source.HasData() && !dest.HasData());
-    
-    programCounter += 4;
+    generalRegisters[30] = source.currentLocation;
+    generalRegisters[29] = dest.currentLocation;
+    generalRegisters[28] = source.stringLength;
+    generalRegisters[27] = source.offset;
+    generalRegisters[26] = dest.offset;
+    programCounter += 2;
 }
 
 inline void orNotBitString(const Instruction& instruction)
@@ -1277,8 +1299,12 @@ inline void orNotBitString(const Instruction& instruction)
     }
     
     assert(!source.HasData() && !dest.HasData());
-    
-    programCounter += 4;
+    generalRegisters[30] = source.currentLocation;
+    generalRegisters[29] = dest.currentLocation;
+    generalRegisters[28] = source.stringLength;
+    generalRegisters[27] = source.offset;
+    generalRegisters[26] = dest.offset;
+    programCounter += 2;
 }
 
 inline void xorNotBitString(const Instruction& instruction)
@@ -1301,10 +1327,14 @@ inline void xorNotBitString(const Instruction& instruction)
         source.Read(data, bits);
         dest.SetNext(XorNoter(), data, bits);
     }
-    
+    generalRegisters[30] = source.currentLocation;
+    generalRegisters[29] = dest.currentLocation;
+    generalRegisters[28] = source.stringLength;
+    generalRegisters[27] = source.offset;
+    generalRegisters[26] = dest.offset;
     assert(!source.HasData() && !dest.HasData());
     
-    programCounter += 4;
+    programCounter += 2;
 }
 
 inline void notBitString(const Instruction& instruction)
@@ -1329,8 +1359,12 @@ inline void notBitString(const Instruction& instruction)
     }
     
     assert(!source.HasData() && !dest.HasData());
-    
-    programCounter += 4;
+    generalRegisters[30] = source.currentLocation;
+    generalRegisters[29] = dest.currentLocation;
+    generalRegisters[28] = source.stringLength;
+    generalRegisters[27] = source.offset;
+    generalRegisters[26] = dest.offset;
+    programCounter += 2;
 }
 
 
