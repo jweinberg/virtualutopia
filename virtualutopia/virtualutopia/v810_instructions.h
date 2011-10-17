@@ -12,8 +12,8 @@
 
 #ifndef v810_instructions_guard
 #define v810_instructions_guard
-//#define d_printf(A, ...)
-#define d_printf(A, ...) do{ if(debugOutput) { printf("%X: " A, (0x07000000 + (uint32_t)((char*)programCounter - ((char*)memoryManagmentUnit.rom.data))), ##__VA_ARGS__); } }while(0)
+#define d_printf(A, ...)
+//#define d_printf(A, ...) do{ if(debugOutput) { printf("%X: " A, (0x07000000 + (uint32_t)((char*)programCounter - ((char*)memoryManagmentUnit.rom.data))), ##__VA_ARGS__); } }while(0)
 
 struct OrNoter
 {
@@ -864,7 +864,7 @@ inline void loadWord(const Instruction& instruction)
 
 inline void loadSystemRegister(const CPU::Instruction& instruction)
 {
-    d_printf("LDSR\n");
+    d_printf("LDSR %d\n", instruction.reg1);
     //TODO: Prevent writing to write disabled registers
     uint8_t regID = instruction.reg1;
     systemRegisters[regID] = generalRegisters[instruction.reg2];
@@ -874,7 +874,7 @@ inline void loadSystemRegister(const CPU::Instruction& instruction)
 
 inline void storeSystemRegister(const CPU::Instruction& instruction)
 {
-    d_printf("STSR\n");
+    d_printf("STSR %d\n", instruction.reg1);
     //TODO: Prevent reading from reserved registers
     uint8_t regID = instruction.reg1;
     generalRegisters[instruction.reg2] = systemRegisters[regID];

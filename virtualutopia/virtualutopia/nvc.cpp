@@ -86,6 +86,17 @@ void NVC::NVC::ApplyWriteWait(uint32_t address)
 
 void NVC::NVC::Step(uint32_t cycles)
 {
+//    if (SCR.HWSI)
+//    {
+//        SCR.HWSI = 0;
+//        SCR.STAT = 1;
+//    }
+//    if (!SCR.DIS && (SDHR != 0 || SDLR & 0xF8))
+//    {
+//        SCR.STAT = 0;
+//        cpu->processInterrupt((CPU::InterruptCode)0);
+//    }
+    
     if (TCR.T_ENB)
     {
         if ((cycles-lastTimer) > (TCR.T_CLK_SEL ? 400 : 2000))

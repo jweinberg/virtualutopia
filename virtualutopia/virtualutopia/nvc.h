@@ -65,6 +65,7 @@ namespace NVC
         template <typename T>
         inline void store(T& val, uint32_t address)
         {
+            //printf("Setting %X to %X\n", address, val);
             switch (address)
             {
                 case 0x2000000:
@@ -149,6 +150,7 @@ namespace NVC
                           uint8_t reserved_0:1;
                           uint8_t SOFTCK:1;
                           uint8_t PARA:1;
+                          uint8_t reserved_1:1;
                           uint8_t INT:1;
                           );
                           

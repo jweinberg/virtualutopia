@@ -15,7 +15,7 @@ namespace CPU
 {
     v810::v810(MMU &_mmu, VIP::VIP &_vip, NVC::NVC &_nvc) : memoryManagmentUnit(_mmu), vip(_vip), nvc(_nvc)
     {
-        debugOutput = false;
+        debugOutput = true;
         systemRegisters.TKCW = 0x000000E0;
         systemRegisters.PIR = 0x00005346;
     }
@@ -153,11 +153,6 @@ namespace CPU
     {    
         //Some instructions think its FUNNY to assign to reg 0 as an optimization
         generalRegisters[0] = 0;   
-//        nvc.SCR.STAT = 1;
-//        nvc.SDHR.STA = 1;
-//        if (!nvc.SCR.DIS && (nvc.SDHR != 0 || nvc.SDLR & 0xF8))
-//            processInterrupt((InterruptCode)0);
-//        
         nvc.Step(cycles);
         vip.Step(cycles);
         decode(*(uint32_t*)programCounter);

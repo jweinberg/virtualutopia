@@ -10,6 +10,7 @@
 #include "vip.h"
 #include "world.h"
 #include "v810.h"
+#include "affinetable.h"
 #import <QuartzCore/QuartzCore.h>
 
 namespace VIP
@@ -257,6 +258,54 @@ namespace VIP
                         x += (8 - xOff);
                     } while(x <= world.W);
                 }
+            }
+            else if (type == World::kAffineType)
+            {
+                const World &world = worlds[n];
+                
+                
+                int xWorlds = 1 << world.SCX;
+                int yWorlds = 1 << world.SCY;;
+                
+                
+                if (world.GY + world.H <= row * 8)
+                    continue;
+                if (world.GY > (row * 8 + 8))
+                    continue;
+                
+                int y = max<int>((row * 8) - world.GY, 0);
+                for (; y < (max<int>((row * 8) - world.GY, 0) + 8) && y <= world.H; ++y)
+                {
+                    AffineTable* affineTable = ((AffineTable*)&read<uint32_t>((world.PARAM_BASE & 0xFFF0) * 2 + 0x00020000));
+                    for (int x = 0; x < world.W; ++x)
+                    {
+                        int srcX = (int)((float)affineTable[y].MX + (float)affineTable[y].DX * (affineTable[y].MP < 0 ? x + affineTable[y].MP : x));  
+                        int srcY = (int)((float)affineTable[y].MY + (float)affineTable[y].DY * (affineTable[y].MP < 0 ? x + affineTable[y].MP : x));
+                        
+                        //if (!world.OVER)
+                        {
+                            srcX %= (xWorlds * 512);
+                            srcY %= (yWorlds * 512);
+                        }
+                        int xWorld = srcX / 512;
+                        int xChar = (srcX & 0x1FF) / 8;
+                        int xOff = srcX & 7;
+
+                        int yWorld = srcY / 512;
+                        int yChar = (srcY & 0x1FF) / 8;                            
+                        int yOff = srcY & 7;
+                     
+                        const BGMap &map = bgMaps[world.BGMAP_BASE + (yWorld * xWorlds) + xWorld];
+                        const BGMapData &data = map.chars[yChar * 64 + xChar];
+                        const Chr& chr = chrRam[data.charNum];  
+
+                        leftFrameBuffer[0].DrawChr(chr, row, x + world.GX + world.GP, y + world.GY, xOff, yOff, 1, 1, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
+                        
+                        rightFrameBuffer[0].DrawChr(chr, row, x + world.GX - world.GP, y + world.GY, xOff, yOff, 1, 1, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
+
+                    }
+                }
+                
             }
         }
        //WriteFrame();

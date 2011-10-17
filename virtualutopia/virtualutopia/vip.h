@@ -118,7 +118,7 @@ namespace VIP
                 case 0x78000 ... 0x7FFFF:
                     return *(((char*)&chrRam[0]) + (offset - 0x78000));
                 default:
-                  //  printf("Accessing memory: %x\n", offset);
+                    //printf("Accessing memory: %x\n", offset);
                     return videoRam[offset];
             }
         }

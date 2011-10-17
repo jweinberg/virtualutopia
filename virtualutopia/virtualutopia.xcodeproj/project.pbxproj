@@ -211,6 +211,7 @@
 		8260EDFB143F97ED004CC416 /* world.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = world.h; sourceTree = "<group>"; };
 		8260EDFD143FA374004CC416 /* obj.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = obj.h; sourceTree = "<group>"; };
 		8260EDFE143FA88C004CC416 /* chr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = chr.h; sourceTree = "<group>"; };
+		8284A975144BD64C00265708 /* affinetable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = affinetable.h; sourceTree = "<group>"; };
 		82C8AB591417D5B0006213AA /* cpu_utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cpu_utils.h; sourceTree = "<group>"; };
 		82C8AB5C1417DFB3006213AA /* instruction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = instruction.cpp; sourceTree = "<group>"; };
 		82C8AB5E1417DFBE006213AA /* instruction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = instruction.h; sourceTree = "<group>"; };
@@ -374,6 +375,7 @@
 				82EB1C95144148B5007A22EA /* bgmap.h */,
 				82EB1C9A1441556A007A22EA /* palette.h */,
 				820C7F0D1442BAFF00825291 /* framebuffer.h */,
+				8284A975144BD64C00265708 /* affinetable.h */,
 			);
 			name = VIP;
 			sourceTree = "<group>";

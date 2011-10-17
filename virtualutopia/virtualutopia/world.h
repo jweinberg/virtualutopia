@@ -67,9 +67,8 @@ namespace VIP
                 int16_t MY;
                 int16_t W;
                 int16_t H;
-                int16_t reserved_1:4;
-                int16_t PARAM_BASE:12;
-                int16_t OVERPLANE_CHARACTER;
+                uint16_t PARAM_BASE;
+                uint16_t OVERPLANE_CHARACTER;
                 
                 int16_t reserved_2[5];
             };
