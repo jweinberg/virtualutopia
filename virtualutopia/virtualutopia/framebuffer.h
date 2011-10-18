@@ -20,7 +20,7 @@ namespace VIP
         public:
         char data[0x6000];
         
-        void DrawChr(const Chr &chr, uint8_t row, int xoff, int yoff, int sourceXOffset, int sourceYOffset, int w, int h, bool flipHor, bool flipVert,const Palette &palette)
+        inline void DrawChr(const Chr &chr, uint8_t row, int xoff, int yoff, int sourceXOffset, int sourceYOffset, int w, int h, bool flipHor, bool flipVert,const Palette &palette)
         {
             const uint16_t * const data = chr.data;
             const uint8_t expandedRow = row * 8;

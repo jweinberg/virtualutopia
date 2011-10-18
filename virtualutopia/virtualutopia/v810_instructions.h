@@ -84,32 +84,32 @@ enum FlagCondition
 }; 
 
 //Move Form I
-inline void move(const Instruction& instruction)
+void move(uint8_t reg1, uint8_t reg2)
 {
-    d_printf("MOV: GR[%d] <- GR[%d](0x%X)\n", instruction.reg2, instruction.reg1, generalRegisters[instruction.reg1]);
-    generalRegisters[instruction.reg2] = generalRegisters[instruction.reg1];
+    d_printf("MOV: GR[%d] <- GR[%d](0x%X)\n", reg2, reg1, generalRegisters[reg1]);
+    generalRegisters[reg2] = generalRegisters[reg1];
     programCounter += 2;
     cycles += 1;
 }
 
 //Move Form II
-inline void moveImmediate(const Instruction& instruction)
+void moveImmediate(uint8_t imm5, uint8_t reg2)
 {
-    d_printf("MOV: GR[%d] <- (0x%X)\n", instruction.reg2, sign_extend(5, instruction.reg1));
-    generalRegisters[instruction.reg2] = sign_extend(5, instruction.reg1);
+    d_printf("MOV: GR[%d] <- (0x%X)\n", reg2, sign_extend(5, imm5));
+    generalRegisters[reg2] = sign_extend(5, imm5);
     programCounter += 2;
     cycles += 1;
 }
 
 //Add Form I
-inline void add(const Instruction& instruction)
+void add(uint8_t reg1, uint8_t reg2)
 {
-    d_printf("ADD: GR[%d] <- GR[%d](0x%X) + GR[%d](0x%X)\n", instruction.reg2, instruction.reg2, generalRegisters[instruction.reg2], instruction.reg1, generalRegisters[instruction.reg1]);
-    int32_t a = generalRegisters[instruction.reg1];
-    int32_t b = generalRegisters[instruction.reg2];
+    d_printf("ADD: GR[%d] <- GR[%d](0x%X) + GR[%d](0x%X)\n", reg2, reg2, generalRegisters[reg2], reg1, generalRegisters[reg1]);
+    int32_t a = generalRegisters[reg1];
+    int32_t b = generalRegisters[reg2];
     int64_t r = a+b;
     int32_t truncatedResult = (int32_t)r;
-    generalRegisters[instruction.reg2] = truncatedResult;           
+    generalRegisters[reg2] = truncatedResult;           
     
     systemRegisters.PSW.OV = (sign(a) == sign(b)) ? (sign(truncatedResult) != sign(a)) : 0;
     systemRegisters.PSW.CY = r > INT32_MAX || r < INT32_MIN;
@@ -121,14 +121,14 @@ inline void add(const Instruction& instruction)
 }
 
 //Add Form II
-inline void addImmediate5(const Instruction& instruction)
+void addImmediate5(uint8_t imm5, uint8_t reg2)
 {
-    d_printf("ADD: GR[%d] <- GR[%d](0x%X) + 0x%X\n", instruction.reg2, instruction.reg2, generalRegisters[instruction.reg2], sign_extend(5, instruction.reg1));
-    int32_t a = sign_extend(5, instruction.reg1);
-    int32_t b = generalRegisters[instruction.reg2];
+    d_printf("ADD: GR[%d] <- GR[%d](0x%X) + 0x%X\n", reg2, reg2, generalRegisters[reg2], sign_extend(5, imm5));
+    int32_t a = sign_extend(5, imm5);
+    int32_t b = generalRegisters[reg2];
     int64_t r = a+b;
     int32_t truncatedResult = (int32_t)r;
-    generalRegisters[instruction.reg2] = truncatedResult;           
+    generalRegisters[reg2] = truncatedResult;           
     
     systemRegisters.PSW.OV = (sign(a) == sign(b)) ? (sign(truncatedResult) != sign(a)) : 0;
     systemRegisters.PSW.CY = r > INT32_MAX || r < INT32_MIN;
@@ -140,15 +140,15 @@ inline void addImmediate5(const Instruction& instruction)
 }
 
 
-inline void addImmediate(const Instruction& instruction)
+void addImmediate(uint8_t reg1, uint8_t reg2, int16_t imm16)
 {
-    d_printf("ADDI: GR[%d] <- GR[%d](0x%X) + 0x%X\n", instruction.reg2, instruction.reg1, generalRegisters[instruction.reg1], sign_extend(16, instruction.imm16));
+    d_printf("ADDI: GR[%d] <- GR[%d](0x%X) + 0x%X\n", reg2, reg1, generalRegisters[reg1], sign_extend(16, imm16));
     
-    int32_t a = sign_extend(16, instruction.imm16);
-    int32_t b = generalRegisters[instruction.reg1];
+    int32_t a = sign_extend(16, imm16);
+    int32_t b = generalRegisters[reg1];
     int64_t r = a+b;
     int32_t truncatedResult = (int32_t)r;
-    generalRegisters[instruction.reg2] = truncatedResult;           
+    generalRegisters[reg2] = truncatedResult;           
     
     systemRegisters.PSW.OV = (sign(a) == sign(b)) ? (sign(truncatedResult) != sign(a)) : 0;
     systemRegisters.PSW.CY = r > INT32_MAX || r < INT32_MIN;
@@ -160,13 +160,13 @@ inline void addImmediate(const Instruction& instruction)
 
 
 //Subtract
-inline void subtract(const Instruction& instruction)
+void subtract(uint8_t reg1, uint8_t reg2)
 {
-    d_printf("SUB: GR[%d] <- GR[%d](0x%X) - GR[%d](0x%X)\n", instruction.reg2, instruction.reg2, generalRegisters[instruction.reg2], instruction.reg1, generalRegisters[instruction.reg1]);
-    int32_t a = generalRegisters[instruction.reg1];
-    int32_t b = generalRegisters[instruction.reg2];
+    d_printf("SUB: GR[%d] <- GR[%d](0x%X) - GR[%d](0x%X)\n", reg2, reg2, generalRegisters[reg2], reg1, generalRegisters[reg1]);
+    int32_t a = generalRegisters[reg1];
+    int32_t b = generalRegisters[reg2];
     uint32_t r = b-a;
-    generalRegisters[instruction.reg2] = (int32_t)r;           
+    generalRegisters[reg2] = (int32_t)r;           
     
     systemRegisters.PSW.OV = calculate_overflow_subtract(a, b);
     systemRegisters.PSW.CY = r > b;
@@ -177,11 +177,11 @@ inline void subtract(const Instruction& instruction)
     cycles += 1;
 }
 
-inline void divide(const Instruction& instruction)
+void divide(uint8_t reg1, uint8_t reg2)
 {
-    d_printf("DIV: GR[%d] <- GR[%d](0x%X) / GR[%d](0x%X)\n", instruction.reg2, instruction.reg2, generalRegisters[instruction.reg2], instruction.reg1, generalRegisters[instruction.reg1]);
-    int32_t a = generalRegisters[instruction.reg1];
-    int32_t b = generalRegisters[instruction.reg2];
+    d_printf("DIV: GR[%d] <- GR[%d](0x%X) / GR[%d](0x%X)\n", reg2, reg2, generalRegisters[reg2], reg1, generalRegisters[reg1]);
+    int32_t a = generalRegisters[reg1];
+    int32_t b = generalRegisters[reg2];
     
     if (a == 0)
     {
@@ -192,21 +192,21 @@ inline void divide(const Instruction& instruction)
     int32_t result = b / a;
     
     generalRegisters[30] = b % a;
-    generalRegisters[instruction.reg2] = result;
+    generalRegisters[reg2] = result;
     
     systemRegisters.PSW.OV = (b == 0x80000000 && a == 0xFFFFFFF) ? 1 : 0;
-    systemRegisters.PSW.S = (generalRegisters[instruction.reg2] < 0) ? 1 : 0;
-    systemRegisters.PSW.Z = (generalRegisters[instruction.reg2] == 0) ? 1 : 0;
+    systemRegisters.PSW.S = (result < 0) ? 1 : 0;
+    systemRegisters.PSW.Z = (result == 0) ? 1 : 0;
     
     programCounter += 2;
     cycles += 38;
 }
 
-inline void divideUnsigned(const Instruction& instruction)
+void divideUnsigned(uint8_t reg1, uint8_t reg2)
 {
-    d_printf("DIVU: GR[%d] <- GR[%d](0x%X) / GR[%d](0x%X)\n", instruction.reg2, instruction.reg2, generalRegisters[instruction.reg2], instruction.reg1, generalRegisters[instruction.reg1]);
-    uint32_t a = generalRegisters[instruction.reg1];
-    int32_t b = generalRegisters[instruction.reg2];
+    d_printf("DIVU: GR[%d] <- GR[%d](0x%X) / GR[%d](0x%X)\n", reg2, reg2, generalRegisters[reg2], reg1, generalRegisters[reg1]);
+    uint32_t a = generalRegisters[reg1];
+    int32_t b = generalRegisters[reg2];
     
     if (a == 0)
     {
@@ -217,59 +217,59 @@ inline void divideUnsigned(const Instruction& instruction)
     int32_t result = b / a;
     
     generalRegisters[30] = b % a;
-    generalRegisters[instruction.reg2] = result;
+    generalRegisters[reg2] = result;
     
     systemRegisters.PSW.OV = 0;
-    systemRegisters.PSW.S = (generalRegisters[instruction.reg2] < 0) ? 1 : 0;
-    systemRegisters.PSW.Z = (generalRegisters[instruction.reg2] == 0) ? 1 : 0;
+    systemRegisters.PSW.S = (result < 0) ? 1 : 0;
+    systemRegisters.PSW.Z = (result == 0) ? 1 : 0;
     
     programCounter += 2;
     cycles += 36;
 }
 
-inline void multiply(const Instruction& instruction)
+void multiply(uint8_t reg1, uint8_t reg2)
 {
-    d_printf("MUL: GR[%d] <- GR[%d](0x%X) * GR[%d](0x%X)\n", instruction.reg2, instruction.reg2, generalRegisters[instruction.reg2], instruction.reg1, generalRegisters[instruction.reg1]);
-    int32_t a = generalRegisters[instruction.reg1];
-    int32_t b = generalRegisters[instruction.reg2];
+    d_printf("MUL: GR[%d] <- GR[%d](0x%X) * GR[%d](0x%X)\n", reg2, reg2, generalRegisters[reg2], reg1, generalRegisters[reg1]);
+    int32_t a = generalRegisters[reg1];
+    int32_t b = generalRegisters[reg2];
     int64_t result = b * a;
     
     generalRegisters[30] = (int32_t)(result >> 32);
-    generalRegisters[instruction.reg2] = (int32_t)(result & 0xFFFFFFFF);
+    generalRegisters[reg2] = (int32_t)(result & 0xFFFFFFFF);
     
     systemRegisters.PSW.OV = (generalRegisters[30] == 0) ? 0 : 1;
-    systemRegisters.PSW.S = (generalRegisters[instruction.reg2] < 0) ? 1 : 0;
-    systemRegisters.PSW.Z = (generalRegisters[instruction.reg2] == 0) ? 1 : 0;
+    systemRegisters.PSW.S = (generalRegisters[reg2] < 0) ? 1 : 0;
+    systemRegisters.PSW.Z = (generalRegisters[reg2] == 0) ? 1 : 0;
     
     programCounter += 2;
     cycles += 13;
 }
 
-inline void multiplyUnsigned(const Instruction& instruction)
+void multiplyUnsigned(uint8_t reg1, uint8_t reg2)
 {
-    d_printf("MULU: GR[%d] <- GR[%d](0x%X) * GR[%d](0x%X)\n", instruction.reg2, instruction.reg2, generalRegisters[instruction.reg2], instruction.reg1, generalRegisters[instruction.reg1]);
-    uint32_t a = generalRegisters[instruction.reg1];
-    uint32_t b = generalRegisters[instruction.reg2];
+    d_printf("MULU: GR[%d] <- GR[%d](0x%X) * GR[%d](0x%X)\n", reg2, reg2, generalRegisters[reg2], reg1, generalRegisters[reg1]);
+    uint32_t a = generalRegisters[reg1];
+    uint32_t b = generalRegisters[reg2];
     uint64_t result = b * a;
     
     generalRegisters[30] = (int32_t)(result >> 32);
-    generalRegisters[instruction.reg2] = (int32_t)(result & 0xFFFFFFFF);
+    generalRegisters[reg2] = (int32_t)(result & 0xFFFFFFFF);
     
     systemRegisters.PSW.OV = (generalRegisters[30] == 0) ? 0 : 1;
-    systemRegisters.PSW.S = (generalRegisters[instruction.reg2] < 0) ? 1 : 0;
-    systemRegisters.PSW.Z = (generalRegisters[instruction.reg2] == 0) ? 1 : 0;
+    systemRegisters.PSW.S = (generalRegisters[reg2] < 0) ? 1 : 0;
+    systemRegisters.PSW.Z = (generalRegisters[reg2] == 0) ? 1 : 0;
     
     programCounter += 2;
     cycles += 13;
 }
 
 //Compare Form I
-inline void compare(const Instruction& instruction)
+void compare(uint8_t reg1, uint8_t reg2)
 {
-    int32_t a = generalRegisters[instruction.reg1];
-    int32_t b = generalRegisters[instruction.reg2];
+    int32_t a = generalRegisters[reg1];
+    int32_t b = generalRegisters[reg2];
     
-    d_printf("CMP: GR[%d](0x%X) and GR[%d](0x%X)\n", instruction.reg1, a, instruction.reg2, b);
+    d_printf("CMP: GR[%d](0x%X) and GR[%d](0x%X)\n", reg1, a, reg2, b);
     uint32_t result = b-a;
 
     
@@ -282,12 +282,12 @@ inline void compare(const Instruction& instruction)
 }
 
 //Compare Form II
-inline void compareImmediate(const Instruction &instruction)
+void compareImmediate(uint8_t imm5, uint8_t reg2)
 {
-    int32_t a = sign_extend(5, instruction.reg1);
-    int32_t b = generalRegisters[instruction.reg2];
+    int32_t a = sign_extend(5, imm5);
+    int32_t b = generalRegisters[reg2];
     
-    d_printf("CMP: 0x%X and GR[%d](0x%X)\n", a, instruction.reg2, b);
+    d_printf("CMP: 0x%X and GR[%d](0x%X)\n", a, reg2, b);
     uint32_t result = b-a;
     
     
@@ -301,11 +301,11 @@ inline void compareImmediate(const Instruction &instruction)
 }
 
 //Set Flag Condition
-inline void setFlag(const Instruction &instruction)
+void setFlag(uint8_t imm5, uint8_t reg2)
 {
-    d_printf("SETF: GR[%d] <- Condition (0x%X)\n", instruction.reg2, instruction.reg1);
+    d_printf("SETF: GR[%d] <- Condition (0x%X)\n", reg2, imm5);
     bool conditionMet = false;
-    switch ((FlagCondition)instruction.reg1) {
+    switch ((FlagCondition)imm5) {
         case kFlagOverflow:
             conditionMet = (systemRegisters.PSW.OV == 1);
             break;
@@ -356,22 +356,22 @@ inline void setFlag(const Instruction &instruction)
             break;
     }
     
-    generalRegisters[instruction.reg2] = conditionMet;
+    generalRegisters[reg2] = conditionMet;
     programCounter += 2;
     cycles += 1;
 }
 
 //Shift Left Form I
-inline void shiftLeft(const Instruction& instruction)
+void shiftLeft(uint8_t reg1, uint8_t reg2)
 {
-    d_printf("SHL: GR[%d] <- GR[%d](0x%X) << GR[%d](0x%X)\n", instruction.reg2, instruction.reg2, generalRegisters[instruction.reg2], instruction.reg1, generalRegisters[instruction.reg1]);
-    int32_t s = generalRegisters[instruction.reg1];
-    int32_t a = generalRegisters[instruction.reg2];
+    d_printf("SHL: GR[%d] <- GR[%d](0x%X) << GR[%d](0x%X)\n", reg2, reg2, generalRegisters[reg2], reg1, generalRegisters[reg1]);
+    int32_t s = generalRegisters[reg1];
+    int32_t a = generalRegisters[reg2];
     int32_t result = a << s;
-    generalRegisters[instruction.reg2] = result;
+    generalRegisters[reg2] = result;
     
     systemRegisters.PSW.OV = 0;
-    systemRegisters.PSW.CY = instruction.reg1 ? (a >> (32-s)) & 1 : 0;
+    systemRegisters.PSW.CY = reg1 ? (a >> (32-s)) & 1 : 0;
     systemRegisters.PSW.S = result < 0;
     systemRegisters.PSW.Z = result == 0;
     programCounter += 2;
@@ -379,13 +379,13 @@ inline void shiftLeft(const Instruction& instruction)
 }
 
 //Shift Left Form II
-inline void shiftLeftImmediate(const Instruction& instruction)
+void shiftLeftImmediate(uint8_t imm5, uint8_t reg2)
 {
-    d_printf("SHL: GR[%d] <- GR[%d](0x%X) << 0x%X\n", instruction.reg2, instruction.reg2, generalRegisters[instruction.reg2], instruction.reg1);
-    int32_t s = instruction.reg1;
-    int32_t a = generalRegisters[instruction.reg2];
+    d_printf("SHL: GR[%d] <- GR[%d](0x%X) << 0x%X\n", reg2, reg2, generalRegisters[reg2], imm5);
+    int32_t s = imm5;
+    int32_t a = generalRegisters[reg2];
     int32_t result = a << s;
-    generalRegisters[instruction.reg2] = result;
+    generalRegisters[reg2] = result;
     
     systemRegisters.PSW.OV = 0;
     systemRegisters.PSW.CY = s ? (a >> (32-s)) & 1 : 0;
@@ -396,16 +396,16 @@ inline void shiftLeftImmediate(const Instruction& instruction)
 }
 
 //Shift Right Form I
-inline void shiftRight(const Instruction& instruction)
+void shiftRight(uint8_t reg1, uint8_t reg2)
 {
-    d_printf("SHR: GR[%d] <- GR[%d](0x%X) >> GR[%d](0x%X)\n", instruction.reg2, instruction.reg2, generalRegisters[instruction.reg2], instruction.reg1, generalRegisters[instruction.reg1]);
-    uint32_t s = generalRegisters[instruction.reg1];
-    uint32_t a = generalRegisters[instruction.reg2];
+    d_printf("SHR: GR[%d] <- GR[%d](0x%X) >> GR[%d](0x%X)\n", reg2, reg2, generalRegisters[reg2], reg1, generalRegisters[reg1]);
+    uint32_t s = generalRegisters[reg1];
+    uint32_t a = generalRegisters[reg2];
     int32_t result = a >> s;
-    generalRegisters[instruction.reg2] = result;
+    generalRegisters[reg2] = result;
     
     systemRegisters.PSW.OV = 0;
-    systemRegisters.PSW.CY = instruction.reg1 ? (a >> (a-1)) & 1 : 0;
+    systemRegisters.PSW.CY = s ? (a >> (a-1)) & 1 : 0;
     systemRegisters.PSW.S = result < 0;
     systemRegisters.PSW.Z = result == 0;
     programCounter += 2;
@@ -413,16 +413,16 @@ inline void shiftRight(const Instruction& instruction)
 }
 
 //Shift Right Form II
-inline void shiftRightImmediate(const Instruction &instruction)
+void shiftRightImmediate(uint8_t imm5, uint8_t reg2)
 {
-    d_printf("SHR: GR[%d] <- GR[%d](0x%X) >> 0x%X\n", instruction.reg2, instruction.reg2, generalRegisters[instruction.reg2], instruction.reg1);
-    uint32_t s = instruction.reg1;
-    uint32_t a = generalRegisters[instruction.reg2];
+    d_printf("SHR: GR[%d] <- GR[%d](0x%X) >> 0x%X\n", reg2, reg2, generalRegisters[reg2], imm5);
+    uint32_t s = imm5;
+    uint32_t a = generalRegisters[reg2];
     int32_t result = a >> s;
-    generalRegisters[instruction.reg2] = result;
+    generalRegisters[reg2] = result;
     
     systemRegisters.PSW.OV = 0;
-    systemRegisters.PSW.CY = instruction.reg1 ? (a >> (a-1)) & 1 : 0;
+    systemRegisters.PSW.CY = imm5 ? (a >> (a-1)) & 1 : 0;
     systemRegisters.PSW.S = result < 0;
     systemRegisters.PSW.Z = result == 0;
     programCounter += 2;
@@ -430,91 +430,91 @@ inline void shiftRightImmediate(const Instruction &instruction)
 }
 
 //Shift Arithmetic Right (signed shift)
-inline void shiftArithmeticRight(const Instruction& instruction)
+void shiftArithmeticRight(uint8_t reg1, uint8_t reg2)
 {
-    d_printf("SAR: GR[%d] <- GR[%d](0x%X) >>>  GR[%d](0x%X)\n", instruction.reg2, instruction.reg2, generalRegisters[instruction.reg2], instruction.reg1, generalRegisters[instruction.reg1]);
-    int32_t s = generalRegisters[instruction.reg1];
-    int32_t a = generalRegisters[instruction.reg2];
+    d_printf("SAR: GR[%d] <- GR[%d](0x%X) >>>  GR[%d](0x%X)\n", reg2, reg2, generalRegisters[reg2], reg1, generalRegisters[reg1]);
+    int32_t s = generalRegisters[reg1];
+    int32_t a = generalRegisters[reg2];
     int32_t result = a >> s;
-    generalRegisters[instruction.reg2] = result;
+    generalRegisters[reg2] = result;
     
     systemRegisters.PSW.OV = 0;
-    systemRegisters.PSW.CY = instruction.reg1 ? (a >> (a-1)) & 1 : 0;
+    systemRegisters.PSW.CY = s ? (a >> (a-1)) & 1 : 0;
     systemRegisters.PSW.S = result < 0;
     systemRegisters.PSW.Z = result == 0;
     programCounter += 2;
     cycles += 1;
 }
 
-inline void shiftArithmeticRightImmediate(const Instruction& instruction)
+void shiftArithmeticRightImmediate(uint8_t imm5, uint8_t reg2)
 {
-    d_printf("SAR: GR[%d] <- GR[%d](0x%X) >>> 0x%X\n", instruction.reg2, instruction.reg2, generalRegisters[instruction.reg2], instruction.reg1);
-    int32_t s = instruction.reg1;
-    int32_t a = generalRegisters[instruction.reg2];
+    d_printf("SAR: GR[%d] <- GR[%d](0x%X) >>> 0x%X\n", reg2, reg2, generalRegisters[reg2], imm5);
+    int32_t s = imm5;
+    int32_t a = generalRegisters[reg2];
     int32_t result = a >> s;
-    generalRegisters[instruction.reg2] = result;
+    generalRegisters[reg2] = result;
     
     systemRegisters.PSW.OV = 0;
-    systemRegisters.PSW.CY = instruction.reg1 ? (a >> (a-1)) & 1 : 0;
+    systemRegisters.PSW.CY = imm5 ? (a >> (a-1)) & 1 : 0;
     systemRegisters.PSW.S = result < 0;
     systemRegisters.PSW.Z = result == 0;
     programCounter += 2;  
     cycles += 1;
 }
 
-inline void logicalOr(const Instruction& instruction)
+void logicalOr(uint8_t reg1, uint8_t reg2)
 {
-    d_printf("OR: GR[%d] <- GR[%d](0x%X) | GR[%d](0x%X)\n", instruction.reg2, instruction.reg2, generalRegisters[instruction.reg2], instruction.reg1, generalRegisters[instruction.reg1]);
-    int32_t result = generalRegisters[instruction.reg2] | generalRegisters[instruction.reg1];
+    d_printf("OR: GR[%d] <- GR[%d](0x%X) | GR[%d](0x%X)\n", reg2, reg2, generalRegisters[reg2], reg1, generalRegisters[reg1]);
+    int32_t result = generalRegisters[reg2] | generalRegisters[reg1];
     systemRegisters.PSW.OV = 0;
     systemRegisters.PSW.S = (result < 0) ? 1 : 0;
     systemRegisters.PSW.Z = (result == 0) ? 1 : 0;
-    generalRegisters[instruction.reg2] = result;
+    generalRegisters[reg2] = result;
     programCounter += 2;
     cycles += 1;
 }
 
-inline void logicalXor(const Instruction& instruction)
+void logicalXor(uint8_t reg1, uint8_t reg2)
 {
-    d_printf("XOR: GR[%d] <- GR[%d](0x%X) ^ GR[%d](0x%X)\n", instruction.reg2, instruction.reg2, generalRegisters[instruction.reg2], instruction.reg1, generalRegisters[instruction.reg1]);
-    int32_t result = generalRegisters[instruction.reg2] ^ generalRegisters[instruction.reg1];
+    d_printf("XOR: GR[%d] <- GR[%d](0x%X) ^ GR[%d](0x%X)\n", reg2, reg2, generalRegisters[reg2], reg1, generalRegisters[reg1]);
+    int32_t result = generalRegisters[reg2] ^ generalRegisters[reg1];
     systemRegisters.PSW.OV = 0;
     systemRegisters.PSW.S = (result < 0) ? 1 : 0;
     systemRegisters.PSW.Z = (result == 0) ? 1 : 0;
-    generalRegisters[instruction.reg2] = result;
+    generalRegisters[reg2] = result;
     programCounter += 2;
     cycles += 1;
 }
 
-inline void logicalAnd(const Instruction& instruction)
+void logicalAnd(uint8_t reg1, uint8_t reg2)
 {
-    d_printf("AND: GR[%d] <- GR[%d](0x%X) & GR[%d](0x%X)\n", instruction.reg2, instruction.reg2, generalRegisters[instruction.reg2], instruction.reg1, generalRegisters[instruction.reg1]);
-    int32_t result = generalRegisters[instruction.reg2] & generalRegisters[instruction.reg1];
+    d_printf("AND: GR[%d] <- GR[%d](0x%X) & GR[%d](0x%X)\n", reg2, reg2, generalRegisters[reg2], reg1, generalRegisters[reg1]);
+    int32_t result = generalRegisters[reg2] & generalRegisters[reg1];
     systemRegisters.PSW.OV = 0;
     systemRegisters.PSW.S = (result < 0) ? 1 : 0;
     systemRegisters.PSW.Z = (result == 0) ? 1 : 0;
-    generalRegisters[instruction.reg2] = result;
+    generalRegisters[reg2] = result;
     programCounter += 2;
     cycles += 1;
 }
 
-inline void logicalNot(const Instruction& instruction)
+void logicalNot(uint8_t reg1, uint8_t reg2)
 {
-    d_printf("NOT: GR[%d] <- ~GR[%d](0x%X)\n", instruction.reg2, instruction.reg1, generalRegisters[instruction.reg1]);
-    int32_t result = ~generalRegisters[instruction.reg1];
+    d_printf("NOT: GR[%d] <- ~GR[%d](0x%X)\n", reg2, reg1, generalRegisters[reg1]);
+    int32_t result = ~generalRegisters[reg1];
     systemRegisters.PSW.OV = 0;
     systemRegisters.PSW.S = (result < 0) ? 1 : 0;
     systemRegisters.PSW.Z = (result == 0) ? 1 : 0;
-    generalRegisters[instruction.reg2] = result;
+    generalRegisters[reg2] = result;
     programCounter += 2;
     cycles += 1;
 }
 
-inline void andImmediate(const Instruction &instruction)
+void andImmediate(uint8_t reg1, uint8_t reg2, uint16_t imm16)
 {
-    d_printf("ANDI: GR[%d] <- GR[%d](0x%X) & 0x%X\n", instruction.reg2, instruction.reg1, generalRegisters[instruction.reg1], instruction.imm16);
-    uint32_t res = generalRegisters[instruction.reg1] & instruction.imm16;
-    generalRegisters[instruction.reg2] = res;
+    d_printf("ANDI: GR[%d] <- GR[%d](0x%X) & 0x%X\n", reg2, reg1, generalRegisters[reg1], imm16);
+    uint32_t res = generalRegisters[reg1] & imm16;
+    generalRegisters[reg2] = res;
     systemRegisters.PSW.OV = 0;
     systemRegisters.PSW.S = 0;
     systemRegisters.PSW.Z = (res == 0) ? 1 : 0;
@@ -523,53 +523,53 @@ inline void andImmediate(const Instruction &instruction)
     cycles += 1;
 }
 
-inline void orImmediate(const Instruction &instruction)
+void orImmediate(uint8_t reg1, uint8_t reg2, uint16_t imm16)
 {
-    d_printf("ORI: GR[%d] <- GR[%d](0x%X) | 0x%X\n", instruction.reg2, instruction.reg1, generalRegisters[instruction.reg1], instruction.imm16);
-    generalRegisters[instruction.reg2] = generalRegisters[instruction.reg1] | instruction.imm16;
+    d_printf("ORI: GR[%d] <- GR[%d](0x%X) | 0x%X\n", reg2, reg1, generalRegisters[reg1], imm16);
+    generalRegisters[reg2] = generalRegisters[reg1] | imm16;
     
     systemRegisters.PSW.OV = 0;
-    systemRegisters.PSW.S = generalRegisters[instruction.reg2] < 0;
-    systemRegisters.PSW.Z = (generalRegisters[instruction.reg2] == 0) ? 1 : 0;
+    systemRegisters.PSW.S = generalRegisters[reg2] < 0;
+    systemRegisters.PSW.Z = (generalRegisters[reg2] == 0) ? 1 : 0;
     
     programCounter += 4;
     cycles += 1;
 }
 
-inline void xorImmediate(const Instruction &instruction)
+void xorImmediate(uint8_t reg1, uint8_t reg2, uint16_t imm16)
 {
-    d_printf("XORI: GR[%d] <- GR[%d](0x%X) ^ 0x%X\n", instruction.reg2, instruction.reg1, generalRegisters[instruction.reg1], instruction.imm16);
-    generalRegisters[instruction.reg2] = generalRegisters[instruction.reg1] ^ instruction.imm16;
+    d_printf("XORI: GR[%d] <- GR[%d](0x%X) ^ 0x%X\n", reg2, reg1, generalRegisters[reg1], imm16);
+    generalRegisters[reg2] = generalRegisters[reg1] ^ imm16;
     
     systemRegisters.PSW.OV = 0;
-    systemRegisters.PSW.S = generalRegisters[instruction.reg2] < 0;
-    systemRegisters.PSW.Z = (generalRegisters[instruction.reg2] == 0) ? 1 : 0;
+    systemRegisters.PSW.S = generalRegisters[reg2] < 0;
+    systemRegisters.PSW.Z = (generalRegisters[reg2] == 0) ? 1 : 0;
     
     programCounter += 4;
     cycles += 1;
 }
 
-inline void jump(const Instruction& instruction)
+void jump(uint8_t reg1, uint8_t unused)
 {
-    d_printf("JMP: PC <- GR[%d](0x%X)\n", instruction.reg1, generalRegisters[instruction.reg1]);
-    programCounter = (char*)&memoryManagmentUnit.read<uint32_t>(generalRegisters[instruction.reg1]);
+    d_printf("JMP: PC <- GR[%d](0x%X)\n", reg1, generalRegisters[reg1]);
+    programCounter = (char*)&memoryManagmentUnit.read<uint32_t>(generalRegisters[reg1]);
     cycles += 3;
 }
 
-inline void jumpRelative(const Instruction &instruction)
+void jumpRelative(uint32_t disp26)
 {
-    int32_t relativeJump = sign_extend(26, instruction.disp26());
-    d_printf("JMP: PC <- PC + 0x%X\n", relativeJump);
+    int32_t relativeJump = sign_extend(26, disp26);
+    d_printf("JR: PC <- PC + 0x%X\n", relativeJump);
     programCounter += relativeJump;
     cycles += 3;
 }
 
-inline void branchIfNoOverflow(const Instruction& instruction)
+void branchIfNoOverflow(uint16_t disp9)
 {
     d_printf("%s\n", "BNV");
     if (systemRegisters.PSW.OV == 0)
     {
-        programCounter += sign_extend(9, instruction.disp9());
+        programCounter += sign_extend(9, disp9);
         cycles += 3;
     }
     else
@@ -579,12 +579,12 @@ inline void branchIfNoOverflow(const Instruction& instruction)
     }
 }
 
-inline void branchIfOverflow(const Instruction& instruction)
+void branchIfOverflow(uint16_t disp9)
 {
     d_printf("%s\n", "BV");
     if (systemRegisters.PSW.OV)
     {
-        programCounter += sign_extend(9, instruction.disp9());
+        programCounter += sign_extend(9, disp9);
         cycles += 3;
     }
     else
@@ -594,12 +594,12 @@ inline void branchIfOverflow(const Instruction& instruction)
     }
 }
 
-inline void branchIfZero(const Instruction& instruction)
+void branchIfZero(uint16_t disp9)
 {
     d_printf("%s\n", "BZ");
     if (systemRegisters.PSW.Z)
     {
-        programCounter += sign_extend(9, instruction.disp9());
+        programCounter += sign_extend(9, disp9);
         cycles += 3;
     }
     else
@@ -609,12 +609,12 @@ inline void branchIfZero(const Instruction& instruction)
     }
 }
 
-inline void branchIfNotZero(const Instruction& instruction)
+void branchIfNotZero(uint16_t disp9)
 {
     d_printf("%s\n", "BNZ");
     if (systemRegisters.PSW.Z == 0)
     {
-        programCounter += sign_extend(9, instruction.disp9());
+        programCounter += sign_extend(9, disp9);
         cycles += 3;
     }
     else
@@ -625,12 +625,12 @@ inline void branchIfNotZero(const Instruction& instruction)
 }
 
 
-inline void branchIfLessThan(const Instruction& instruction)
+void branchIfLessThan(uint16_t disp9)
 {
     d_printf("%s\n", "BLT");
     if ((systemRegisters.PSW.S ^ systemRegisters.PSW.OV) == 1)
     {
-        programCounter += sign_extend(9, instruction.disp9());
+        programCounter += sign_extend(9, disp9);
         cycles += 3;
     }
     else
@@ -640,12 +640,12 @@ inline void branchIfLessThan(const Instruction& instruction)
     }
 }
 
-inline void branchIfNotHigher(const Instruction& instruction)
+void branchIfNotHigher(uint16_t disp9)
 {
     d_printf("%s\n", "BNH");
     if ((systemRegisters.PSW.Z | systemRegisters.PSW.CY) == 1)
     {
-        programCounter += sign_extend(9, instruction.disp9());
+        programCounter += sign_extend(9, disp9);
         cycles += 3;
     }
     else
@@ -655,12 +655,12 @@ inline void branchIfNotHigher(const Instruction& instruction)
     }
 }
 
-inline void branchIfNegative(const Instruction& instruction)
+void branchIfNegative(uint16_t disp9)
 {
     d_printf("%s\n", "BN");
     if (systemRegisters.PSW.S)
     {
-        programCounter += sign_extend(9, instruction.disp9());
+        programCounter += sign_extend(9, disp9);
         cycles += 3;
     }
     else
@@ -670,12 +670,12 @@ inline void branchIfNegative(const Instruction& instruction)
     }
 }
 
-inline void branchIfPositive(const Instruction& instruction)
+void branchIfPositive(uint16_t disp9)
 {
     d_printf("%s\n", "BP");
     if (systemRegisters.PSW.S == 0)
     {
-        programCounter += sign_extend(9, instruction.disp9());
+        programCounter += sign_extend(9, disp9);
         cycles += 3;
     }
     else
@@ -686,12 +686,12 @@ inline void branchIfPositive(const Instruction& instruction)
 }
 
 
-inline void branchIfHigher(const Instruction& instruction)
+void branchIfHigher(uint16_t disp9)
 {
     d_printf("%s\n", "BH");
     if ((systemRegisters.PSW.Z | systemRegisters.PSW.CY) == 0)
     {
-        programCounter += sign_extend(9, instruction.disp9());
+        programCounter += sign_extend(9, disp9);
         cycles += 3;
     }
     else
@@ -701,12 +701,12 @@ inline void branchIfHigher(const Instruction& instruction)
     }
 }
 
-inline void branchIfGreaterOrEqual(const Instruction& instruction)
+void branchIfGreaterOrEqual(uint16_t disp9)
 {
     d_printf("BGE\n");
     if ((systemRegisters.PSW.S ^ systemRegisters.PSW.OV) == 0)
     {
-        programCounter += sign_extend(9, instruction.disp9());
+        programCounter += sign_extend(9, disp9);
         cycles += 3;
     }
     else
@@ -716,12 +716,12 @@ inline void branchIfGreaterOrEqual(const Instruction& instruction)
     }
 }
 
-inline void branchIfGreaterThan(const Instruction& instruction)
+void branchIfGreaterThan(uint16_t disp9)
 {
     d_printf("BGT\n");
     if (((systemRegisters.PSW.S ^ systemRegisters.PSW.OV) | systemRegisters.PSW.Z) == 0)
     {
-        programCounter += sign_extend(9, instruction.disp9());
+        programCounter += sign_extend(9, disp9);
         cycles += 3;
     }
     else
@@ -731,12 +731,12 @@ inline void branchIfGreaterThan(const Instruction& instruction)
     }
 }
 
-inline void branchIfLessOrEqual(const Instruction& instruction)
+void branchIfLessOrEqual(uint16_t disp9)
 {
     d_printf("BLE\n");
     if (((systemRegisters.PSW.S ^ systemRegisters.PSW.OV) | systemRegisters.PSW.Z) == 1)
     {
-        programCounter += sign_extend(9, instruction.disp9());
+        programCounter += sign_extend(9, disp9);
         cycles += 3;
     }
     else
@@ -746,169 +746,167 @@ inline void branchIfLessOrEqual(const Instruction& instruction)
     }
 }
 
-inline void branchIfCarry(const Instruction& instruction)
-{
-    d_printf("BC\n");
-    if (systemRegisters.PSW.CY)
-    {
-        programCounter += sign_extend(9, instruction.disp9());
-        cycles += 3;
-    }
-    else
-    {
-        programCounter += 2;   
-        cycles += 1;
-    }
-}
-
-inline void branchIfNoCarry(const Instruction& instruction)
-{
-    d_printf("BNC\n");
-    if (systemRegisters.PSW.CY == 0)
-    {
-        programCounter += sign_extend(9, instruction.disp9());
-        cycles += 3;
-    }
-    else
-    {
-        programCounter += 2;   
-        cycles += 1;
-    }
-}
-
-inline void branch(const Instruction& instruction)
-{
-    d_printf("BR\n");
-    programCounter += sign_extend(9, instruction.disp9());
-    cycles += 3;
-}
-
-inline void moveHigh(const Instruction& instruction)
-{
-    d_printf("MOVEHI: GR[%d] <- GR[%d](0x%X) + 0x%X\n", instruction.reg2, instruction.reg1, generalRegisters[instruction.reg1], (instruction.imm16 << 16));
-    generalRegisters[instruction.reg2] = generalRegisters[instruction.reg1] + (instruction.imm16 << 16);
-    programCounter += 4;
-    cycles += 1;
-}
-
-inline void moveAddImmediate(const Instruction& instruction)
-{
-    d_printf("MOVEA: GR[%d] <- GR[%d](0x%X) + 0x%X\n", instruction.reg2, instruction.reg1, generalRegisters[instruction.reg1], sign_extend(16, instruction.imm16));
-    generalRegisters[instruction.reg2] = generalRegisters[instruction.reg1] + sign_extend(16, instruction.imm16);
-    programCounter += 4;
-    cycles += 1;
-}
-
-inline void storeWord(const Instruction& instruction)
-{
-    uint32_t address = (generalRegisters[instruction.reg1] + (int16_t)instruction.disp16) & 0xFFFFFFFC;
-    d_printf("ST.W: [GR[%d](0x%X) + %d](0x%X) <- [GR[%d](0x%X)\n", instruction.reg1, generalRegisters[instruction.reg1], sign_extend(16, instruction.disp16) & 0xFFFFFFFC, address, instruction.reg2, generalRegisters[instruction.reg2]);
-
-    memoryManagmentUnit.store<uint32_t>(generalRegisters[instruction.reg2], address);
-    programCounter += 4;
-    cycles += 1;
-}
-
-inline void storeHWord(const Instruction& instruction)
-{
-    uint32_t address = (generalRegisters[instruction.reg1] + (int16_t)instruction.disp16) & 0xFFFFFFFE;
-    d_printf("ST.H: [GR[%d](0x%X) + %d](0x%X) <- [GR[%d](0x%X)\n", instruction.reg1, generalRegisters[instruction.reg1], sign_extend(16, instruction.disp16) & 0xFFFFFFFE, address, instruction.reg2, generalRegisters[instruction.reg2]);
-
-    
-    memoryManagmentUnit.store<uint16_t>(generalRegisters[instruction.reg2] & 0xFFFF, address);
-    programCounter += 4;
-    cycles += 1;
-}
-
-inline void storeByte(const Instruction& instruction)
-{
-    uint32_t address = (generalRegisters[instruction.reg1] + (int16_t)instruction.disp16);
-    d_printf("ST.B: [GR[%d](0x%X) + %d](0x%X) <- [GR[%d](0x%X)\n", instruction.reg1, generalRegisters[instruction.reg1], sign_extend(16, instruction.disp16), address, instruction.reg2, generalRegisters[instruction.reg2]);
-
-
-    memoryManagmentUnit.store<uint8_t>(generalRegisters[instruction.reg2] & 0xFF, address);
-    programCounter += 4;
-    cycles += 1;
-}
-
-inline void loadByte(const Instruction& instruction)
-{
-    d_printf("LD.B: GR[%d] <- [GR[%d](0x%X) + %d\n", instruction.reg2, instruction.reg1, generalRegisters[instruction.reg1], sign_extend(16, instruction.disp16));
-
-    uint32_t address = (generalRegisters[instruction.reg1] + (int16_t)instruction.disp16);
-    generalRegisters[instruction.reg2] = sign_extend(8, memoryManagmentUnit.read<int8_t>(address));
-    programCounter += 4;    
-    cycles += 3;
-}
-
-inline void loadHWord(const Instruction& instruction)
-{
-    uint32_t address = (generalRegisters[instruction.reg1] + (int16_t)instruction.disp16);
-    address &= 0xFFFFFFFE;
-    d_printf("LD.H: GR[%d] <- [GR[%d](0x%X) + %d\n", instruction.reg2, instruction.reg1, generalRegisters[instruction.reg1], sign_extend(16, instruction.disp16));
-    
-    generalRegisters[instruction.reg2] = sign_extend(16, memoryManagmentUnit.read<int16_t>(address));
-    programCounter += 4;    
-    cycles += 3;
-}
-
-inline void loadWord(const Instruction& instruction)
-{
-    uint32_t address = (generalRegisters[instruction.reg1] + (int16_t)instruction.disp16) & 0xFFFFFFFC;
-    d_printf("LD.W: GR[%d] <- [GR[%d](0x%X) + %d\n", instruction.reg2, instruction.reg1, generalRegisters[instruction.reg1], sign_extend(16, instruction.disp16));
-    
-    generalRegisters[instruction.reg2] = memoryManagmentUnit.read<int32_t>(address);
-    programCounter += 4;    
-    cycles += 3;
-}
-
-inline void loadSystemRegister(const CPU::Instruction& instruction)
-{
-    d_printf("LDSR %d\n", instruction.reg1);
-    //TODO: Prevent writing to write disabled registers
-    uint8_t regID = instruction.reg1;
-    systemRegisters[regID] = generalRegisters[instruction.reg2];
-    programCounter += 2;
-    cycles += 1;
-}
-
-inline void storeSystemRegister(const CPU::Instruction& instruction)
-{
-    d_printf("STSR %d\n", instruction.reg1);
-    //TODO: Prevent reading from reserved registers
-    uint8_t regID = instruction.reg1;
-    generalRegisters[instruction.reg2] = systemRegisters[regID];
-    programCounter += 2;   
-    cycles += 1;
-}
-
-inline void jumpAndLink(const Instruction &instruction)
-{
-    d_printf("JAL\n");
-    uint32_t currentPC = (0x07000000 + (uint32_t)(((char*)programCounter + 4) - ((char*)memoryManagmentUnit.rom.data)));
-    generalRegisters[31] = currentPC;
-    currentPC -= 4;
-    int32_t relativeJump = sign_extend(26, instruction.disp26());
-    currentPC += relativeJump;
-    
-    programCounter = (char*)&memoryManagmentUnit.read<uint32_t>(currentPC);
-    cycles += 3;
-}
-
-inline void outWrite(const Instruction& instruction)
-{
-    d_printf("OUT.W\n");
-    programCounter += 4;
-}
-
-inline void nop(const Instruction& instruction)
+void nop(uint16_t disp9)
 {
     d_printf("NOP\n");
     programCounter += 2;
     cycles += 1;
 }
 
-inline void setInterruptDisable(const Instruction& instruction)
+void branchIfCarry(uint16_t disp9)
+{
+    d_printf("BC\n");
+    if (systemRegisters.PSW.CY)
+    {
+        programCounter += sign_extend(9, disp9);
+        cycles += 3;
+    }
+    else
+    {
+        programCounter += 2;   
+        cycles += 1;
+    }
+}
+
+void branchIfNoCarry(uint16_t disp9)
+{
+    d_printf("BNC\n");
+    if (systemRegisters.PSW.CY == 0)
+    {
+        programCounter += sign_extend(9, disp9);
+        cycles += 3;
+    }
+    else
+    {
+        programCounter += 2;   
+        cycles += 1;
+    }
+}
+
+void branch(uint16_t disp9)
+{
+    d_printf("BR\n");
+    programCounter += sign_extend(9, disp9);
+    cycles += 3;
+}
+
+void moveHigh(uint8_t reg1, uint8_t reg2, uint16_t imm16)
+{
+    d_printf("MOVEHI: GR[%d] <- GR[%d](0x%X) + 0x%X\n", reg2, reg1, generalRegisters[reg1], (imm16 << 16));
+    generalRegisters[reg2] = generalRegisters[reg1] + (imm16 << 16);
+    programCounter += 4;
+    cycles += 1;
+}
+
+void moveAddImmediate(uint8_t reg1, uint8_t reg2, uint16_t imm16)
+{
+    d_printf("MOVEA: GR[%d] <- GR[%d](0x%X) + 0x%X\n", reg2, reg1, generalRegisters[reg1], sign_extend(16, imm16));
+    generalRegisters[reg2] = generalRegisters[reg1] + sign_extend(16, imm16);
+    programCounter += 4;
+    cycles += 1;
+}
+
+void storeWord(uint8_t reg1, uint8_t reg2, uint16_t disp16)
+{
+    uint32_t address = (generalRegisters[reg1] + (int16_t)disp16) & 0xFFFFFFFC;
+    d_printf("ST.W: [GR[%d](0x%X) + %d](0x%X) <- [GR[%d](0x%X)\n", reg1, generalRegisters[reg1], sign_extend(16, disp16) & 0xFFFFFFFC, address, reg2, generalRegisters[reg2]);
+
+    memoryManagmentUnit.store<uint32_t>(generalRegisters[reg2], address);
+    programCounter += 4;
+    cycles += 1;
+}
+
+void storeHWord(uint8_t reg1, uint8_t reg2, uint16_t disp16)
+{
+    uint32_t address = (generalRegisters[reg1] + (int16_t)disp16) & 0xFFFFFFFE;
+    d_printf("ST.H: [GR[%d](0x%X) + %d](0x%X) <- [GR[%d](0x%X)\n", reg1, generalRegisters[reg1], sign_extend(16, disp16) & 0xFFFFFFFE, address, reg2, generalRegisters[reg2]);
+
+    
+    memoryManagmentUnit.store<uint16_t>(generalRegisters[reg2] & 0xFFFF, address);
+    programCounter += 4;
+    cycles += 1;
+}
+
+void storeByte(uint8_t reg1, uint8_t reg2, uint16_t disp16)
+{
+    uint32_t address = (generalRegisters[reg1] + (int16_t)disp16);
+    d_printf("ST.B: [GR[%d](0x%X) + %d](0x%X) <- [GR[%d](0x%X)\n", reg1, generalRegisters[reg1], sign_extend(16, disp16), address, reg2, generalRegisters[reg2]);
+
+
+    memoryManagmentUnit.store<uint8_t>(generalRegisters[reg2] & 0xFF, address);
+    programCounter += 4;
+    cycles += 1;
+}
+
+void loadByte(uint8_t reg1, uint8_t reg2, uint16_t disp16)
+{
+    d_printf("LD.B: GR[%d] <- [GR[%d](0x%X) + %d\n", reg2, reg1, generalRegisters[reg1], sign_extend(16, disp16));
+
+    uint32_t address = (generalRegisters[reg1] + (int16_t)disp16);
+    generalRegisters[reg2] = sign_extend(8, memoryManagmentUnit.read<int8_t>(address));
+    programCounter += 4;    
+    cycles += 3;
+}
+
+void loadHWord(uint8_t reg1, uint8_t reg2, uint16_t disp16)
+{
+    uint32_t address = (generalRegisters[reg1] + (int16_t)disp16);
+    address &= 0xFFFFFFFE;
+    d_printf("LD.H: GR[%d] <- [GR[%d](0x%X) + %d\n", reg2, reg1, generalRegisters[reg1], sign_extend(16, disp16));
+    
+    generalRegisters[reg2] = sign_extend(16, memoryManagmentUnit.read<int16_t>(address));
+    programCounter += 4;    
+    cycles += 3;
+}
+
+void loadWord(uint8_t reg1, uint8_t reg2, uint16_t disp16)
+{
+    uint32_t address = (generalRegisters[reg1] + (int16_t)disp16) & 0xFFFFFFFC;
+    d_printf("LD.W: GR[%d] <- [GR[%d](0x%X) + %d\n", reg2, reg1, generalRegisters[reg1], sign_extend(16, disp16));
+    
+    generalRegisters[reg2] = memoryManagmentUnit.read<int32_t>(address);
+    programCounter += 4;    
+    cycles += 3;
+}
+
+void loadSystemRegister(uint8_t reg1, uint8_t reg2)
+{
+    d_printf("LDSR %d\n", reg1);
+    //TODO: Prevent writing to write disabled registers
+    systemRegisters[reg1] = generalRegisters[reg2];
+    programCounter += 2;
+    cycles += 1;
+}
+
+void storeSystemRegister(uint8_t reg1, uint8_t reg2)
+{
+    d_printf("STSR %d\n", reg1);
+    //TODO: Prevent reading from reserved registers
+    generalRegisters[reg2] = systemRegisters[reg1];
+    programCounter += 2;   
+    cycles += 1;
+}
+
+void jumpAndLink(uint32_t disp26)
+{
+    d_printf("JAL\n");
+    uint32_t currentPC = (0x07000000 + (uint32_t)(((char*)programCounter + 4) - ((char*)memoryManagmentUnit.rom.data)));
+    generalRegisters[31] = currentPC;
+    currentPC -= 4;
+    int32_t relativeJump = sign_extend(26, disp26);
+    currentPC += relativeJump;
+    
+    programCounter = (char*)&memoryManagmentUnit.read<uint32_t>(currentPC);
+    cycles += 3;
+}
+
+void outWrite(uint8_t reg1, uint8_t reg2, uint16_t disp16)
+{
+    d_printf("OUT.W\n");
+    programCounter += 4;
+}
+
+void setInterruptDisable(uint8_t reg1, uint8_t reg2)
 {
     d_printf("SEI\n");
     systemRegisters.PSW.ID = 1;
@@ -916,7 +914,7 @@ inline void setInterruptDisable(const Instruction& instruction)
     cycles += 1;
 }
 
-inline void clearInterruptDisable(const Instruction& instruction)
+void clearInterruptDisable(uint8_t reg1, uint8_t reg2)
 {
     d_printf("CLI\n");
     systemRegisters.PSW.ID = 0;
@@ -924,7 +922,7 @@ inline void clearInterruptDisable(const Instruction& instruction)
     cycles += 1;
 }
 
-inline void returnFromTrap(const Instruction& instruction)
+void returnFromTrap(uint8_t imm5, uint8_t reg2)
 {
     d_printf("RETI\n");
     if (systemRegisters.PSW.NP)
@@ -940,10 +938,10 @@ inline void returnFromTrap(const Instruction& instruction)
     cycles += 10;
 }
 
-inline void compareFloat(const Instruction& instruction)
+void compareFloat(uint8_t reg1, uint8_t reg2)
 {
     d_printf("CMPF.S\n");
-    float f = generalRegistersFloat[instruction.reg2] - generalRegistersFloat[instruction.reg1];
+    float f = generalRegistersFloat[reg2] - generalRegistersFloat[reg1];
     systemRegisters.PSW.Z = (f == 0.0f);
     systemRegisters.PSW.OV = 0;
     systemRegisters.PSW.S = (f < 0.0f);
@@ -953,11 +951,11 @@ inline void compareFloat(const Instruction& instruction)
 //        systemRegisters.PSW.FRO = 
 }
 
-inline void convertWordToFloat(const Instruction& instruction)
+void convertWordToFloat(uint8_t reg1, uint8_t reg2)
 {
     d_printf("CVT.WS\n");
-    float f = generalRegisters[instruction.reg1];
-    generalRegistersFloat[instruction.reg2] = f;
+    float f = generalRegisters[reg1];
+    generalRegistersFloat[reg2] = f;
     
     systemRegisters.PSW.Z = (f == 0.0f);
     systemRegisters.PSW.S = (f < 0.0f);
@@ -968,17 +966,17 @@ inline void convertWordToFloat(const Instruction& instruction)
     cycles += 5;
 }
 
-inline void convertFloatToWord(const Instruction& instruction)
+void convertFloatToWord(uint8_t reg1, uint8_t reg2)
 {
     d_printf("CVT.SW\n");
-    float f = generalRegistersFloat[instruction.reg1];
+    float f = generalRegistersFloat[reg1];
     int32_t t = 0;
     if (f >= 0)
         t = floorf(f + .5f);
     else
         t = ceilf(f - .5f);
     
-    generalRegisters[instruction.reg2] = t;
+    generalRegisters[reg2] = t;
     
     systemRegisters.PSW.OV = 0;
     systemRegisters.PSW.S = (t < 0);
@@ -988,13 +986,13 @@ inline void convertFloatToWord(const Instruction& instruction)
     cycles += 9;
 }
 
-inline void addFloat(const Instruction &instruction)
+void addFloat(uint8_t reg1, uint8_t reg2)
 {
     d_printf("ADDF.S\n");
     
-    float f = generalRegistersFloat[instruction.reg2] + generalRegistersFloat[instruction.reg1];
+    float f = generalRegistersFloat[reg2] + generalRegistersFloat[reg1];
     
-    generalRegistersFloat[instruction.reg2] = f;
+    generalRegistersFloat[reg2] = f;
     
     systemRegisters.PSW.OV = 0;
     systemRegisters.PSW.CY = (f < 0.0f);
@@ -1004,13 +1002,13 @@ inline void addFloat(const Instruction &instruction)
     cycles += 9;
 }
 
-inline void subtractFloat(const Instruction &instruction)
+void subtractFloat(uint8_t reg1, uint8_t reg2)
 {
     d_printf("SUBF.S\n");
     
-    float f = generalRegistersFloat[instruction.reg2] - generalRegistersFloat[instruction.reg1];
+    float f = generalRegistersFloat[reg2] - generalRegistersFloat[reg1];
     
-    generalRegistersFloat[instruction.reg2] = f;
+    generalRegistersFloat[reg2] = f;
     
     systemRegisters.PSW.OV = 0;
     systemRegisters.PSW.CY = (f < 0.0f);
@@ -1020,13 +1018,13 @@ inline void subtractFloat(const Instruction &instruction)
     cycles += 12;
 }
 
-inline void multiplyFloat(const Instruction &instruction)
+void multiplyFloat(uint8_t reg1, uint8_t reg2)
 {
     d_printf("MULF.S\n");
     
-    float f = generalRegistersFloat[instruction.reg2] * generalRegistersFloat[instruction.reg1];
+    float f = generalRegistersFloat[reg2] * generalRegistersFloat[reg1];
     
-    generalRegistersFloat[instruction.reg2] = f;
+    generalRegistersFloat[reg2] = f;
     
     systemRegisters.PSW.OV = 0;
     systemRegisters.PSW.CY = (f < 0.0f);
@@ -1036,13 +1034,13 @@ inline void multiplyFloat(const Instruction &instruction)
     cycles += 8;
 }
 
-inline void divideFloat(const Instruction &instruction)
+void divideFloat(uint8_t reg1, uint8_t reg2)
 {
     d_printf("DIVF.S\n");
     
-    float f = generalRegistersFloat[instruction.reg2] / generalRegistersFloat[instruction.reg1];
+    float f = generalRegistersFloat[reg2] / generalRegistersFloat[reg1];
     
-    generalRegistersFloat[instruction.reg2] = f;
+    generalRegistersFloat[reg2] = f;
     
     systemRegisters.PSW.OV = 0;
     systemRegisters.PSW.CY = (f < 0.0f);
@@ -1052,17 +1050,17 @@ inline void divideFloat(const Instruction &instruction)
     cycles += 44;
 }
 
-inline void truncateFloat(const Instruction& instruction)
+void truncateFloat(uint8_t reg1, uint8_t reg2)
 {
     d_printf("TRNC.SW\n");
-    float f = generalRegistersFloat[instruction.reg1];
+    float f = generalRegistersFloat[reg1];
     int32_t t = 0;
     if (f >= 0)
         t = floorf(f);
     else
         t = ceilf(f);
     
-    generalRegisters[instruction.reg2] = t;
+    generalRegisters[reg2] = t;
     
     systemRegisters.PSW.OV = 0;
     systemRegisters.PSW.S = (t < 0);
@@ -1072,31 +1070,31 @@ inline void truncateFloat(const Instruction& instruction)
     cycles += 8;
 }
 
-inline void exchangeByte(const Instruction& instruction)
+void exchangeByte(uint8_t reg1, uint8_t reg2)
 {
     d_printf("XB\n");
     
-    int32_t val = generalRegisters[instruction.reg2];
+    int32_t val = generalRegisters[reg2];
     val = (val & 0xFFFF0000) | ((val << 8) & 0x0000FF00) | ((val >> 8) & 0x000000FF);
-    generalRegisters[instruction.reg2] = val;
+    generalRegisters[reg2] = val;
     programCounter += 4;
     cycles += 1;
 }
 
-inline void exchangeHalfWord(const Instruction &instruction)
+void exchangeHalfWord(uint8_t reg1, uint8_t reg2)
 {
     d_printf("XH\n");
-    int32_t val = generalRegisters[instruction.reg2];
+    int32_t val = generalRegisters[reg2];
     val = ((val << 16) & 0xFFFF0000) | ((val >> 16) & 0x0000FFFF);
-    generalRegisters[instruction.reg2] = val;
+    generalRegisters[reg2] = val;
     programCounter += 4;
     cycles += 1;
 }
 
-inline void reverseWord(const Instruction &instruction)
+void reverseWord(uint8_t reg1, uint8_t reg2)
 {
     d_printf("REV\n");
-    int32_t word = generalRegisters[instruction.reg1];
+    int32_t word = generalRegisters[reg1];
     int32_t out = 0;
     for (int i = 0; i < 32; ++i)
     {
@@ -1105,22 +1103,22 @@ inline void reverseWord(const Instruction &instruction)
         word = word >> 1;
     }
     
-    generalRegisters[instruction.reg2] = word;
+    generalRegisters[reg2] = word;
     programCounter += 4;
     cycles += 1;
 }
 
-inline void multiplyHalfWord(const Instruction &instruction)
+void multiplyHalfWord(uint8_t reg1, uint8_t reg2)
 {
     d_printf("MPYHW\n");
     
-    generalRegisters[instruction.reg2] = (int32_t)(int16_t)(generalRegisters[instruction.reg2] & 0xFFFF) * (int32_t)(int16_t)(generalRegisters[instruction.reg1] & 0xFFFF);
+    generalRegisters[reg2] = (int32_t)(int16_t)(generalRegisters[reg2] & 0xFFFF) * (int32_t)(int16_t)(generalRegisters[reg1] & 0xFFFF);
     
     programCounter += 4;
     cycles += 9;
 }
 
-inline void moveBitString(const Instruction& instruction)
+void moveBitString(uint8_t reg1, uint8_t reg2)
 {
     d_printf("MOVBSU\n");
     uint32_t startAddress = generalRegisters[30];
@@ -1153,7 +1151,7 @@ inline void moveBitString(const Instruction& instruction)
     programCounter += 2;
 }
 
-inline void andBitString(const Instruction& instruction)
+void andBitString(uint8_t reg1, uint8_t reg2)
 {
     d_printf("ANDBSU\n");
     uint32_t startAddress = generalRegisters[30];
@@ -1183,7 +1181,7 @@ inline void andBitString(const Instruction& instruction)
     programCounter += 2;
 }
 
-inline void orBitString(const Instruction& instruction)
+void orBitString(uint8_t reg1, uint8_t reg2)
 {
     d_printf("ORBSU\n");
     uint32_t startAddress = generalRegisters[30];
@@ -1215,7 +1213,7 @@ inline void orBitString(const Instruction& instruction)
     programCounter += 2;
 }
 
-inline void xorBitString(const Instruction& instruction)
+void xorBitString(uint8_t reg1, uint8_t reg2)
 {
     d_printf("XORBSU\n");
     uint32_t startAddress = generalRegisters[30];
@@ -1245,7 +1243,7 @@ inline void xorBitString(const Instruction& instruction)
     programCounter += 2;
 }
 
-inline void andNotBitString(const Instruction& instruction)
+void andNotBitString(uint8_t reg1, uint8_t reg2)
 {
     d_printf("ANDNBSU\n");
     uint32_t startAddress = generalRegisters[30];
@@ -1276,7 +1274,7 @@ inline void andNotBitString(const Instruction& instruction)
     programCounter += 2;
 }
 
-inline void orNotBitString(const Instruction& instruction)
+void orNotBitString(uint8_t reg1, uint8_t reg2)
 {
     d_printf("ORNBSU\n");
     uint32_t startAddress = generalRegisters[30];
@@ -1307,7 +1305,7 @@ inline void orNotBitString(const Instruction& instruction)
     programCounter += 2;
 }
 
-inline void xorNotBitString(const Instruction& instruction)
+void xorNotBitString(uint8_t reg1, uint8_t reg2)
 {
     d_printf("XORNBSU\n");
     uint32_t startAddress = generalRegisters[30];
@@ -1337,7 +1335,7 @@ inline void xorNotBitString(const Instruction& instruction)
     programCounter += 2;
 }
 
-inline void notBitString(const Instruction& instruction)
+void notBitString(uint8_t reg1, uint8_t reg2)
 {
     d_printf("XORNBSU\n");
     uint32_t startAddress = generalRegisters[30];
