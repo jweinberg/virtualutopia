@@ -143,10 +143,26 @@ namespace VIP
     
     void VIP::DrawObj(const Obj &obj, int row)
     {
+        //See what is offscreen or not
+        if (obj.JY + 8 < row * 8 || obj.JY >= (row * 8) + 8)
+            return;
+        
+
         if (obj.JLON)
+        {
+            int x = obj.JX - obj.JP;
+            if (x + 8 < 0 || x >= 384)
+                return;
+
             leftFrameBuffer[0].DrawChr(chrRam[obj.JCA], row, obj.JX - obj.JP, obj.JY, 0, 0, 8, 8, obj.JHFLP, obj.JVFLP, JPLT[obj.JPLTS]);
+        }
         if (obj.JRON)
+        {
+            int x = obj.JX + obj.JP;
+            if (x + 8 < 0 || x >= 384)
+                return;
             rightFrameBuffer[0].DrawChr(chrRam[obj.JCA], row, obj.JX + obj.JP, obj.JY, 0, 0, 8, 8, obj.JHFLP, obj.JVFLP, JPLT[obj.JPLTS]);
+        }
             
     }
     
@@ -190,74 +206,66 @@ namespace VIP
                 if (world.GY > (row * 8 + 8))
                     continue;
                 
-                if (world.LON)
-                {
-                    int x = 0;
-                    do
+                int y = max<int>((row * 8) - world.GY, 0);
+                do
+                {   
+                    int srcY = (y + world.MY) % (yWorlds * 512);
+                    int yWorld = srcY / 512;
+                    int yChar = (srcY & 0x1FF) / 8;                            
+                    int yOff = srcY & 7;
+                    
+                    int h = 8 - yOff;
+                    h = MIN(h, world.H + 1 - y);
+                    
+                    if (world.LON)
                     {
-                        int srcX = (x + world.MX - world.MP) % (xWorlds * 512);
-                        int xWorld = srcX / 512;
-                        int xChar = (srcX & 0x1FF) / 8;
-                        int xOff = srcX & 7;
-                        int y = max<int>((row * 8) - world.GY, 0);
-                        
-                        int w = 8 - xOff;
-                        w = MIN(w, world.W + 1 - x);
-                        
+                        int x = 0;
                         do
                         {
-                            int srcY = (y + world.MY) % (yWorlds * 512);
-                            int yWorld = srcY / 512;
-                            int yChar = (srcY & 0x1FF) / 8;                            
-                            int yOff = srcY & 7;
+                            int srcX = (x + world.MX - world.MP) % (xWorlds * 512);
+                            int xWorld = srcX / 512;
+                            int xChar = (srcX & 0x1FF) / 8;
+                            int xOff = srcX & 7;
+                            
+                            int w = 8 - xOff;
+                            w = MIN(w, world.W + 1 - x);
                             
                             const BGMap &map = bgMaps[world.BGMAP_BASE + (yWorld * xWorlds) + xWorld];
                             const BGMapData &data = map.chars[yChar * 64 + xChar];
                             const Chr& chr = chrRam[data.charNum];  
                             
-                            int h = 8 - yOff;
-                            h = MIN(h, world.H + 1 - y);
-                            
-                            leftFrameBuffer[0].DrawChr(chr, row, x + world.GX - world.GP, y + world.GY, xOff, yOff, w, h, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
-                            y += (8 - yOff);
-                        } while(y <= (max<int>((row * 8) - world.GY, 0) + 8) && y <= world.H);
-                        x += (8 - xOff);
-                    } while(x <= world.W);
-                }
-                if (world.RON)
-                {
-                    int x = 0;
-                    do
+                            int xPos = x + world.GX - world.GP;
+                            if (!(xPos + w < 0 || xPos >= 384))
+                                leftFrameBuffer[0].DrawChr(chr, row, xPos, y + world.GY, xOff, yOff, w, h, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
+                            x += (8 - xOff);
+                        } while(x <= world.W);
+                    }
+                    
+                    if (world.RON)
                     {
-                        int srcX = (x + world.MX + world.MP) % (xWorlds * 512);
-                        int xWorld = srcX / 512;
-                        int xChar = (srcX & 0x1FF) / 8;
-                        int xOff = srcX & 7;
-                        int y = max<int>((row * 8) - world.GY, 0);
-                        
-                        int w = 8 - xOff;
-                        w = MIN(w, world.W + 1 - x);
-                        
+                        int x = 0;
                         do
                         {
-                            int srcY = (y + world.MY) % (yWorlds * 512);
-                            int yWorld = srcY / 512;
-                            int yChar = (srcY & 0x1FF) / 8;                            
-                            int yOff = srcY & 7;
+                            int srcX = (x + world.MX + world.MP) % (xWorlds * 512);
+                            int xWorld = srcX / 512;
+                            int xChar = (srcX & 0x1FF) / 8;
+                            int xOff = srcX & 7;
                             
+                            int w = 8 - xOff;
+                            w = MIN(w, world.W + 1 - x);
+
                             const BGMap &map = bgMaps[world.BGMAP_BASE + (yWorld * xWorlds) + xWorld];
                             const BGMapData &data = map.chars[yChar * 64 + xChar];
                             const Chr& chr = chrRam[data.charNum];  
                             
-                            int h = 8 - yOff;
-                            h = MIN(h, world.H + 1 - y);
-                            
-                            rightFrameBuffer[0].DrawChr(chr, row, x + world.GX + world.GP, y + world.GY, xOff, yOff, w, h, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
-                            y += (8 - yOff);
-                        } while(y <= (max<int>((row * 8) - world.GY, 0) + 8) && y <= world.H);
-                        x += (8 - xOff);
-                    } while(x <= world.W);
-                }
+                            int xPos = x + world.GX + world.GP;
+                            if (!(xPos + w < 0 || xPos >= 384))
+                                rightFrameBuffer[0].DrawChr(chr, row, xPos, y + world.GY, xOff, yOff, w, h, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
+                            x += (8 - xOff);
+                        } while(x <= world.W);
+                    }
+                    y += (8 - yOff);
+                } while(y <= (max<int>((row * 8) - world.GY, 0) + 8) && y <= world.H);
             }
             else if (type == World::kAffineType)
             {
@@ -273,72 +281,66 @@ namespace VIP
                 if (world.GY > (row * 8 + 8))
                     continue;
                 
-                if (world.LON)
+                int y = max<int>((row * 8) - world.GY, 0);
+                for (; y < (max<int>((row * 8) - world.GY, 0) + 8) && y <= world.H; ++y)
                 {
-                    int y = max<int>((row * 8) - world.GY, 0);
-                    for (; y < (max<int>((row * 8) - world.GY, 0) + 8) && y <= world.H; ++y)
+                    AffineTable* affineTable = ((AffineTable*)&read<uint32_t>((world.PARAM_BASE & 0xFFF0) * 2 + 0x00020000));
+                    int srcY = (int)((float)affineTable[y].MY + (float)affineTable[y].DY * y);
+                    int yWorld = srcY / 512;
+                    int yChar = (srcY & 0x1FF) / 8;                            
+                    int yOff = srcY & 7;
+                    srcY %= (yWorlds * 512);
+                    
+                    for (int x = 0; x < world.W; ++x)
                     {
-                        AffineTable* affineTable = ((AffineTable*)&read<uint32_t>((world.PARAM_BASE & 0xFFF0) * 2 + 0x00020000));
-                        for (int x = 0; x < world.W; ++x)
+                        if (world.LON)
                         {
-                            int srcX = (int)((float)affineTable[y].MX + (float)affineTable[y].DX * (affineTable[y].MP < 0 ? x + affineTable[y].MP : x));  
-                            int srcY = (int)((float)affineTable[y].MY + (float)affineTable[y].DY * y);
-                            
-                            //if (!world.OVER)
+                            int xPos = x + world.GX + world.GP;
+                            if (!(xPos + 1 < 0 || xPos >= 384))
                             {
-                                srcX %= (xWorlds * 512);
-                                srcY %= (yWorlds * 512);
+                                int srcX = (int)((float)affineTable[y].MX + (float)affineTable[y].DX * (affineTable[y].MP < 0 ? x + affineTable[y].MP : x));  
+                                
+                                //if (!world.OVER)
+                                {
+                                    srcX %= (xWorlds * 512);
+                                }
+                                int xWorld = srcX / 512;
+                                int xChar = (srcX & 0x1FF) / 8;
+                                int xOff = srcX & 7;
+
+                                const BGMap &map = bgMaps[world.BGMAP_BASE + (yWorld * xWorlds) + xWorld];
+                                const BGMapData &data = map.chars[yChar * 64 + xChar];
+                                const Chr& chr = chrRam[data.charNum];  
+
+                                leftFrameBuffer[0].DrawChr(chr, row, xPos, y + world.GY, xOff, yOff, 1, 1, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
                             }
-                            int xWorld = srcX / 512;
-                            int xChar = (srcX & 0x1FF) / 8;
-                            int xOff = srcX & 7;
-
-                            int yWorld = srcY / 512;
-                            int yChar = (srcY & 0x1FF) / 8;                            
-                            int yOff = srcY & 7;
-                         
-                            const BGMap &map = bgMaps[world.BGMAP_BASE + (yWorld * xWorlds) + xWorld];
-                            const BGMapData &data = map.chars[yChar * 64 + xChar];
-                            const Chr& chr = chrRam[data.charNum];  
-
-                            leftFrameBuffer[0].DrawChr(chr, row, x + world.GX + world.GP, y + world.GY, xOff, yOff, 1, 1, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
                         }
-                    }
-                }
-                if (world.RON)
-                {
-                    int y = max<int>((row * 8) - world.GY, 0);
-                    for (; y < (max<int>((row * 8) - world.GY, 0) + 8) && y <= world.H; ++y)
-                    {
-                        AffineTable* affineTable = ((AffineTable*)&read<uint32_t>((world.PARAM_BASE & 0xFFF0) * 2 + 0x00020000));
-                        for (int x = 0; x < world.W; ++x)
+                        if (world.RON)
                         {
-                            int srcX = (int)((float)affineTable[y].MX + (float)affineTable[y].DX * (affineTable[y].MP >= 0 ? x + affineTable[y].MP : x));  
-                            int srcY = (int)((float)affineTable[y].MY + (float)affineTable[y].DY * y);
-                            
-                            //if (!world.OVER)
-                            {
-                                srcX %= (xWorlds * 512);
-                                srcY %= (yWorlds * 512);
+                            int xPos = x + world.GX - world.GP;
+                            if (!(xPos + 1 < 0 || xPos >= 384))
+                            {                                
+                                int srcX = (int)((float)affineTable[y].MX + (float)affineTable[y].DX * (affineTable[y].MP >= 0 ? x + affineTable[y].MP : x));  
+                                
+                                //if (!world.OVER)
+                                {
+                                    srcX %= (xWorlds * 512);
+                                }
+                                int xWorld = srcX / 512;
+                                int xChar = (srcX & 0x1FF) / 8;
+                                int xOff = srcX & 7;
+                                
+                                const BGMap &map = bgMaps[world.BGMAP_BASE + (yWorld * xWorlds) + xWorld];
+                                const BGMapData &data = map.chars[yChar * 64 + xChar];
+                                const Chr& chr = chrRam[data.charNum];  
+                                
+                                rightFrameBuffer[0].DrawChr(chr, row, xPos, y + world.GY, xOff, yOff, 1, 1, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
                             }
-                            int xWorld = srcX / 512;
-                            int xChar = (srcX & 0x1FF) / 8;
-                            int xOff = srcX & 7;
-                            
-                            int yWorld = srcY / 512;
-                            int yChar = (srcY & 0x1FF) / 8;                            
-                            int yOff = srcY & 7;
-                            
-                            const BGMap &map = bgMaps[world.BGMAP_BASE + (yWorld * xWorlds) + xWorld];
-                            const BGMapData &data = map.chars[yChar * 64 + xChar];
-                            const Chr& chr = chrRam[data.charNum];  
-                            
-                            rightFrameBuffer[0].DrawChr(chr, row, x + world.GX - world.GP, y + world.GY, xOff, yOff, 1, 1, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
                         }
+
                     }
+                                            
                 }
-                
-                
             }
         }
        //WriteFrame();

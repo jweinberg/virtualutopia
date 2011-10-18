@@ -47,7 +47,7 @@ namespace VIP
             *((T*)&(*this)[offset]) = val;
         }
         
-        inline char& operator[](const int offset)
+        char& operator[](const int offset)
         {
             switch (offset)
             {

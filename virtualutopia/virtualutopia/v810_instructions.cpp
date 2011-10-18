@@ -3,7 +3,7 @@
 //  virtualutopia
 //
 
-//#include "v810.h"
+#include "v810.h"
 //#include "instruction.h"
 //#include "cpu_utils.h"
 //#include "mmu.h"
@@ -84,7 +84,7 @@ enum FlagCondition
 }; 
 
 //Move Form I
-void move(uint8_t reg1, uint8_t reg2)
+void CPU::v810::move(uint8_t reg1, uint8_t reg2)
 {
     d_printf("MOV: GR[%d] <- GR[%d](0x%X)\n", reg2, reg1, generalRegisters[reg1]);
     generalRegisters[reg2] = generalRegisters[reg1];
@@ -93,7 +93,7 @@ void move(uint8_t reg1, uint8_t reg2)
 }
 
 //Move Form II
-void moveImmediate(uint8_t imm5, uint8_t reg2)
+void CPU::v810::moveImmediate(uint8_t imm5, uint8_t reg2)
 {
     d_printf("MOV: GR[%d] <- (0x%X)\n", reg2, sign_extend(5, imm5));
     generalRegisters[reg2] = sign_extend(5, imm5);
@@ -102,7 +102,7 @@ void moveImmediate(uint8_t imm5, uint8_t reg2)
 }
 
 //Add Form I
-void add(uint8_t reg1, uint8_t reg2)
+void CPU::v810::add(uint8_t reg1, uint8_t reg2)
 {
     d_printf("ADD: GR[%d] <- GR[%d](0x%X) + GR[%d](0x%X)\n", reg2, reg2, generalRegisters[reg2], reg1, generalRegisters[reg1]);
     int32_t a = generalRegisters[reg1];
@@ -121,7 +121,7 @@ void add(uint8_t reg1, uint8_t reg2)
 }
 
 //Add Form II
-void addImmediate5(uint8_t imm5, uint8_t reg2)
+void CPU::v810::addImmediate5(uint8_t imm5, uint8_t reg2)
 {
     d_printf("ADD: GR[%d] <- GR[%d](0x%X) + 0x%X\n", reg2, reg2, generalRegisters[reg2], sign_extend(5, imm5));
     int32_t a = sign_extend(5, imm5);
@@ -140,7 +140,7 @@ void addImmediate5(uint8_t imm5, uint8_t reg2)
 }
 
 
-void addImmediate(uint8_t reg1, uint8_t reg2, int16_t imm16)
+void CPU::v810::addImmediate(uint8_t reg1, uint8_t reg2, int16_t imm16)
 {
     d_printf("ADDI: GR[%d] <- GR[%d](0x%X) + 0x%X\n", reg2, reg1, generalRegisters[reg1], sign_extend(16, imm16));
     
@@ -160,7 +160,7 @@ void addImmediate(uint8_t reg1, uint8_t reg2, int16_t imm16)
 
 
 //Subtract
-void subtract(uint8_t reg1, uint8_t reg2)
+void CPU::v810::subtract(uint8_t reg1, uint8_t reg2)
 {
     d_printf("SUB: GR[%d] <- GR[%d](0x%X) - GR[%d](0x%X)\n", reg2, reg2, generalRegisters[reg2], reg1, generalRegisters[reg1]);
     int32_t a = generalRegisters[reg1];
@@ -177,7 +177,7 @@ void subtract(uint8_t reg1, uint8_t reg2)
     cycles += 1;
 }
 
-void divide(uint8_t reg1, uint8_t reg2)
+void CPU::v810::divide(uint8_t reg1, uint8_t reg2)
 {
     d_printf("DIV: GR[%d] <- GR[%d](0x%X) / GR[%d](0x%X)\n", reg2, reg2, generalRegisters[reg2], reg1, generalRegisters[reg1]);
     int32_t a = generalRegisters[reg1];
@@ -202,7 +202,7 @@ void divide(uint8_t reg1, uint8_t reg2)
     cycles += 38;
 }
 
-void divideUnsigned(uint8_t reg1, uint8_t reg2)
+void CPU::v810::divideUnsigned(uint8_t reg1, uint8_t reg2)
 {
     d_printf("DIVU: GR[%d] <- GR[%d](0x%X) / GR[%d](0x%X)\n", reg2, reg2, generalRegisters[reg2], reg1, generalRegisters[reg1]);
     uint32_t a = generalRegisters[reg1];
@@ -227,7 +227,7 @@ void divideUnsigned(uint8_t reg1, uint8_t reg2)
     cycles += 36;
 }
 
-void multiply(uint8_t reg1, uint8_t reg2)
+void CPU::v810::multiply(uint8_t reg1, uint8_t reg2)
 {
     d_printf("MUL: GR[%d] <- GR[%d](0x%X) * GR[%d](0x%X)\n", reg2, reg2, generalRegisters[reg2], reg1, generalRegisters[reg1]);
     int32_t a = generalRegisters[reg1];
@@ -245,7 +245,7 @@ void multiply(uint8_t reg1, uint8_t reg2)
     cycles += 13;
 }
 
-void multiplyUnsigned(uint8_t reg1, uint8_t reg2)
+void CPU::v810::multiplyUnsigned(uint8_t reg1, uint8_t reg2)
 {
     d_printf("MULU: GR[%d] <- GR[%d](0x%X) * GR[%d](0x%X)\n", reg2, reg2, generalRegisters[reg2], reg1, generalRegisters[reg1]);
     uint32_t a = generalRegisters[reg1];
@@ -264,7 +264,7 @@ void multiplyUnsigned(uint8_t reg1, uint8_t reg2)
 }
 
 //Compare Form I
-void compare(uint8_t reg1, uint8_t reg2)
+void CPU::v810::compare(uint8_t reg1, uint8_t reg2)
 {
     int32_t a = generalRegisters[reg1];
     int32_t b = generalRegisters[reg2];
@@ -282,7 +282,7 @@ void compare(uint8_t reg1, uint8_t reg2)
 }
 
 //Compare Form II
-void compareImmediate(uint8_t imm5, uint8_t reg2)
+void CPU::v810::compareImmediate(uint8_t imm5, uint8_t reg2)
 {
     int32_t a = sign_extend(5, imm5);
     int32_t b = generalRegisters[reg2];
@@ -301,7 +301,7 @@ void compareImmediate(uint8_t imm5, uint8_t reg2)
 }
 
 //Set Flag Condition
-void setFlag(uint8_t imm5, uint8_t reg2)
+void CPU::v810::setFlag(uint8_t imm5, uint8_t reg2)
 {
     d_printf("SETF: GR[%d] <- Condition (0x%X)\n", reg2, imm5);
     bool conditionMet = false;
@@ -362,7 +362,7 @@ void setFlag(uint8_t imm5, uint8_t reg2)
 }
 
 //Shift Left Form I
-void shiftLeft(uint8_t reg1, uint8_t reg2)
+void CPU::v810::shiftLeft(uint8_t reg1, uint8_t reg2)
 {
     d_printf("SHL: GR[%d] <- GR[%d](0x%X) << GR[%d](0x%X)\n", reg2, reg2, generalRegisters[reg2], reg1, generalRegisters[reg1]);
     int32_t s = generalRegisters[reg1];
@@ -379,7 +379,7 @@ void shiftLeft(uint8_t reg1, uint8_t reg2)
 }
 
 //Shift Left Form II
-void shiftLeftImmediate(uint8_t imm5, uint8_t reg2)
+void CPU::v810::shiftLeftImmediate(uint8_t imm5, uint8_t reg2)
 {
     d_printf("SHL: GR[%d] <- GR[%d](0x%X) << 0x%X\n", reg2, reg2, generalRegisters[reg2], imm5);
     int32_t s = imm5;
@@ -396,7 +396,7 @@ void shiftLeftImmediate(uint8_t imm5, uint8_t reg2)
 }
 
 //Shift Right Form I
-void shiftRight(uint8_t reg1, uint8_t reg2)
+void CPU::v810::shiftRight(uint8_t reg1, uint8_t reg2)
 {
     d_printf("SHR: GR[%d] <- GR[%d](0x%X) >> GR[%d](0x%X)\n", reg2, reg2, generalRegisters[reg2], reg1, generalRegisters[reg1]);
     uint32_t s = generalRegisters[reg1];
@@ -413,7 +413,7 @@ void shiftRight(uint8_t reg1, uint8_t reg2)
 }
 
 //Shift Right Form II
-void shiftRightImmediate(uint8_t imm5, uint8_t reg2)
+void CPU::v810::shiftRightImmediate(uint8_t imm5, uint8_t reg2)
 {
     d_printf("SHR: GR[%d] <- GR[%d](0x%X) >> 0x%X\n", reg2, reg2, generalRegisters[reg2], imm5);
     uint32_t s = imm5;
@@ -430,7 +430,7 @@ void shiftRightImmediate(uint8_t imm5, uint8_t reg2)
 }
 
 //Shift Arithmetic Right (signed shift)
-void shiftArithmeticRight(uint8_t reg1, uint8_t reg2)
+void CPU::v810::shiftArithmeticRight(uint8_t reg1, uint8_t reg2)
 {
     d_printf("SAR: GR[%d] <- GR[%d](0x%X) >>>  GR[%d](0x%X)\n", reg2, reg2, generalRegisters[reg2], reg1, generalRegisters[reg1]);
     int32_t s = generalRegisters[reg1];
@@ -446,7 +446,7 @@ void shiftArithmeticRight(uint8_t reg1, uint8_t reg2)
     cycles += 1;
 }
 
-void shiftArithmeticRightImmediate(uint8_t imm5, uint8_t reg2)
+void CPU::v810::shiftArithmeticRightImmediate(uint8_t imm5, uint8_t reg2)
 {
     d_printf("SAR: GR[%d] <- GR[%d](0x%X) >>> 0x%X\n", reg2, reg2, generalRegisters[reg2], imm5);
     int32_t s = imm5;
@@ -462,7 +462,7 @@ void shiftArithmeticRightImmediate(uint8_t imm5, uint8_t reg2)
     cycles += 1;
 }
 
-void logicalOr(uint8_t reg1, uint8_t reg2)
+void CPU::v810::logicalOr(uint8_t reg1, uint8_t reg2)
 {
     d_printf("OR: GR[%d] <- GR[%d](0x%X) | GR[%d](0x%X)\n", reg2, reg2, generalRegisters[reg2], reg1, generalRegisters[reg1]);
     int32_t result = generalRegisters[reg2] | generalRegisters[reg1];
@@ -474,7 +474,7 @@ void logicalOr(uint8_t reg1, uint8_t reg2)
     cycles += 1;
 }
 
-void logicalXor(uint8_t reg1, uint8_t reg2)
+void CPU::v810::logicalXor(uint8_t reg1, uint8_t reg2)
 {
     d_printf("XOR: GR[%d] <- GR[%d](0x%X) ^ GR[%d](0x%X)\n", reg2, reg2, generalRegisters[reg2], reg1, generalRegisters[reg1]);
     int32_t result = generalRegisters[reg2] ^ generalRegisters[reg1];
@@ -486,7 +486,7 @@ void logicalXor(uint8_t reg1, uint8_t reg2)
     cycles += 1;
 }
 
-void logicalAnd(uint8_t reg1, uint8_t reg2)
+void CPU::v810::logicalAnd(uint8_t reg1, uint8_t reg2)
 {
     d_printf("AND: GR[%d] <- GR[%d](0x%X) & GR[%d](0x%X)\n", reg2, reg2, generalRegisters[reg2], reg1, generalRegisters[reg1]);
     int32_t result = generalRegisters[reg2] & generalRegisters[reg1];
@@ -498,7 +498,7 @@ void logicalAnd(uint8_t reg1, uint8_t reg2)
     cycles += 1;
 }
 
-void logicalNot(uint8_t reg1, uint8_t reg2)
+void CPU::v810::logicalNot(uint8_t reg1, uint8_t reg2)
 {
     d_printf("NOT: GR[%d] <- ~GR[%d](0x%X)\n", reg2, reg1, generalRegisters[reg1]);
     int32_t result = ~generalRegisters[reg1];
@@ -510,7 +510,7 @@ void logicalNot(uint8_t reg1, uint8_t reg2)
     cycles += 1;
 }
 
-void andImmediate(uint8_t reg1, uint8_t reg2, uint16_t imm16)
+void CPU::v810::andImmediate(uint8_t reg1, uint8_t reg2, uint16_t imm16)
 {
     d_printf("ANDI: GR[%d] <- GR[%d](0x%X) & 0x%X\n", reg2, reg1, generalRegisters[reg1], imm16);
     uint32_t res = generalRegisters[reg1] & imm16;
@@ -523,7 +523,7 @@ void andImmediate(uint8_t reg1, uint8_t reg2, uint16_t imm16)
     cycles += 1;
 }
 
-void orImmediate(uint8_t reg1, uint8_t reg2, uint16_t imm16)
+void CPU::v810::orImmediate(uint8_t reg1, uint8_t reg2, uint16_t imm16)
 {
     d_printf("ORI: GR[%d] <- GR[%d](0x%X) | 0x%X\n", reg2, reg1, generalRegisters[reg1], imm16);
     generalRegisters[reg2] = generalRegisters[reg1] | imm16;
@@ -536,7 +536,7 @@ void orImmediate(uint8_t reg1, uint8_t reg2, uint16_t imm16)
     cycles += 1;
 }
 
-void xorImmediate(uint8_t reg1, uint8_t reg2, uint16_t imm16)
+void CPU::v810::xorImmediate(uint8_t reg1, uint8_t reg2, uint16_t imm16)
 {
     d_printf("XORI: GR[%d] <- GR[%d](0x%X) ^ 0x%X\n", reg2, reg1, generalRegisters[reg1], imm16);
     generalRegisters[reg2] = generalRegisters[reg1] ^ imm16;
@@ -549,14 +549,14 @@ void xorImmediate(uint8_t reg1, uint8_t reg2, uint16_t imm16)
     cycles += 1;
 }
 
-void jump(uint8_t reg1, uint8_t unused)
+void CPU::v810::jump(uint8_t reg1, uint8_t unused)
 {
     d_printf("JMP: PC <- GR[%d](0x%X)\n", reg1, generalRegisters[reg1]);
     programCounter = (char*)&memoryManagmentUnit.read<uint32_t>(generalRegisters[reg1]);
     cycles += 3;
 }
 
-void jumpRelative(uint32_t disp26)
+void CPU::v810::jumpRelative(uint32_t disp26)
 {
     int32_t relativeJump = sign_extend(26, disp26);
     d_printf("JR: PC <- PC + 0x%X\n", relativeJump);
@@ -564,7 +564,7 @@ void jumpRelative(uint32_t disp26)
     cycles += 3;
 }
 
-void branchIfNoOverflow(uint16_t disp9)
+void CPU::v810::branchIfNoOverflow(uint16_t disp9)
 {
     d_printf("%s\n", "BNV");
     if (systemRegisters.PSW.OV == 0)
@@ -579,7 +579,7 @@ void branchIfNoOverflow(uint16_t disp9)
     }
 }
 
-void branchIfOverflow(uint16_t disp9)
+void CPU::v810::branchIfOverflow(uint16_t disp9)
 {
     d_printf("%s\n", "BV");
     if (systemRegisters.PSW.OV)
@@ -594,7 +594,7 @@ void branchIfOverflow(uint16_t disp9)
     }
 }
 
-void branchIfZero(uint16_t disp9)
+void CPU::v810::branchIfZero(uint16_t disp9)
 {
     d_printf("%s\n", "BZ");
     if (systemRegisters.PSW.Z)
@@ -609,7 +609,7 @@ void branchIfZero(uint16_t disp9)
     }
 }
 
-void branchIfNotZero(uint16_t disp9)
+void CPU::v810::branchIfNotZero(uint16_t disp9)
 {
     d_printf("%s\n", "BNZ");
     if (systemRegisters.PSW.Z == 0)
@@ -625,7 +625,7 @@ void branchIfNotZero(uint16_t disp9)
 }
 
 
-void branchIfLessThan(uint16_t disp9)
+void CPU::v810::branchIfLessThan(uint16_t disp9)
 {
     d_printf("%s\n", "BLT");
     if ((systemRegisters.PSW.S ^ systemRegisters.PSW.OV) == 1)
@@ -640,7 +640,7 @@ void branchIfLessThan(uint16_t disp9)
     }
 }
 
-void branchIfNotHigher(uint16_t disp9)
+void CPU::v810::branchIfNotHigher(uint16_t disp9)
 {
     d_printf("%s\n", "BNH");
     if ((systemRegisters.PSW.Z | systemRegisters.PSW.CY) == 1)
@@ -655,7 +655,7 @@ void branchIfNotHigher(uint16_t disp9)
     }
 }
 
-void branchIfNegative(uint16_t disp9)
+void CPU::v810::branchIfNegative(uint16_t disp9)
 {
     d_printf("%s\n", "BN");
     if (systemRegisters.PSW.S)
@@ -670,7 +670,7 @@ void branchIfNegative(uint16_t disp9)
     }
 }
 
-void branchIfPositive(uint16_t disp9)
+void CPU::v810::branchIfPositive(uint16_t disp9)
 {
     d_printf("%s\n", "BP");
     if (systemRegisters.PSW.S == 0)
@@ -686,7 +686,7 @@ void branchIfPositive(uint16_t disp9)
 }
 
 
-void branchIfHigher(uint16_t disp9)
+void CPU::v810::branchIfHigher(uint16_t disp9)
 {
     d_printf("%s\n", "BH");
     if ((systemRegisters.PSW.Z | systemRegisters.PSW.CY) == 0)
@@ -701,7 +701,7 @@ void branchIfHigher(uint16_t disp9)
     }
 }
 
-void branchIfGreaterOrEqual(uint16_t disp9)
+void CPU::v810::branchIfGreaterOrEqual(uint16_t disp9)
 {
     d_printf("BGE\n");
     if ((systemRegisters.PSW.S ^ systemRegisters.PSW.OV) == 0)
@@ -716,7 +716,7 @@ void branchIfGreaterOrEqual(uint16_t disp9)
     }
 }
 
-void branchIfGreaterThan(uint16_t disp9)
+void CPU::v810::branchIfGreaterThan(uint16_t disp9)
 {
     d_printf("BGT\n");
     if (((systemRegisters.PSW.S ^ systemRegisters.PSW.OV) | systemRegisters.PSW.Z) == 0)
@@ -731,7 +731,7 @@ void branchIfGreaterThan(uint16_t disp9)
     }
 }
 
-void branchIfLessOrEqual(uint16_t disp9)
+void CPU::v810::branchIfLessOrEqual(uint16_t disp9)
 {
     d_printf("BLE\n");
     if (((systemRegisters.PSW.S ^ systemRegisters.PSW.OV) | systemRegisters.PSW.Z) == 1)
@@ -746,14 +746,14 @@ void branchIfLessOrEqual(uint16_t disp9)
     }
 }
 
-void nop(uint16_t disp9)
+void CPU::v810::nop(uint16_t disp9)
 {
     d_printf("NOP\n");
     programCounter += 2;
     cycles += 1;
 }
 
-void branchIfCarry(uint16_t disp9)
+void CPU::v810::branchIfCarry(uint16_t disp9)
 {
     d_printf("BC\n");
     if (systemRegisters.PSW.CY)
@@ -768,7 +768,7 @@ void branchIfCarry(uint16_t disp9)
     }
 }
 
-void branchIfNoCarry(uint16_t disp9)
+void CPU::v810::branchIfNoCarry(uint16_t disp9)
 {
     d_printf("BNC\n");
     if (systemRegisters.PSW.CY == 0)
@@ -783,14 +783,14 @@ void branchIfNoCarry(uint16_t disp9)
     }
 }
 
-void branch(uint16_t disp9)
+void CPU::v810::branch(uint16_t disp9)
 {
     d_printf("BR\n");
     programCounter += sign_extend(9, disp9);
     cycles += 3;
 }
 
-void moveHigh(uint8_t reg1, uint8_t reg2, uint16_t imm16)
+void CPU::v810::moveHigh(uint8_t reg1, uint8_t reg2, uint16_t imm16)
 {
     d_printf("MOVEHI: GR[%d] <- GR[%d](0x%X) + 0x%X\n", reg2, reg1, generalRegisters[reg1], (imm16 << 16));
     generalRegisters[reg2] = generalRegisters[reg1] + (imm16 << 16);
@@ -798,7 +798,7 @@ void moveHigh(uint8_t reg1, uint8_t reg2, uint16_t imm16)
     cycles += 1;
 }
 
-void moveAddImmediate(uint8_t reg1, uint8_t reg2, uint16_t imm16)
+void CPU::v810::moveAddImmediate(uint8_t reg1, uint8_t reg2, uint16_t imm16)
 {
     d_printf("MOVEA: GR[%d] <- GR[%d](0x%X) + 0x%X\n", reg2, reg1, generalRegisters[reg1], sign_extend(16, imm16));
     generalRegisters[reg2] = generalRegisters[reg1] + sign_extend(16, imm16);
@@ -806,7 +806,7 @@ void moveAddImmediate(uint8_t reg1, uint8_t reg2, uint16_t imm16)
     cycles += 1;
 }
 
-void storeWord(uint8_t reg1, uint8_t reg2, uint16_t disp16)
+void CPU::v810::storeWord(uint8_t reg1, uint8_t reg2, uint16_t disp16)
 {
     uint32_t address = (generalRegisters[reg1] + (int16_t)disp16) & 0xFFFFFFFC;
     d_printf("ST.W: [GR[%d](0x%X) + %d](0x%X) <- [GR[%d](0x%X)\n", reg1, generalRegisters[reg1], sign_extend(16, disp16) & 0xFFFFFFFC, address, reg2, generalRegisters[reg2]);
@@ -816,7 +816,7 @@ void storeWord(uint8_t reg1, uint8_t reg2, uint16_t disp16)
     cycles += 1;
 }
 
-void storeHWord(uint8_t reg1, uint8_t reg2, uint16_t disp16)
+void CPU::v810::storeHWord(uint8_t reg1, uint8_t reg2, uint16_t disp16)
 {
     uint32_t address = (generalRegisters[reg1] + (int16_t)disp16) & 0xFFFFFFFE;
     d_printf("ST.H: [GR[%d](0x%X) + %d](0x%X) <- [GR[%d](0x%X)\n", reg1, generalRegisters[reg1], sign_extend(16, disp16) & 0xFFFFFFFE, address, reg2, generalRegisters[reg2]);
@@ -827,7 +827,7 @@ void storeHWord(uint8_t reg1, uint8_t reg2, uint16_t disp16)
     cycles += 1;
 }
 
-void storeByte(uint8_t reg1, uint8_t reg2, uint16_t disp16)
+void CPU::v810::storeByte(uint8_t reg1, uint8_t reg2, uint16_t disp16)
 {
     uint32_t address = (generalRegisters[reg1] + (int16_t)disp16);
     d_printf("ST.B: [GR[%d](0x%X) + %d](0x%X) <- [GR[%d](0x%X)\n", reg1, generalRegisters[reg1], sign_extend(16, disp16), address, reg2, generalRegisters[reg2]);
@@ -838,7 +838,7 @@ void storeByte(uint8_t reg1, uint8_t reg2, uint16_t disp16)
     cycles += 1;
 }
 
-void loadByte(uint8_t reg1, uint8_t reg2, uint16_t disp16)
+void CPU::v810::loadByte(uint8_t reg1, uint8_t reg2, uint16_t disp16)
 {
     d_printf("LD.B: GR[%d] <- [GR[%d](0x%X) + %d\n", reg2, reg1, generalRegisters[reg1], sign_extend(16, disp16));
 
@@ -848,7 +848,7 @@ void loadByte(uint8_t reg1, uint8_t reg2, uint16_t disp16)
     cycles += 3;
 }
 
-void loadHWord(uint8_t reg1, uint8_t reg2, uint16_t disp16)
+void CPU::v810::loadHWord(uint8_t reg1, uint8_t reg2, uint16_t disp16)
 {
     uint32_t address = (generalRegisters[reg1] + (int16_t)disp16);
     address &= 0xFFFFFFFE;
@@ -859,7 +859,7 @@ void loadHWord(uint8_t reg1, uint8_t reg2, uint16_t disp16)
     cycles += 3;
 }
 
-void loadWord(uint8_t reg1, uint8_t reg2, uint16_t disp16)
+void CPU::v810::loadWord(uint8_t reg1, uint8_t reg2, uint16_t disp16)
 {
     uint32_t address = (generalRegisters[reg1] + (int16_t)disp16) & 0xFFFFFFFC;
     d_printf("LD.W: GR[%d] <- [GR[%d](0x%X) + %d\n", reg2, reg1, generalRegisters[reg1], sign_extend(16, disp16));
@@ -869,7 +869,7 @@ void loadWord(uint8_t reg1, uint8_t reg2, uint16_t disp16)
     cycles += 3;
 }
 
-void loadSystemRegister(uint8_t reg1, uint8_t reg2)
+void CPU::v810::loadSystemRegister(uint8_t reg1, uint8_t reg2)
 {
     d_printf("LDSR %d\n", reg1);
     //TODO: Prevent writing to write disabled registers
@@ -878,7 +878,7 @@ void loadSystemRegister(uint8_t reg1, uint8_t reg2)
     cycles += 1;
 }
 
-void storeSystemRegister(uint8_t reg1, uint8_t reg2)
+void CPU::v810::storeSystemRegister(uint8_t reg1, uint8_t reg2)
 {
     d_printf("STSR %d\n", reg1);
     //TODO: Prevent reading from reserved registers
@@ -887,7 +887,7 @@ void storeSystemRegister(uint8_t reg1, uint8_t reg2)
     cycles += 1;
 }
 
-void jumpAndLink(uint32_t disp26)
+void CPU::v810::jumpAndLink(uint32_t disp26)
 {
     d_printf("JAL\n");
     uint32_t currentPC = (0x07000000 + (uint32_t)(((char*)programCounter + 4) - ((char*)memoryManagmentUnit.rom.data)));
@@ -900,13 +900,13 @@ void jumpAndLink(uint32_t disp26)
     cycles += 3;
 }
 
-void outWrite(uint8_t reg1, uint8_t reg2, uint16_t disp16)
+void CPU::v810::outWrite(uint8_t reg1, uint8_t reg2, uint16_t disp16)
 {
     d_printf("OUT.W\n");
     programCounter += 4;
 }
 
-void setInterruptDisable(uint8_t reg1, uint8_t reg2)
+void CPU::v810::setInterruptDisable(uint8_t reg1, uint8_t reg2)
 {
     d_printf("SEI\n");
     systemRegisters.PSW.ID = 1;
@@ -914,7 +914,7 @@ void setInterruptDisable(uint8_t reg1, uint8_t reg2)
     cycles += 1;
 }
 
-void clearInterruptDisable(uint8_t reg1, uint8_t reg2)
+void CPU::v810::clearInterruptDisable(uint8_t reg1, uint8_t reg2)
 {
     d_printf("CLI\n");
     systemRegisters.PSW.ID = 0;
@@ -922,7 +922,7 @@ void clearInterruptDisable(uint8_t reg1, uint8_t reg2)
     cycles += 1;
 }
 
-void returnFromTrap(uint8_t imm5, uint8_t reg2)
+void CPU::v810::returnFromTrap(uint8_t imm5, uint8_t reg2)
 {
     d_printf("RETI\n");
     if (systemRegisters.PSW.NP)
@@ -938,7 +938,7 @@ void returnFromTrap(uint8_t imm5, uint8_t reg2)
     cycles += 10;
 }
 
-void compareFloat(uint8_t reg1, uint8_t reg2)
+void CPU::v810::compareFloat(uint8_t reg1, uint8_t reg2)
 {
     d_printf("CMPF.S\n");
     float f = generalRegistersFloat[reg2] - generalRegistersFloat[reg1];
@@ -951,7 +951,7 @@ void compareFloat(uint8_t reg1, uint8_t reg2)
 //        systemRegisters.PSW.FRO = 
 }
 
-void convertWordToFloat(uint8_t reg1, uint8_t reg2)
+void CPU::v810::convertWordToFloat(uint8_t reg1, uint8_t reg2)
 {
     d_printf("CVT.WS\n");
     float f = generalRegisters[reg1];
@@ -966,7 +966,7 @@ void convertWordToFloat(uint8_t reg1, uint8_t reg2)
     cycles += 5;
 }
 
-void convertFloatToWord(uint8_t reg1, uint8_t reg2)
+void CPU::v810::convertFloatToWord(uint8_t reg1, uint8_t reg2)
 {
     d_printf("CVT.SW\n");
     float f = generalRegistersFloat[reg1];
@@ -986,7 +986,7 @@ void convertFloatToWord(uint8_t reg1, uint8_t reg2)
     cycles += 9;
 }
 
-void addFloat(uint8_t reg1, uint8_t reg2)
+void CPU::v810::addFloat(uint8_t reg1, uint8_t reg2)
 {
     d_printf("ADDF.S\n");
     
@@ -1002,7 +1002,7 @@ void addFloat(uint8_t reg1, uint8_t reg2)
     cycles += 9;
 }
 
-void subtractFloat(uint8_t reg1, uint8_t reg2)
+void CPU::v810::subtractFloat(uint8_t reg1, uint8_t reg2)
 {
     d_printf("SUBF.S\n");
     
@@ -1018,7 +1018,7 @@ void subtractFloat(uint8_t reg1, uint8_t reg2)
     cycles += 12;
 }
 
-void multiplyFloat(uint8_t reg1, uint8_t reg2)
+void CPU::v810::multiplyFloat(uint8_t reg1, uint8_t reg2)
 {
     d_printf("MULF.S\n");
     
@@ -1034,7 +1034,7 @@ void multiplyFloat(uint8_t reg1, uint8_t reg2)
     cycles += 8;
 }
 
-void divideFloat(uint8_t reg1, uint8_t reg2)
+void CPU::v810::divideFloat(uint8_t reg1, uint8_t reg2)
 {
     d_printf("DIVF.S\n");
     
@@ -1050,7 +1050,7 @@ void divideFloat(uint8_t reg1, uint8_t reg2)
     cycles += 44;
 }
 
-void truncateFloat(uint8_t reg1, uint8_t reg2)
+void CPU::v810::truncateFloat(uint8_t reg1, uint8_t reg2)
 {
     d_printf("TRNC.SW\n");
     float f = generalRegistersFloat[reg1];
@@ -1070,7 +1070,7 @@ void truncateFloat(uint8_t reg1, uint8_t reg2)
     cycles += 8;
 }
 
-void exchangeByte(uint8_t reg1, uint8_t reg2)
+void CPU::v810::exchangeByte(uint8_t reg1, uint8_t reg2)
 {
     d_printf("XB\n");
     
@@ -1081,7 +1081,7 @@ void exchangeByte(uint8_t reg1, uint8_t reg2)
     cycles += 1;
 }
 
-void exchangeHalfWord(uint8_t reg1, uint8_t reg2)
+void CPU::v810::exchangeHalfWord(uint8_t reg1, uint8_t reg2)
 {
     d_printf("XH\n");
     int32_t val = generalRegisters[reg2];
@@ -1091,7 +1091,7 @@ void exchangeHalfWord(uint8_t reg1, uint8_t reg2)
     cycles += 1;
 }
 
-void reverseWord(uint8_t reg1, uint8_t reg2)
+void CPU::v810::reverseWord(uint8_t reg1, uint8_t reg2)
 {
     d_printf("REV\n");
     int32_t word = generalRegisters[reg1];
@@ -1108,7 +1108,7 @@ void reverseWord(uint8_t reg1, uint8_t reg2)
     cycles += 1;
 }
 
-void multiplyHalfWord(uint8_t reg1, uint8_t reg2)
+void CPU::v810::multiplyHalfWord(uint8_t reg1, uint8_t reg2)
 {
     d_printf("MPYHW\n");
     
@@ -1118,7 +1118,7 @@ void multiplyHalfWord(uint8_t reg1, uint8_t reg2)
     cycles += 9;
 }
 
-void moveBitString(uint8_t reg1, uint8_t reg2)
+void CPU::v810::moveBitString(uint8_t reg1, uint8_t reg2)
 {
     d_printf("MOVBSU\n");
     uint32_t startAddress = generalRegisters[30];
@@ -1151,7 +1151,7 @@ void moveBitString(uint8_t reg1, uint8_t reg2)
     programCounter += 2;
 }
 
-void andBitString(uint8_t reg1, uint8_t reg2)
+void CPU::v810::andBitString(uint8_t reg1, uint8_t reg2)
 {
     d_printf("ANDBSU\n");
     uint32_t startAddress = generalRegisters[30];
@@ -1181,7 +1181,7 @@ void andBitString(uint8_t reg1, uint8_t reg2)
     programCounter += 2;
 }
 
-void orBitString(uint8_t reg1, uint8_t reg2)
+void CPU::v810::orBitString(uint8_t reg1, uint8_t reg2)
 {
     d_printf("ORBSU\n");
     uint32_t startAddress = generalRegisters[30];
@@ -1213,7 +1213,7 @@ void orBitString(uint8_t reg1, uint8_t reg2)
     programCounter += 2;
 }
 
-void xorBitString(uint8_t reg1, uint8_t reg2)
+void CPU::v810::xorBitString(uint8_t reg1, uint8_t reg2)
 {
     d_printf("XORBSU\n");
     uint32_t startAddress = generalRegisters[30];
@@ -1243,7 +1243,7 @@ void xorBitString(uint8_t reg1, uint8_t reg2)
     programCounter += 2;
 }
 
-void andNotBitString(uint8_t reg1, uint8_t reg2)
+void CPU::v810::andNotBitString(uint8_t reg1, uint8_t reg2)
 {
     d_printf("ANDNBSU\n");
     uint32_t startAddress = generalRegisters[30];
@@ -1274,7 +1274,7 @@ void andNotBitString(uint8_t reg1, uint8_t reg2)
     programCounter += 2;
 }
 
-void orNotBitString(uint8_t reg1, uint8_t reg2)
+void CPU::v810::orNotBitString(uint8_t reg1, uint8_t reg2)
 {
     d_printf("ORNBSU\n");
     uint32_t startAddress = generalRegisters[30];
@@ -1305,7 +1305,7 @@ void orNotBitString(uint8_t reg1, uint8_t reg2)
     programCounter += 2;
 }
 
-void xorNotBitString(uint8_t reg1, uint8_t reg2)
+void CPU::v810::xorNotBitString(uint8_t reg1, uint8_t reg2)
 {
     d_printf("XORNBSU\n");
     uint32_t startAddress = generalRegisters[30];
@@ -1335,7 +1335,7 @@ void xorNotBitString(uint8_t reg1, uint8_t reg2)
     programCounter += 2;
 }
 
-void notBitString(uint8_t reg1, uint8_t reg2)
+void CPU::v810::notBitString(uint8_t reg1, uint8_t reg2)
 {
     d_printf("XORNBSU\n");
     uint32_t startAddress = generalRegisters[30];

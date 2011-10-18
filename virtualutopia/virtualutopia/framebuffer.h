@@ -25,10 +25,6 @@ namespace VIP
             const uint16_t * const data = chr.data;
             const uint8_t expandedRow = row * 8;
             
-            //See what is offscreen or not
-            if (xoff + w < 0 || yoff + h < expandedRow || xoff >= 384 || yoff >= (expandedRow + 8))
-                return;
-            
             int yOver = (expandedRow + 8) - (yoff + h);
             uint8_t y = 0;
             if (yOver > -h && yOver < 0)

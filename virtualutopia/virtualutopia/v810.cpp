@@ -85,15 +85,105 @@ namespace CPU
                 break;
         }
         
-#define OPCODE_DECODE_I(OPCODE, FUNCTION) case OPCODE: FUNCTION(arg1, arg2); break;
-#define OPCODE_DECODE_II(OPCODE, FUNCTION) case OPCODE: FUNCTION(arg1, arg2); break;
-#define OPCODE_DECODE_III(OPCODE, FUNCTION) case OPCODE: FUNCTION(arg3); break;
-#define OPCODE_DECODE_IV(OPCODE, FUNCTION) case OPCODE: FUNCTION(arg3); break;
-#define OPCODE_DECODE_V(OPCODE, FUNCTION) case OPCODE: FUNCTION(arg1, arg2, arg3); break;
-#define OPCODE_DECODE_VI(OPCODE, FUNCTION) case OPCODE: FUNCTION(arg1, arg2, arg3); break;
+#define OPCODE_DECODE_I(OPCODE, FUNCTION) OPCODE: \
+        FUNCTION(arg1, arg2); goto END;
+#define OPCODE_DECODE_II(OPCODE, FUNCTION) OPCODE: \
+        FUNCTION(arg1, arg2); goto END;
+#define OPCODE_DECODE_III(OPCODE, FUNCTION) OPCODE: \
+        FUNCTION(arg3); goto END;
+#define OPCODE_DECODE_IV(OPCODE, FUNCTION) OPCODE: \
+        FUNCTION(arg3); goto END;
+#define OPCODE_DECODE_V(OPCODE, FUNCTION) OPCODE: \
+        FUNCTION(arg1, arg2, arg3); goto END;
+#define OPCODE_DECODE_VI(OPCODE, FUNCTION) OPCODE: \
+        FUNCTION(arg1, arg2, arg3); goto END;
         
-        switch (opcode)
+        static const void * jmp_entry[] =
         {
+            &&MOV_1,
+            &&ADD_1,
+            &&SUB,  
+            &&CMP_1,
+            &&SHL_1,
+            &&SHR_1,
+            &&JMP,  
+            &&SAR_1,
+            &&MUL,  
+            &&DIV,  
+            &&MULU, 
+            &&DIVU, 
+            &&OR,   
+            &&AND,  
+            &&XOR,  
+            &&NOT,  
+            &&MOV_2,
+            &&ADD_2,
+            &&SETF, 
+            &&CMP_2,
+            &&SHL_2,
+            &&SHR_2,
+            &&CLI,  
+            &&SAR_2,
+            &&NOP, 
+            &&RETI, 
+            &&NOP, 
+            &&NOP,   
+            &&LDSR, 
+            &&STSR, 
+            &&SEI,  
+            &&Bstr, 
+            &&NOP,   
+            &&NOP,   
+            &&NOP,   
+            &&NOP,   
+            &&NOP,   
+            &&NOP,   
+            &&NOP,   
+            &&NOP,   
+            &&MOVEA,
+            &&ADDI, 
+            &&JR,   
+            &&JAL,  
+            &&ORI,  
+            &&ANDI, 
+            &&XORI, 
+            &&MOVHI,
+            &&LD_B, 
+            &&LD_H, 
+            &&NOP,   
+            &&LD_W, 
+            &&ST_B, 
+            &&ST_H, 
+            &&NOP,   
+            &&ST_W, 
+            &&IN_B, 
+            &&IN_H, 
+            &&CAXI, 
+            &&IN_W, 
+            &&OUT_B,
+            &&OUT_H,
+            &&Fpp,  
+            &&OUT_W,
+            &&BV,   
+            &&BC,   
+            &&BZ,   
+            &&BNH,  
+            &&BN,   
+            &&BR,   
+            &&BLT,  
+            &&BLE,  
+            &&BNV,  
+            &&BNC,  
+            &&BNZ,  
+            &&BH,   
+            &&BP,   
+            &&NOP,  
+            &&BGE,  
+            &&BGT, 
+        };
+
+        goto *jmp_entry[opcode];
+        
             OPCODE_DECODE_I(MOV_1, move);
             OPCODE_DECODE_I(ADD_1, add); 
             OPCODE_DECODE_I(SUB, subtract);   
@@ -124,26 +214,22 @@ namespace CPU
             OPCODE_DECODE_II(LDSR, loadSystemRegister);  
             OPCODE_DECODE_II(STSR, storeSystemRegister);  
             OPCODE_DECODE_II(SEI, setInterruptDisable);   
-            case Bstr:
+            Bstr:
                 switch ((BinaryStringMnumonic)partialDecode & 0x1F)
                 {
 //                    OPCODE_DECODE_II(SCH0BSU, nop); 
 //                    OPCODE_DECODE_II(SCH0BSD, nop); 
 //                    OPCODE_DECODE_II(SCH1BSU, nop); 
 //                    OPCODE_DECODE_II(SCH1BSD, nop); 
-                    OPCODE_DECODE_II(ORBSU, orBitString);   
-                    OPCODE_DECODE_II(ANDBSU, andBitString); 
-                    OPCODE_DECODE_II(XORBSU, xorBitString);  
-                    OPCODE_DECODE_II(MOVBSU, moveBitString);  
-                    OPCODE_DECODE_II(ORNBSU, orNotBitString);  
-                    OPCODE_DECODE_II(ANDNBSU, andNotBitString); 
-                    OPCODE_DECODE_II(XORNBSU, xorBitString); 
-                    OPCODE_DECODE_II(NOTBSU, notBitString);  
-                    default:
-                        printf("%X: Decoding uknown bstr: (0x%X)\n", (0x07000000 + (uint32_t)((char*)programCounter - ((char*)memoryManagmentUnit.rom.data))), partialDecode & 0x1F);
-                        exit(-1);
+                    case OPCODE_DECODE_II(ORBSU, orBitString);   
+                    case OPCODE_DECODE_II(ANDBSU, andBitString); 
+                    case OPCODE_DECODE_II(XORBSU, xorBitString);  
+                    case OPCODE_DECODE_II(MOVBSU, moveBitString);  
+                    case OPCODE_DECODE_II(ORNBSU, orNotBitString);  
+                    case OPCODE_DECODE_II(ANDNBSU, andNotBitString); 
+                    case OPCODE_DECODE_II(XORNBSU, xorBitString); 
+                    case OPCODE_DECODE_II(NOTBSU, notBitString);  
                 }
-                break;
             OPCODE_DECODE_V(MOVEA, moveAddImmediate); 
             OPCODE_DECODE_V(ADDI, addImmediate);  
             OPCODE_DECODE_IV(JR, jumpRelative);    
@@ -164,26 +250,23 @@ namespace CPU
             OPCODE_DECODE_VI(IN_W, outWrite);  
             OPCODE_DECODE_VI(OUT_B, outWrite); 
             OPCODE_DECODE_VI(OUT_H, outWrite); 
-            case Fpp:
+            Fpp:
+        
                 switch ((FloatingPointMnumonic)arg3)
                 {
-                    OPCODE_DECODE_I(CMPF_S, compareFloat);
-                    OPCODE_DECODE_I(CVT_WS, convertWordToFloat);
-                    OPCODE_DECODE_I(CVT_SW, convertFloatToWord);
-                    OPCODE_DECODE_I(ADDF_S, addFloat);
-                    OPCODE_DECODE_I(SUBF_S, subtractFloat);
-                    OPCODE_DECODE_I(MULF_S, multiplyFloat);
-                    OPCODE_DECODE_I(DIVF_S, divideFloat);
-                    OPCODE_DECODE_I(XB, exchangeByte);
-                    OPCODE_DECODE_I(XH, exchangeHalfWord);
-                    OPCODE_DECODE_I(REV, reverseWord);
-                    OPCODE_DECODE_I(TRNC_SW, truncateFloat);
-                    OPCODE_DECODE_I(MPYHW, multiplyHalfWord);
-                    default:
-                        printf("%X: Decoding uknown fppcode: (0x%X)\n", (0x07000000 + (uint32_t)((char*)programCounter - ((char*)memoryManagmentUnit.rom.data))), arg3);
-                        exit(-1);
+                    case OPCODE_DECODE_I(CMPF_S, compareFloat);
+                    case OPCODE_DECODE_I(CVT_WS, convertWordToFloat);
+                    case OPCODE_DECODE_I(CVT_SW, convertFloatToWord);
+                    case OPCODE_DECODE_I(ADDF_S, addFloat);
+                    case OPCODE_DECODE_I(SUBF_S, subtractFloat);
+                    case OPCODE_DECODE_I(MULF_S, multiplyFloat);
+                    case OPCODE_DECODE_I(DIVF_S, divideFloat);
+                    case OPCODE_DECODE_I(XB, exchangeByte);
+                    case OPCODE_DECODE_I(XH, exchangeHalfWord);
+                    case OPCODE_DECODE_I(REV, reverseWord);
+                    case OPCODE_DECODE_I(TRNC_SW, truncateFloat);
+                    case OPCODE_DECODE_I(MPYHW, multiplyHalfWord);
                 }
-                break;
             OPCODE_DECODE_VI(OUT_W, outWrite);  
             OPCODE_DECODE_III(BV, branchIfOverflow);    
             OPCODE_DECODE_III(BC, branchIfCarry);    
@@ -201,11 +284,9 @@ namespace CPU
             OPCODE_DECODE_III(NOP, nop);
             OPCODE_DECODE_III(BGE, branchIfGreaterOrEqual);
             OPCODE_DECODE_III(BGT, branchIfGreaterThan);
-            default:
-                printf("%X: Decoding uknown opcode: (0x%X)\n", (0x07000000 + (uint32_t)((char*)programCounter - ((char*)memoryManagmentUnit.rom.data))),  opcode);
-                exit(-1);
-        }
 #undef OPCODE_DECODE
+    END:
+        return;
     }
     
     void v810::step()
