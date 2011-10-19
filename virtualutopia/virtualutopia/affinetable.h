@@ -12,21 +12,31 @@
 struct Fixed13x3
 {
     int16_t integer;
-    
-    operator float() const 
-    {
-        return (float)integer / 8.0f;
-    }
 };
 
 struct Fixed7x9
 {
     int16_t integer;
+};
+
+struct Fixed16x16
+{
+    int32_t integer;
     
-    operator float() const
+    const int16_t operator+(const Fixed16x16& other)
     {
-        return (float)integer / 512.0f;
+        return ((int64_t)integer + (int64_t)other.integer) >> 16;
     }
+ 
+    const Fixed16x16 operator*(const Fixed16x16& other)
+    {
+        int64_t combined = ((int64_t)integer * (int64_t)other.integer);
+        return combined >> 16;
+    }
+    
+    Fixed16x16(int64_t val) : integer((int32_t)val) {}
+    Fixed16x16(const Fixed7x9& other) :integer(other.integer << 7) {}
+    Fixed16x16(const Fixed13x3& other) :integer(other.integer << 13) {}
 };
 
 struct AffineTable

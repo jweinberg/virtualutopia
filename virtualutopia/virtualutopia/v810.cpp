@@ -30,7 +30,7 @@ namespace CPU
     
     void v810::reset()
     {   
-        programCounter = (char*)&memoryManagmentUnit.read<uint32_t>(0xFFFFFFF0);
+        programCounter = &memoryManagmentUnit.read<char>(0xFFFFFFF0);
         systemRegisters.PSW = 0x00008000;
         generalRegisters[0] = 0;
         nvc.Reset();
@@ -296,8 +296,9 @@ namespace CPU
 //        nvc.SCR.STAT = 1;
 //        nvc.SDHR.STA = 1;
 //        
-        nvc.Step(cycles);
         vip.Step(cycles);
+        nvc.Step(cycles);
+        
         fetchAndDecode();
     }
     
@@ -308,7 +309,7 @@ namespace CPU
         if (systemRegisters.PSW.ID) return;
         if (systemRegisters.PSW.IntLevel > interruptCode) return;
         
-        systemRegisters.EIPC = (0x07000000 + (uint32_t)((char*)programCounter - ((char*)memoryManagmentUnit.rom.data)));
+        systemRegisters.EIPC = (0x07000000 + (uint32_t)(programCounter - memoryManagmentUnit.rom.data));
         systemRegisters.EIPSW = systemRegisters.PSW;
         systemRegisters.ECR.EICC = interruptCode;
         systemRegisters.PSW.EP = 1;
@@ -316,7 +317,7 @@ namespace CPU
         systemRegisters.PSW.AE = 0;
         
         systemRegisters.PSW.IntLevel = min(interruptCode+1, 16);
-        programCounter = (char*)&memoryManagmentUnit.read<uint32_t>(0xFFFFFE00 | interruptCode << 4);
+        programCounter = &memoryManagmentUnit.read<char>(0xFFFFFE00 | interruptCode << 4);
     }
     
     void v810::throwException(ExceptionCode exceptionCode)
@@ -326,24 +327,24 @@ namespace CPU
         {
             memoryManagmentUnit.store((uint32_t)(0xFFFF0000 | exceptionCode), (uint32_t)0x0);
             memoryManagmentUnit.store(systemRegisters.PSW, 0x4);
-            memoryManagmentUnit.store(0x07000000 + (uint32_t)((char*)programCounter - ((char*)memoryManagmentUnit.rom.data)), 0x8);
+            memoryManagmentUnit.store(0x07000000 + (uint32_t)(programCounter - memoryManagmentUnit.rom.data), 0x8);
             return;
         }
         
         //Duplexed Exception
         if (systemRegisters.PSW.EP)
         {
-            systemRegisters.FEPC = (0x07000000 + (uint32_t)((char*)programCounter - ((char*)memoryManagmentUnit.rom.data)));
+            systemRegisters.FEPC = (0x07000000 + (uint32_t)(programCounter - memoryManagmentUnit.rom.data));
             systemRegisters.FEPSW = systemRegisters.PSW;
             systemRegisters.ECR.FECC = exceptionCode;
             systemRegisters.PSW.NP = 1;
             systemRegisters.PSW.ID = 1;
             systemRegisters.PSW.AE = 0;
-            programCounter = (char*)&memoryManagmentUnit.read<uint32_t>(0xFFFFFFD0);
+            programCounter = &memoryManagmentUnit.read<char>(0xFFFFFFD0);
         }
         else
         {
-            systemRegisters.EIPC = (0x07000000 + (uint32_t)((char*)programCounter - ((char*)memoryManagmentUnit.rom.data)));
+            systemRegisters.EIPC = (0x07000000 + (uint32_t)(programCounter - memoryManagmentUnit.rom.data));
             systemRegisters.EIPSW = systemRegisters.PSW;
             systemRegisters.ECR.EICC = exceptionCode;
             systemRegisters.PSW.EP = 1;
@@ -351,7 +352,7 @@ namespace CPU
             systemRegisters.PSW.AE = 0;
             
             //TODO: Lookup the proper handler, this is DIV0
-            programCounter = (char*)&memoryManagmentUnit.read<uint32_t>(0xFFFFFF80);
+            programCounter = &memoryManagmentUnit.read<char>(0xFFFFFF80);
         }
         
     }

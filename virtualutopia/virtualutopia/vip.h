@@ -30,6 +30,9 @@ namespace VIP
         void WriteFrame();
         void DumpCHR();
         void DrawObj(const Obj &obj, int row);
+        void DrawNormalWorld(int row, const World &world);
+        void DrawAffineWorld(int row, const World& world);
+        void DrawHBiasWorld(int row, const World& world);
         VIP();
         CPU::v810 *cpu;
         

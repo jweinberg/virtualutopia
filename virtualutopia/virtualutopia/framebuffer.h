@@ -17,8 +17,19 @@ namespace VIP
 {
     class Framebuffer
     {
+    
         public:
         char data[0x6000];
+    
+        inline void SetPixel(uint16_t x, uint16_t y, char color)
+        {
+            char * column = this->data + (x * 64);
+            column += (y / 4);
+            
+            uint8_t shift = (y & 3) * 2;
+            *column &= ~(0x3 << shift);
+            *column |= (color << shift);
+        }
         
         inline void DrawChr(const Chr &chr, uint8_t row, int xoff, int yoff, int sourceXOffset, int sourceYOffset, int w, int h, bool flipHor, bool flipVert,const Palette &palette)
         {
@@ -55,12 +66,7 @@ namespace VIP
                     uint8_t colorIdx = (row >> (xIdx * 2)) & 0x3;
                     if (colorIdx)
                     {
-                        char * column = this->data + (xPxl * 64);
-                        column += (yPxl / 4);
-                        
-                        uint8_t shift = (yPxl & 3) * 2;
-                        *column &= ~(0x3 << shift);
-                        *column |= (palette[colorIdx] << shift);
+                        SetPixel(xPxl, yPxl, palette[colorIdx]);
                     }
                 }
             }   

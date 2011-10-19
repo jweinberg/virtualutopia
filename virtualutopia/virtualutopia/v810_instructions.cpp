@@ -552,7 +552,7 @@ void CPU::v810::xorImmediate(uint8_t reg1, uint8_t reg2, uint16_t imm16)
 void CPU::v810::jump(uint8_t reg1, uint8_t unused)
 {
     d_printf("JMP: PC <- GR[%d](0x%X)\n", reg1, generalRegisters[reg1]);
-    programCounter = (char*)&memoryManagmentUnit.read<uint32_t>(generalRegisters[reg1]);
+    programCounter = &memoryManagmentUnit.read<char>(generalRegisters[reg1]);
     cycles += 3;
 }
 
@@ -896,7 +896,7 @@ void CPU::v810::jumpAndLink(uint32_t disp26)
     int32_t relativeJump = sign_extend(26, disp26);
     currentPC += relativeJump;
     
-    programCounter = (char*)&memoryManagmentUnit.read<uint32_t>(currentPC);
+    programCounter = &memoryManagmentUnit.read<char>(currentPC);
     cycles += 3;
 }
 
@@ -927,12 +927,12 @@ void CPU::v810::returnFromTrap(uint8_t imm5, uint8_t reg2)
     d_printf("RETI\n");
     if (systemRegisters.PSW.NP)
     {
-        programCounter = (char*)&memoryManagmentUnit.read<uint32_t>(systemRegisters.FEPC);
+        programCounter = &memoryManagmentUnit.read<char>(systemRegisters.FEPC);
         systemRegisters.PSW = systemRegisters.FEPSW;
     }
     else
     {
-        programCounter = (char*)&memoryManagmentUnit.read<uint32_t>(systemRegisters.EIPC);
+        programCounter = &memoryManagmentUnit.read<char>(systemRegisters.EIPC);
         systemRegisters.PSW = systemRegisters.EIPSW;            
     }
     cycles += 10;
