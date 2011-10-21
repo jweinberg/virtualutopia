@@ -22,7 +22,7 @@ public:
     MMU(const ROM &rom, VIP::VIP &vip, NVC::NVC &nvc);
 
     template <typename T>
-    inline const T& read(uint32_t virtualAddress)
+    inline const T& read(uint32_t virtualAddress) const
     {
         virtualAddress = virtualAddress & 0x07FFFFFF;
         //nvc.ApplyReadWait(virtualAddress);

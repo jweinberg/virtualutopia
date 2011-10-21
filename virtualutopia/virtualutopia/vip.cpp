@@ -83,65 +83,6 @@ namespace VIP
         free(bmpdata);
     }
     
-    void VIP::WriteFrame()
-    {
-        
-        CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-        
-        uint32_t * bmpdata = (uint32_t*)calloc(384 * 256 * 4, sizeof(char));
-        memset(bmpdata, 0xFF, 384 * 256 * 4);
-        
-        char * internalData = (char*)&leftFrameBuffer[0];
-        
-        for (int x = 0; x < 384; ++x)
-        {
-            for (int y = 0; y < 64; ++y)
-            {
-                for (int bt = 0; bt < 4; ++bt)
-                {
-                    uint32_t pixel;
-                    char px = (*internalData >> (bt * 2)) & 0x3;
-                    if (px == 1)
-                        pixel = 0xFF520052;
-                    else if (px == 2)
-                        pixel = 0xFFAD00AD;
-                    else if (px == 3)
-                        pixel = 0xFFFF00FF;
-                    else if (px == 0)
-                        pixel = 0xFF000000;
-                    
-                    *(bmpdata + (384 * (y * 4 + bt)) + x) = pixel;
-                }
-                internalData++;
-            }
-        }
-        
-        CGContextRef context = CGBitmapContextCreate(bmpdata,
-                                                     384, 
-                                                     256, 8, 1536, colorSpace, kCGImageAlphaPremultipliedLast);
-        
-        
-        CGImageRef image = CGBitmapContextCreateImage(context);
-
-        static int f = 0;
-        CFStringRef str = CFStringCreateWithFormat(NULL, NULL, CFSTR("/Users/jweinberg/frames/frame_%03d.png"), f++); 
-        CFURLRef url = CFURLCreateWithFileSystemPath(NULL, str, kCFURLPOSIXPathStyle, false);
-        
-        CGImageDestinationRef destination = CGImageDestinationCreateWithURL(url, kUTTypePNG, 1, NULL);
-        CGImageDestinationAddImage(destination, image, NULL);
-        
-        CGImageDestinationFinalize(destination);
-        
-        
-        CFRelease(destination);
-        CFRelease(url);
-        CFRelease(str);
-        
-        CGColorSpaceRelease(colorSpace);
-        CGContextRelease(context);
-        free(bmpdata);
-    }
-    
     void VIP::DrawObj(const Obj &obj, int row)
     {
         int h = 8;
@@ -179,13 +120,15 @@ namespace VIP
         int xWorlds = 1 << world.SCX;
         int yWorlds = 1 << world.SCY;;
         
+        BGMapLookup mapLookup(*this, &bgMaps[world.BGMAP_BASE], xWorlds, yWorlds, world.OVER, world.OVERPLANE_CHARACTER);
+        
         int y = max<int>((row * 8) - world.GY, 0);
         do
         {   
-            int srcY = (y + world.MY) % (yWorlds * 512);
-            int yWorld = srcY / 512;
-            int yChar = (srcY & 0x1FF) / 8;                            
+            int srcY = (y + world.MY);
             int yOff = srcY & 7;
+
+            mapLookup.SetY(srcY);
             
             int h = 8 - yOff;
             h = MIN(h, world.H + 1 - y);
@@ -195,21 +138,20 @@ namespace VIP
                 int x = 0;
                 do
                 {
-                    int srcX = (x + world.MX - world.MP) % (xWorlds * 512);
-                    int xWorld = srcX / 512;
-                    int xChar = (srcX & 0x1FF) / 8;
+                    int srcX = (x + world.MX - world.MP);
                     int xOff = srcX & 7;
+
+                    mapLookup.SetX(srcX);
                     
                     int w = 8 - xOff;
                     w = MIN(w, world.W + 1 - x);
                     
-                    const BGMap &map = bgMaps[world.BGMAP_BASE + (yWorld * xWorlds) + xWorld];
-                    const BGMapData &data = map.chars[yChar * 64 + xChar];
-                    const Chr& chr = chrRam[data.charNum];  
-                    
                     int xPos = x + world.GX - world.GP;
                     if (!(xPos + w < 0 || xPos >= 384))
-                        leftFrameBuffer[0].DrawChr(chr, row, xPos, y + world.GY, xOff, yOff, w, h, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
+                    {
+                        const BGMapData& data = mapLookup.GetMapData();
+                        leftFrameBuffer[0].DrawChr(chrRam[data.charNum], row, xPos, y + world.GY, xOff, yOff, w, h, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
+                    }
                     x += (8 - xOff);
                 } while(x <= world.W);
             }
@@ -219,21 +161,20 @@ namespace VIP
                 int x = 0;
                 do
                 {
-                    int srcX = (x + world.MX + world.MP) % (xWorlds * 512);
-                    int xWorld = srcX / 512;
-                    int xChar = (srcX & 0x1FF) / 8;
+                    int srcX = (x + world.MX + world.MP);
                     int xOff = srcX & 7;
+
+                    mapLookup.SetX(srcX);
                     
                     int w = 8 - xOff;
                     w = MIN(w, world.W + 1 - x);
                     
-                    const BGMap &map = bgMaps[world.BGMAP_BASE + (yWorld * xWorlds) + xWorld];
-                    const BGMapData &data = map.chars[yChar * 64 + xChar];
-                    const Chr& chr = chrRam[data.charNum];  
-                    
                     int xPos = x + world.GX + world.GP;
                     if (!(xPos + w < 0 || xPos >= 384))
-                        rightFrameBuffer[0].DrawChr(chr, row, xPos, y + world.GY, xOff, yOff, w, h, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
+                    {
+                        const BGMapData& data = mapLookup.GetMapData();
+                        rightFrameBuffer[0].DrawChr(chrRam[data.charNum], row, xPos, y + world.GY, xOff, yOff, w, h, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
+                    }
                     x += (8 - xOff);
                 } while(x <= world.W);
             }
@@ -246,6 +187,7 @@ namespace VIP
         uint8_t xWorlds = 1 << world.SCX;
         uint8_t yWorlds = 1 << world.SCY;;
         
+        BGMapLookup mapLookup(*this, &bgMaps[world.BGMAP_BASE], xWorlds, yWorlds, world.OVER, world.OVERPLANE_CHARACTER);
         
         int y = max<int>((row * 8) - world.GY, 0);
         
@@ -257,11 +199,8 @@ namespace VIP
             int leftParalax = (affineTable.MP >= 0 ? affineTable.MP : 0);
             
             int srcY = Fixed16x16(affineTable.MY) + Fixed16x16(affineTable.DY) * (((int64_t)y) << 16);
-            if (srcY < 0 || srcY > yWorlds * 512)
-                srcY %= (yWorlds * 512);
+            mapLookup.SetY(srcY);
             
-            uint8_t yWorld = srcY / 512;
-            uint16_t yChar = (srcY & 0x1FF) / 8;                            
             uint8_t yOff = srcY & 7;
             
             for (int x = 0; x < world.W; ++x)
@@ -272,18 +211,11 @@ namespace VIP
                     if (!(xPos < 0 || xPos >= 384))
                     {
                         int srcX = (Fixed16x16(affineTable.MX) + Fixed16x16(affineTable.DX) * (((int64_t)(x + leftParalax)) << 16));
-                        
-                        //if (!world.OVER)
-                        if (srcX < 0 || srcX > xWorlds * 512)
-                        {
-                            srcX %= (xWorlds * 512);
-                        }
-                        uint8_t xWorld = srcX / 512;
-                        uint16_t xChar = (srcX & 0x1FF) / 8;
+                        mapLookup.SetX(srcX);
+                            
                         uint8_t xOff = srcX & 7;
                         
-                        const BGMap &map = bgMaps[world.BGMAP_BASE + (yWorld * xWorlds) + xWorld];
-                        const BGMapData &data = map.chars[yChar * 64 + xChar];
+                        const BGMapData &data = mapLookup.GetMapData();
                         const Chr& chr = chrRam[data.charNum];  
                         
                         //We know we're rather safe here, don't need all the checks DrawChr does
@@ -302,18 +234,11 @@ namespace VIP
                     if (!(xPos < 0 || xPos >= 384))
                     {                                
                         int srcX = (Fixed16x16(affineTable.MX) + Fixed16x16(affineTable.DX) * (((int64_t)((x + rightParalax))) << 16));
+                        mapLookup.SetX(srcX);
                         
-                        //if (!world.OVER)
-                        if (srcX < 0 || srcX > xWorlds * 512)
-                        {
-                            srcX %= (xWorlds * 512);
-                        }
-                        uint8_t xWorld = srcX / 512;
-                        uint16_t xChar = (srcX & 0x1FF) / 8;
                         uint8_t xOff = srcX & 7;
                         
-                        const BGMap &map = bgMaps[world.BGMAP_BASE + (yWorld * xWorlds) + xWorld];
-                        const BGMapData &data = map.chars[yChar * 64 + xChar];
+                        const BGMapData &data = mapLookup.GetMapData();
                         const Chr& chr = chrRam[data.charNum];  
                         
                         //We know we're rather safe here, don't need all the checks DrawChr does
@@ -335,6 +260,8 @@ namespace VIP
         uint8_t xWorlds = 1 << world.SCX;
         uint8_t yWorlds = 1 << world.SCY;;
         
+        BGMapLookup mapLookup(*this, &bgMaps[world.BGMAP_BASE], xWorlds, yWorlds, world.OVER, world.OVERPLANE_CHARACTER);
+        
         int y = max<int>((row * 8) - world.GY, 0);
         
         for (; y < (max<int>((row * 8) - world.GY, 0) + 8) && y <= world.H; ++y)
@@ -342,34 +269,29 @@ namespace VIP
             const HBiasTable hBiasTable = read<HBiasTable>((world.PARAM_BASE & 0xFFF0) * 2 + 0x00020000 + y * sizeof(HBiasTable));
             
             int srcY = (y + world.MY);
-            if (srcY < 0 || srcY > yWorlds * 512)
-                srcY %= (yWorlds * 512);
-            
-            uint8_t yWorld = srcY / 512;
-            uint16_t yChar = (srcY & 0x1FF) / 8;                            
+            mapLookup.SetY(srcY);
             uint8_t yOff = srcY & 7;
-            
             
             if (world.LON)
             {
                 int x = 0;
                 do
                 {
-                    int srcX = (x + world.MX - world.MP + hBiasTable.HOFSTL) % (xWorlds * 512);
-                    int xWorld = srcX / 512;
-                    int xChar = (srcX & 0x1FF) / 8;
+                    int srcX = (x + world.MX - world.MP + hBiasTable.HOFSTL);
+
+                    mapLookup.SetX(srcX);
                     int xOff = srcX & 7;
                     
                     int w = 8 - xOff;
                     w = MIN(w, world.W + 1 - x);
                     
-                    const BGMap &map = bgMaps[world.BGMAP_BASE + (yWorld * xWorlds) + xWorld];
-                    const BGMapData &data = map.chars[yChar * 64 + xChar];
-                    const Chr& chr = chrRam[data.charNum];  
-                    
                     int xPos = x + world.GX - world.GP;
                     if (!(xPos + w < 0 || xPos >= 384))
+                    {
+                        const BGMapData &data = mapLookup.GetMapData();
+                        const Chr& chr = chrRam[data.charNum];  
                         leftFrameBuffer[0].DrawChr(chr, row, xPos, y + world.GY, xOff, yOff, w, 1, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
+                    }
                     x += (8 - xOff);
                 } while(x <= world.W);
             }
@@ -379,21 +301,22 @@ namespace VIP
                 int x = 0;
                 do
                 {
-                    int srcX = (x + world.MX + world.MP + hBiasTable.HOFSTR) % (xWorlds * 512);
-                    int xWorld = srcX / 512;
-                    int xChar = (srcX & 0x1FF) / 8;
+                    int srcX = (x + world.MX + world.MP + hBiasTable.HOFSTR);
+
+                    mapLookup.SetX(srcX);
                     int xOff = srcX & 7;
                     
                     int w = 8 - xOff;
                     w = MIN(w, world.W + 1 - x);
                     
-                    const BGMap &map = bgMaps[world.BGMAP_BASE + (yWorld * xWorlds) + xWorld];
-                    const BGMapData &data = map.chars[yChar * 64 + xChar];
-                    const Chr& chr = chrRam[data.charNum];  
-                    
                     int xPos = x + world.GX + world.GP;
                     if (!(xPos + w < 0 || xPos >= 384))
+                    {
+                        
+                        const BGMapData &data = mapLookup.GetMapData();
+                        const Chr& chr = chrRam[data.charNum];  
                         rightFrameBuffer[0].DrawChr(chr, row, xPos, y + world.GY, xOff, yOff, w, 1, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
+                    }
                     x += (8 - xOff);
                 } while(x <= world.W);
             }

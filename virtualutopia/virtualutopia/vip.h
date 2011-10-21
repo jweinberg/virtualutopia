@@ -27,7 +27,6 @@ namespace VIP
     class VIP
     {
     public:
-        void WriteFrame();
         void DumpCHR();
         void DrawObj(const Obj &obj, int row);
         void DrawNormalWorld(int row, const World &world);
@@ -254,6 +253,75 @@ namespace VIP
         uint16_t BKCOL;
     };
     
+    struct BGMapLookup
+    {
+    private:
+        VIP& vip;
+        const uint8_t xMaps;
+        const uint8_t yMaps;
+        const BGMap * const baseMap;
+        const bool over;
+        const uint16_t overplaneChrAddress;
+        
+        bool useOverplane;
+        uint8_t xMap;
+        uint8_t yMap;
+        int16_t x;
+        int16_t y;
+        uint16_t xChar;
+        uint16_t yChar;
+        
+        const BGMapData *overPlaneChar;
+    public: 
+        BGMapLookup(VIP& _vip, const BGMap * const _baseMap, uint8_t _xMaps, uint8_t _yMaps, bool _over, uint16_t _overAddress) : 
+        vip(_vip),
+        baseMap(_baseMap), 
+        xMaps(_xMaps), 
+        yMaps(_yMaps),
+        over(_over),
+        overplaneChrAddress(_overAddress)
+        {
+            if (over)
+            {
+                overPlaneChar = &vip.read<BGMapData>(overplaneChrAddress * 2 + 0x20000);
+            }
+        }
+        
+        void SetX(int16_t _x) 
+        { 
+            if (!over)
+                x = _x % (512 * xMaps);
+            else 
+                x = _x;
+            
+            xMap = x / 512;
+            xChar = (x & 0x1FF) / 8;
+        }
+        
+        void SetY(int16_t _y)
+        {
+            if (!over)
+                y = _y % (512 * yMaps);
+            else
+                y = _y;
+            
+            yMap = y / 512;
+            yChar = (y & 0x1FF) / 8;
+        }
+        
+        const BGMapData& GetMapData()
+        {
+            if (y < 0 || y >= 512 * yMaps || x < 0 || x >= 512 * xMaps)
+            {
+                return *overPlaneChar;   
+            }
+            else
+            {
+                const BGMap &map = *(baseMap + (yMap * xMaps) + xMap);
+                return map.chars[yChar * 64 + xChar];
+            }
+        }
+    };
 }
 
 #endif
