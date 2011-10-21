@@ -187,6 +187,7 @@
 
 /* Begin PBXFileReference section */
 		820C7F0D1442BAFF00825291 /* framebuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = framebuffer.h; sourceTree = "<group>"; };
+		820E0E641451E7B00065AE37 /* hbiastable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = hbiastable.h; sourceTree = "<group>"; };
 		821438CE14146AD100A98E34 /* virtualutopia */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = virtualutopia; sourceTree = BUILT_PRODUCTS_DIR; };
 		821438D214146AD100A98E34 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		821438DB14146D1500A98E34 /* v810.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = v810.cpp; sourceTree = "<group>"; };
@@ -378,6 +379,7 @@
 				82EB1C9A1441556A007A22EA /* palette.h */,
 				820C7F0D1442BAFF00825291 /* framebuffer.h */,
 				8284A975144BD64C00265708 /* affinetable.h */,
+				820E0E641451E7B00065AE37 /* hbiastable.h */,
 			);
 			name = VIP;
 			sourceTree = "<group>";
@@ -885,6 +887,11 @@
 				GCC_UNROLL_LOOPS = YES;
 				INFOPLIST_FILE = "VirtualUtopia/VirtualUtopia-Info.plist";
 				INSTALL_PATH = "$(HOME)/Library/Bundles";
+				OTHER_CPLUSPLUSFLAGS = (
+					"-ffast-math",
+					"-fomit-frame-pointer",
+					"$(OTHER_CFLAGS)",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = oecoreplugin;
 			};
