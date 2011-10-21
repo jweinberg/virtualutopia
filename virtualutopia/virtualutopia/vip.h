@@ -290,7 +290,11 @@ namespace VIP
         void SetX(int16_t _x) 
         { 
             if (!over)
+            {
+                while (_x < 0)
+                    _x += (512 * xMaps);
                 x = _x % (512 * xMaps);
+            }
             else 
                 x = _x;
             
@@ -301,7 +305,11 @@ namespace VIP
         void SetY(int16_t _y)
         {
             if (!over)
+            {
+                while (_y < 0)
+                    _y += (512 * yMaps);
                 y = _y % (512 * yMaps);
+            }
             else
                 y = _y;
             

@@ -193,24 +193,25 @@ namespace VIP
         
         for (; y < (max<int>((row * 8) - world.GY, 0) + 8) && y <= world.H; ++y)
         {
-            const AffineTable affineTable = read<AffineTable>((world.PARAM_BASE & 0xFFF0) * 2 + 0x00020000 + y * sizeof(AffineTable));
+            const AffineTable affineTable = read<AffineTable>(((world.PARAM_BASE & 0xFFF0) * 2 + 0x00020000) + y * sizeof(AffineTable));
             
             int rightParalax = (affineTable.MP < 0 ? affineTable.MP : 0);
             int leftParalax = (affineTable.MP >= 0 ? affineTable.MP : 0);
             
-            int srcY = Fixed16x16(affineTable.MY) + Fixed16x16(affineTable.DY) * (((int64_t)y) << 16);
-            mapLookup.SetY(srcY);
-            
-            uint8_t yOff = srcY & 7;
-            
             for (int x = 0; x < world.W; ++x)
             {
+                int srcY = Fixed16x16(affineTable.MY) + Fixed16x16(affineTable.DY) * (((int64_t)x) << 16);
+                mapLookup.SetY(srcY);
+                
+                uint8_t yOff = srcY & 7;
+                
                 if (world.LON)
                 {
                     int xPos = x + world.GX + world.GP;
                     if (!(xPos < 0 || xPos >= 384))
                     {
-                        int srcX = (Fixed16x16(affineTable.MX) + Fixed16x16(affineTable.DX) * (((int64_t)(x + leftParalax)) << 16));
+                        int srcX = (Fixed16x16(affineTable.MX) + (Fixed16x16(affineTable.DX) * (((int64_t)(x + leftParalax)) << 16)));
+
                         mapLookup.SetX(srcX);
                             
                         uint8_t xOff = srcX & 7;
@@ -233,7 +234,7 @@ namespace VIP
                     int xPos = x + world.GX - world.GP;
                     if (!(xPos < 0 || xPos >= 384))
                     {                                
-                        int srcX = (Fixed16x16(affineTable.MX) + Fixed16x16(affineTable.DX) * (((int64_t)((x + rightParalax))) << 16));
+                        int srcX = (Fixed16x16(affineTable.MX) + (Fixed16x16(affineTable.DX) * (((int64_t)((x + rightParalax))) << 16)));
                         mapLookup.SetX(srcX);
                         
                         uint8_t xOff = srcX & 7;
