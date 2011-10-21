@@ -349,68 +349,53 @@ namespace VIP
             uint16_t yChar = (srcY & 0x1FF) / 8;                            
             uint8_t yOff = srcY & 7;
             
-            for (int x = 0; x < world.W; ++x)
+            
+            if (world.LON)
             {
-                if (world.LON)
+                int x = 0;
+                do
                 {
-                    int xPos = x + world.GX + world.GP;
-                    if (!(xPos < 0 || xPos >= 384))
-                    {
-                        int srcX = x + world.MX - world.MP + hBiasTable.HOFSTL;
-                        
-                        //if (!world.OVER)
-                        if (srcX < 0 || srcX > xWorlds * 512)
-                        {
-                            srcX %= (xWorlds * 512);
-                        }
-                        uint8_t xWorld = srcX / 512;
-                        uint16_t xChar = (srcX & 0x1FF) / 8;
-                        uint8_t xOff = srcX & 7;
-                        
-                        const BGMap &map = bgMaps[world.BGMAP_BASE + (yWorld * xWorlds) + xWorld];
-                        const BGMapData &data = map.chars[yChar * 64 + xChar];
-                        const Chr& chr = chrRam[data.charNum];  
-                        
-                        //We know we're rather safe here, don't need all the checks DrawChr does
-                        uint16_t row = chr.data[data.BVFLP ? (7 - yOff) : yOff];
-                        uint8_t shift = ((data.BHFLP ? 7 - xOff : xOff) * 2);
-                        uint8_t idx = (row >> shift) & 0x3;
-                        if (idx)
-                        {
-                            leftFrameBuffer[0].SetPixel(xPos, y + world.GY, GPLT[data.GPLTS][idx]);
-                        }
-                    }
-                }
-                if (world.RON)
-                {
+                    int srcX = (x + world.MX - world.MP + hBiasTable.HOFSTL) % (xWorlds * 512);
+                    int xWorld = srcX / 512;
+                    int xChar = (srcX & 0x1FF) / 8;
+                    int xOff = srcX & 7;
+                    
+                    int w = 8 - xOff;
+                    w = MIN(w, world.W + 1 - x);
+                    
+                    const BGMap &map = bgMaps[world.BGMAP_BASE + (yWorld * xWorlds) + xWorld];
+                    const BGMapData &data = map.chars[yChar * 64 + xChar];
+                    const Chr& chr = chrRam[data.charNum];  
+                    
                     int xPos = x + world.GX - world.GP;
-                    if (!(xPos < 0 || xPos >= 384))
-                    {                                
-                        int srcX = x + world.MX + world.MP + hBiasTable.HOFSTR;
-                        
-                        //if (!world.OVER)
-                        if (srcX < 0 || srcX > xWorlds * 512)
-                        {
-                            srcX %= (xWorlds * 512);
-                        }
-                        uint8_t xWorld = srcX / 512;
-                        uint16_t xChar = (srcX & 0x1FF) / 8;
-                        uint8_t xOff = srcX & 7;
-                        
-                        const BGMap &map = bgMaps[world.BGMAP_BASE + (yWorld * xWorlds) + xWorld];
-                        const BGMapData &data = map.chars[yChar * 64 + xChar];
-                        const Chr& chr = chrRam[data.charNum];  
-                        
-                        //We know we're rather safe here, don't need all the checks DrawChr does
-                        uint16_t row = chr.data[data.BVFLP ? (7 - yOff) : yOff];
-                        uint8_t shift = ((data.BHFLP ? 7 - xOff : xOff) * 2);
-                        uint8_t idx = (row >> shift) & 0x3;
-                        if (idx)
-                        {
-                            rightFrameBuffer[0].SetPixel(xPos, y + world.GY, GPLT[data.GPLTS][idx]);
-                        }
-                    }
-                }   
+                    if (!(xPos + w < 0 || xPos >= 384))
+                        leftFrameBuffer[0].DrawChr(chr, row, xPos, y + world.GY, xOff, yOff, w, 1, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
+                    x += (8 - xOff);
+                } while(x <= world.W);
+            }
+            
+            if (world.RON)
+            {
+                int x = 0;
+                do
+                {
+                    int srcX = (x + world.MX + world.MP + hBiasTable.HOFSTR) % (xWorlds * 512);
+                    int xWorld = srcX / 512;
+                    int xChar = (srcX & 0x1FF) / 8;
+                    int xOff = srcX & 7;
+                    
+                    int w = 8 - xOff;
+                    w = MIN(w, world.W + 1 - x);
+                    
+                    const BGMap &map = bgMaps[world.BGMAP_BASE + (yWorld * xWorlds) + xWorld];
+                    const BGMapData &data = map.chars[yChar * 64 + xChar];
+                    const Chr& chr = chrRam[data.charNum];  
+                    
+                    int xPos = x + world.GX + world.GP;
+                    if (!(xPos + w < 0 || xPos >= 384))
+                        rightFrameBuffer[0].DrawChr(chr, row, xPos, y + world.GY, xOff, yOff, w, 1, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
+                    x += (8 - xOff);
+                } while(x <= world.W);
             }
         }   
     }
