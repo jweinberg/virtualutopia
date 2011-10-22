@@ -262,15 +262,17 @@ namespace VIP
         const BGMap * const baseMap;
         const bool over;
         const uint16_t overplaneChrAddress;
-        
+        bool requiresReload;
         bool useOverplane;
+        uint16_t maxX;
+        uint16_t maxY;
         uint8_t xMap;
         uint8_t yMap;
         int16_t x;
         int16_t y;
         uint16_t xChar;
         uint16_t yChar;
-        
+        const BGMapData *cachedData;
         const BGMapData *overPlaneChar;
     public: 
         BGMapLookup(VIP& _vip, const BGMap * const _baseMap, uint8_t _xMaps, uint8_t _yMaps, bool _over, uint16_t _overAddress) : 
@@ -279,7 +281,11 @@ namespace VIP
         xMaps(_xMaps), 
         yMaps(_yMaps),
         over(_over),
-        overplaneChrAddress(_overAddress)
+        overplaneChrAddress(_overAddress),
+        maxX(xMaps * 512),
+        maxY(yMaps * 512),
+        yChar(0),
+        xChar(0)
         {
             if (over)
             {
@@ -292,14 +298,19 @@ namespace VIP
             if (!over)
             {
                 while (_x < 0)
-                    _x += (512 * xMaps);
-                x = _x % (512 * xMaps);
+                    _x += maxX;
+                x = _x % maxX;
             }
             else 
                 x = _x;
             
+            uint8_t prevXMap = xMap;
             xMap = x / 512;
+            uint16_t prevXChar = xChar;
             xChar = (x & 0x1FF) / 8;
+            
+            if (prevXMap != xMap || prevXChar != xChar)
+                requiresReload = true;
         }
         
         void SetY(int16_t _y)
@@ -307,26 +318,36 @@ namespace VIP
             if (!over)
             {
                 while (_y < 0)
-                    _y += (512 * yMaps);
-                y = _y % (512 * yMaps);
+                    _y += maxY;
+                y = _y % maxY;
             }
             else
                 y = _y;
             
+            uint8_t prevYMap = yMap;
             yMap = y / 512;
+            uint16_t prevYChar = yChar;
             yChar = (y & 0x1FF) / 8;
+            
+            if (prevYMap != yMap || prevYChar != yChar)
+                requiresReload = true;
         }
         
         const BGMapData& GetMapData()
         {
-            if (y < 0 || y >= 512 * yMaps || x < 0 || x >= 512 * xMaps)
+            if (y < 0 || y >= maxY || x < 0 || x >= maxX)
             {
                 return *overPlaneChar;   
             }
             else
             {
-                const BGMap &map = *(baseMap + (yMap * xMaps) + xMap);
-                return map.chars[yChar * 64 + xChar];
+                if (requiresReload)
+                {
+                    const BGMap &map = *(baseMap + (yMap * xMaps) + xMap);
+                    cachedData = &map.chars[yChar * 64 + xChar];
+                    requiresReload = false;
+                }
+                return *cachedData;
             }
         }
     };
