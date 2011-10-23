@@ -77,6 +77,26 @@ namespace VIP
                 else
                     XPSTTS.XPEN = xp->XPEN;
             }
+            
+            //Invalidate the CHR cache
+            switch (offset)
+            {
+                case 0x06000 ... 0x07FFF:
+                    chrCache[(offset - 0x06000) / sizeof(Chr)].valid = false;
+                    break;
+                case 0x0E000 ... 0x0FFFF:
+                    chrCache[(offset - 0x0E000) / sizeof(Chr) + 512].valid = false;
+                    break;
+                case 0x16000 ... 0x17FFF:
+                    chrCache[(offset - 0x16000) / sizeof(Chr) + 1024].valid = false;
+                    break;
+                case 0x1E000 ... 0x1FFFF:
+                    chrCache[(offset - 0x1E000) / sizeof(Chr) + 1536].valid = false;
+                    break;
+                case 0x78000 ... 0x7FFFF:
+                    chrCache[(offset - 0x78000) / sizeof(Chr)].valid = false;
+                    break;
+            }
             *((T*)&(*this)[offset]) = val;
         }
         
@@ -162,6 +182,7 @@ namespace VIP
         World worlds[32];
         
         Chr chrRam[2048];
+        ChrCacheEntry chrCache[2048];
         Obj oam[1024];
         
         uint32_t bmpData[384 * 256];

@@ -31,9 +31,9 @@ namespace VIP
             *column |= (color << shift);
         }
         
-        inline void DrawChr(const Chr &chr, uint8_t row, int xoff, int yoff, int sourceXOffset, int sourceYOffset, int w, int h, bool flipHor, bool flipVert,const Palette &palette)
+        inline void DrawCachedChr(const ChrCacheEntry &chrCache, uint8_t row, int xoff, int yoff, int sourceXOffset, int sourceYOffset, int w, int h, bool flipHor, bool flipVert,const Palette &palette)
         {
-            const uint16_t * const data = chr.data;
+            const uint8_t * const data = chrCache.expandedData;
             const uint8_t expandedRow = row * 8;
             
             int yOver = (expandedRow + 8) - (yoff + h);
@@ -57,13 +57,12 @@ namespace VIP
                 uint16_t yPxl = y + yoff;    
                 uint8_t yIdx = y + sourceYOffset;
                 if (flipVert) yIdx = 7 - yIdx;
-                uint16_t row = data[yIdx];
                 for (uint8_t x = xStart; x < w; ++x)
                 {
                     uint16_t xPxl = x + xoff;
                     uint8_t xIdx = x + sourceXOffset;
                     if (flipHor) xIdx = 7 - xIdx;
-                    uint8_t colorIdx = (row >> (xIdx * 2)) & 0x3;
+                    uint8_t colorIdx = data[xIdx + (yIdx * 8)];
                     if (colorIdx)
                     {
                         SetPixel(xPxl, yPxl, palette[colorIdx]);

@@ -11,6 +11,29 @@
 
 namespace VIP
 {
+    struct ChrCacheEntry
+    {
+        bool valid;
+        uint8_t expandedData[64];
+        
+        void LoadData(uint16_t *data)
+        {
+            valid = true;
+            uint8_t * p = expandedData;
+            for (int y = 0; y < 8; ++y)
+            {
+                uint16_t row = data[y];
+                for (int x = 0; x < 8; ++x)
+                {
+                    *p = row & 0x3;
+                    row >>= 2;
+                    p++;
+                }
+            }
+            
+        }
+    };
+    
     //2 bits for each pixel
     //Data is 8x8
     struct Chr

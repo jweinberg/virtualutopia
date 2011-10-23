@@ -107,14 +107,19 @@ namespace VIP
             if (x + 8 < 0 || x >= 384)
                 return;
 
-            leftFrameBuffer[drawingFB].DrawChr(chrRam[obj.JCA], row, obj.JX - obj.JP, obj.JY, 0, 0, 8, 8, obj.JHFLP, obj.JVFLP, JPLT[obj.JPLTS]);
+            if (!chrCache[obj.JCA].valid)
+                chrCache[obj.JCA].LoadData(chrRam[obj.JCA].data);
+            leftFrameBuffer[0].DrawCachedChr(chrCache[obj.JCA], row, obj.JX - obj.JP, obj.JY, 0, 0, 8, 8, obj.JHFLP, obj.JVFLP, JPLT[obj.JPLTS]);
         }
         if (obj.JRON)
         {
             int x = obj.JX + obj.JP;
             if (x + 8 < 0 || x >= 384)
                 return;
-            rightFrameBuffer[drawingFB].DrawChr(chrRam[obj.JCA], row, obj.JX + obj.JP, obj.JY, 0, 0, 8, 8, obj.JHFLP, obj.JVFLP, JPLT[obj.JPLTS]);
+            
+            if (!chrCache[obj.JCA].valid)
+                chrCache[obj.JCA].LoadData(chrRam[obj.JCA].data);
+            rightFrameBuffer[0].DrawCachedChr(chrCache[obj.JCA], row, obj.JX + obj.JP, obj.JY, 0, 0, 8, 8, obj.JHFLP, obj.JVFLP, JPLT[obj.JPLTS]);
         }
             
     }
@@ -154,7 +159,10 @@ namespace VIP
                     if (!(xPos + w < 0 || xPos >= 384))
                     {
                         const BGMapData& data = mapLookup.GetMapData();
-                        leftFrameBuffer[drawingFB].DrawChr(chrRam[data.charNum], row, xPos, y + world.GY, xOff, yOff, w, h, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
+
+                        if (!chrCache[data.charNum].valid)
+                            chrCache[data.charNum].LoadData(chrRam[data.charNum].data);
+                       leftFrameBuffer[0].DrawCachedChr(chrCache[data.charNum], row, xPos, y + world.GY, xOff, yOff, w, h, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
                     }
                     x += (8 - xOff);
                 } while(x <= world.W);
@@ -177,7 +185,10 @@ namespace VIP
                     if (!(xPos + w < 0 || xPos >= 384))
                     {
                         const BGMapData& data = mapLookup.GetMapData();
-                        rightFrameBuffer[drawingFB].DrawChr(chrRam[data.charNum], row, xPos, y + world.GY, xOff, yOff, w, h, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
+                        if (!chrCache[data.charNum].valid)
+                            chrCache[data.charNum].LoadData(chrRam[data.charNum].data);
+                        
+                        rightFrameBuffer[0].DrawCachedChr(chrCache[data.charNum], row, xPos, y + world.GY, xOff, yOff, w, h, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
                     }
                     x += (8 - xOff);
                 } while(x <= world.W);
@@ -294,8 +305,10 @@ namespace VIP
                     if (!(xPos + w < 0 || xPos >= 384))
                     {
                         const BGMapData &data = mapLookup.GetMapData();
-                        const Chr& chr = chrRam[data.charNum];  
-                        leftFrameBuffer[drawingFB].DrawChr(chr, row, xPos, y + world.GY, xOff, yOff, w, 1, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
+                        if (!chrCache[data.charNum].valid)
+                            chrCache[data.charNum].LoadData(chrRam[data.charNum].data);
+                        
+                        leftFrameBuffer[0].DrawCachedChr(chrCache[data.charNum], row, xPos, y + world.GY, xOff, yOff, w, 1, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
                     }
                     x += (8 - xOff);
                 } while(x <= world.W);
@@ -319,8 +332,10 @@ namespace VIP
                     {
                         
                         const BGMapData &data = mapLookup.GetMapData();
-                        const Chr& chr = chrRam[data.charNum];  
-                        rightFrameBuffer[drawingFB].DrawChr(chr, row, xPos, y + world.GY, xOff, yOff, w, 1, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
+                        if (!chrCache[data.charNum].valid)
+                            chrCache[data.charNum].LoadData(chrRam[data.charNum].data);
+                        
+                        rightFrameBuffer[0].DrawCachedChr(chrCache[data.charNum], row, xPos, y + world.GY, xOff, yOff, w, 1, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
                     }
                     x += (8 - xOff);
                 } while(x <= world.W);
