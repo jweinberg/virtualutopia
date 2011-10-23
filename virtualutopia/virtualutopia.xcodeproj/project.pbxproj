@@ -23,6 +23,8 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		820E0E871454CEB80065AE37 /* vsu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 820E0E861454CEB80065AE37 /* vsu.cpp */; };
+		820E0E881454CEB80065AE37 /* vsu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 820E0E861454CEB80065AE37 /* vsu.cpp */; };
 		821438D314146AD100A98E34 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 821438D214146AD100A98E34 /* main.cpp */; };
 		821438DC14146D1500A98E34 /* v810.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 821438DB14146D1500A98E34 /* v810.cpp */; };
 		821438DF14148B2600A98E34 /* mmu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 821438DE14148B2600A98E34 /* mmu.cpp */; };
@@ -188,6 +190,8 @@
 /* Begin PBXFileReference section */
 		820C7F0D1442BAFF00825291 /* framebuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = framebuffer.h; sourceTree = "<group>"; };
 		820E0E641451E7B00065AE37 /* hbiastable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = hbiastable.h; sourceTree = "<group>"; };
+		820E0E861454CEB80065AE37 /* vsu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vsu.cpp; sourceTree = "<group>"; };
+		820E0E891454CEC00065AE37 /* vsu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vsu.h; sourceTree = "<group>"; };
 		821438CE14146AD100A98E34 /* virtualutopia */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = virtualutopia; sourceTree = BUILT_PRODUCTS_DIR; };
 		821438D214146AD100A98E34 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		821438DB14146D1500A98E34 /* v810.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = v810.cpp; sourceTree = "<group>"; };
@@ -278,6 +282,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		820E0E851454CEAA0065AE37 /* VSU */ = {
+			isa = PBXGroup;
+			children = (
+				820E0E861454CEB80065AE37 /* vsu.cpp */,
+				820E0E891454CEC00065AE37 /* vsu.h */,
+			);
+			name = VSU;
+			sourceTree = "<group>";
+		};
 		821438C314146AD000A98E34 = {
 			isa = PBXGroup;
 			children = (
@@ -303,6 +316,7 @@
 		821438D114146AD100A98E34 /* virtualutopia */ = {
 			isa = PBXGroup;
 			children = (
+				820E0E851454CEAA0065AE37 /* VSU */,
 				821438D214146AD100A98E34 /* main.cpp */,
 				82E9442D1433A995007F3291 /* NVC */,
 				82E9442714339F62007F3291 /* VIP */,
@@ -685,6 +699,7 @@
 				82E944301433A9F7007F3291 /* nvc.cpp in Sources */,
 				82EB1CB014422403007A22EA /* vb.cpp in Sources */,
 				82AA7355144D20A5008BF178 /* v810_instructions.cpp in Sources */,
+				820E0E871454CEB80065AE37 /* vsu.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -712,6 +727,7 @@
 				82EB1D2F144227F6007A22EA /* VBGameCore.mm in Sources */,
 				82EB1D34144228C2007A22EA /* VBGameCoreController.mm in Sources */,
 				82AA7356144D20A6008BF178 /* v810_instructions.cpp in Sources */,
+				820E0E881454CEB80065AE37 /* vsu.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

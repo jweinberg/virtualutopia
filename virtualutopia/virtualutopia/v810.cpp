@@ -10,6 +10,8 @@
 #include <algorithm>
 #include <iomanip>
 #include <iterator>
+#include "vsu.h"
+
 int32_t sign_extend(int bits, uint32_t rawValue)
 {
     bits -= 1;
@@ -21,7 +23,7 @@ int32_t sign_extend(int bits, uint32_t rawValue)
 
 namespace CPU
 {
-    v810::v810(MMU &_mmu, VIP::VIP &_vip, NVC::NVC &_nvc) : memoryManagmentUnit(_mmu), vip(_vip), nvc(_nvc)
+    v810::v810(MMU &_mmu, VIP::VIP &_vip, NVC::NVC &_nvc, VSU::VSU &_vsu) : memoryManagmentUnit(_mmu), vip(_vip), nvc(_nvc), vsu(_vsu)
     {
         debugOutput = false;
         systemRegisters.TKCW = 0x000000E0;

@@ -14,6 +14,7 @@
 #include "mmu.h"
 #include "vip.h"
 #include "nvc.h"
+#include "vsu.h"
 
 class VB
 {
@@ -25,6 +26,7 @@ public:
     VIP::VIP *vip;
     NVC::NVC *nvc;
     MMU *mmu;
+    VSU::VSU *vsu;
 };
 
 #endif

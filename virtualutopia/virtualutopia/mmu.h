@@ -3,13 +3,14 @@
 #include "rom.h"
 #include "vip.h"
 #include "nvc.h"
+#include "vsu.h"
 
 namespace VIP
 {
     class VIP;
 };
-
-namespace NVC {
+namespace NVC 
+{
     class NVC;
 };
 
@@ -19,7 +20,7 @@ public:
     template <typename T>
     class Stream;
     
-    MMU(const ROM &rom, VIP::VIP &vip, NVC::NVC &nvc);
+    MMU(const ROM &rom, VIP::VIP &vip, NVC::NVC &nvc, VSU::VSU &vsu);
 
     template <typename T>
     inline const T& read(uint32_t virtualAddress) const
@@ -31,7 +32,7 @@ public:
             case 0x0 ... 0xFFFFFF: //Display RAM, VIP
                 return vip.read<T>(virtualAddress & 0x7FFFF);
             case 0x01000000 ... 0x010005FF: //Sound Memory
-                return *((T*)&soundRegisters[virtualAddress & 0x5FF]);
+                return vsu.read<T>(virtualAddress & 0x5FF);
             case 0x02000000 ... 0x0200002C: //Hardware registers
                 return nvc.read<T>(virtualAddress);
             case 0x05000000 ... 0x05FFFFFF: //Program RAM (mask with 0xFFFF)
@@ -55,7 +56,7 @@ public:
                 vip.store(val, virtualAddress & 0x7FFFF);
                 break;
             case 0x01000000 ... 0x010005FF: //Sound Memory
-                *(T*)&soundRegisters[virtualAddress & 0x5FF] = val;
+                vsu.store(val, virtualAddress & 0x5FF);
                 break;
             case 0x02000000 ... 0x0200002C: //Hardware registers
                 nvc.store(val, virtualAddress);
@@ -72,7 +73,7 @@ public:
     const ROM &rom;
     NVC::NVC &nvc;
     VIP::VIP &vip;
-    char soundRegisters[0x600];
+    VSU::VSU &vsu;
     char *programRam;
     char *gamepackRam;
 };

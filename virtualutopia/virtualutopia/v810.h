@@ -17,12 +17,17 @@ namespace VIP
     class VIP;
 };
 
+namespace VSU
+{
+    class VSU;
+}
+
 
 namespace CPU
 {
     class v810;
     class Instruction;
- 
+    
     
     enum ExceptionCode
     {
@@ -36,7 +41,7 @@ namespace CPU
     class v810 
     {
     public:
-        v810(MMU& mmu, VIP::VIP& vip, NVC::NVC& nvc);
+        v810(MMU& mmu, VIP::VIP& vip, NVC::NVC& nvc, VSU::VSU& vsu);
         void reset();
         void step();
         const std::string registerDescription() const;
@@ -105,6 +110,7 @@ namespace CPU
         MMU &memoryManagmentUnit;
         VIP::VIP &vip;
         NVC::NVC &nvc;
+        VSU::VSU &vsu;
 #pragma mark - Instructions
         void move(uint8_t reg1, uint8_t reg2);
         void moveImmediate(uint8_t imm5, uint8_t reg2);

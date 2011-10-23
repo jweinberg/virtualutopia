@@ -11,8 +11,10 @@ VB::VB(const std::string &fileName)
     rom = new ROM(fileName);
     vip = new VIP::VIP();
     nvc = new NVC::NVC();
-    mmu = new MMU(*rom, *vip, *nvc);
-    cpu = new CPU::v810(*mmu, *vip, *nvc);
+    vsu = new VSU::VSU();
+    mmu = new MMU(*rom, *vip, *nvc, *vsu);
+    cpu = new CPU::v810(*mmu, *vip, *nvc, *vsu);
+
     vip->cpu = cpu;
     nvc->cpu = cpu;
     
