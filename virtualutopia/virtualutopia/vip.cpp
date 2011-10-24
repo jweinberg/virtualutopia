@@ -21,6 +21,13 @@ namespace VIP
         DPSTTS.DPBSY = 1;
         DPSTTS.SCANRDY = 1;
         DPSTTS.FCLK = 1;
+        
+        XPSTTS.XPEN = 1;
+        
+        sbOutResetTime = -1;
+        column = 0;
+        columnCounter = 259;
+        
     }
     
     void VIP::DumpCHR()
@@ -86,7 +93,7 @@ namespace VIP
     void VIP::DrawObj(const Obj &obj, int row)
     {
         int h = 8;
-        int w = 8;
+    //    int w = 8;
         
         int topInset = (row * 8) - (obj.JY + h);
         int bottomInset = ((row * 8) + 8) - obj.JY;
@@ -103,14 +110,14 @@ namespace VIP
             if (x + 8 < 0 || x >= 384)
                 return;
 
-            leftFrameBuffer[0].DrawChr(chrRam[obj.JCA], row, obj.JX - obj.JP, obj.JY, 0, 0, 8, 8, obj.JHFLP, obj.JVFLP, JPLT[obj.JPLTS]);
+            leftFrameBuffer[drawingFB].DrawChr(chrRam[obj.JCA], row, obj.JX - obj.JP, obj.JY, 0, 0, 8, 8, obj.JHFLP, obj.JVFLP, JPLT[obj.JPLTS]);
         }
         if (obj.JRON)
         {
             int x = obj.JX + obj.JP;
             if (x + 8 < 0 || x >= 384)
                 return;
-            rightFrameBuffer[0].DrawChr(chrRam[obj.JCA], row, obj.JX + obj.JP, obj.JY, 0, 0, 8, 8, obj.JHFLP, obj.JVFLP, JPLT[obj.JPLTS]);
+            rightFrameBuffer[drawingFB].DrawChr(chrRam[obj.JCA], row, obj.JX + obj.JP, obj.JY, 0, 0, 8, 8, obj.JHFLP, obj.JVFLP, JPLT[obj.JPLTS]);
         }
             
     }
@@ -150,7 +157,7 @@ namespace VIP
                     if (!(xPos + w < 0 || xPos >= 384))
                     {
                         const BGMapData& data = mapLookup.GetMapData();
-                        leftFrameBuffer[0].DrawChr(chrRam[data.charNum], row, xPos, y + world.GY, xOff, yOff, w, h, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
+                        leftFrameBuffer[drawingFB].DrawChr(chrRam[data.charNum], row, xPos, y + world.GY, xOff, yOff, w, h, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
                     }
                     x += (8 - xOff);
                 } while(x <= world.W);
@@ -173,7 +180,7 @@ namespace VIP
                     if (!(xPos + w < 0 || xPos >= 384))
                     {
                         const BGMapData& data = mapLookup.GetMapData();
-                        rightFrameBuffer[0].DrawChr(chrRam[data.charNum], row, xPos, y + world.GY, xOff, yOff, w, h, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
+                        rightFrameBuffer[drawingFB].DrawChr(chrRam[data.charNum], row, xPos, y + world.GY, xOff, yOff, w, h, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
                     }
                     x += (8 - xOff);
                 } while(x <= world.W);
@@ -225,7 +232,7 @@ namespace VIP
                         uint8_t idx = (row >> shift) & 0x3;
                         if (idx)
                         {
-                            leftFrameBuffer[0].SetPixel(xPos, y + world.GY, GPLT[data.GPLTS][idx]);
+                            leftFrameBuffer[drawingFB].SetPixel(xPos, y + world.GY, GPLT[data.GPLTS][idx]);
                         }
                     }
                 }
@@ -248,7 +255,7 @@ namespace VIP
                         uint8_t idx = (row >> shift) & 0x3;
                         if (idx)
                         {
-                            rightFrameBuffer[0].SetPixel(xPos, y + world.GY, GPLT[data.GPLTS][idx]);
+                            rightFrameBuffer[drawingFB].SetPixel(xPos, y + world.GY, GPLT[data.GPLTS][idx]);
                         }
                     }
                 }   
@@ -291,7 +298,7 @@ namespace VIP
                     {
                         const BGMapData &data = mapLookup.GetMapData();
                         const Chr& chr = chrRam[data.charNum];  
-                        leftFrameBuffer[0].DrawChr(chr, row, xPos, y + world.GY, xOff, yOff, w, 1, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
+                        leftFrameBuffer[drawingFB].DrawChr(chr, row, xPos, y + world.GY, xOff, yOff, w, 1, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
                     }
                     x += (8 - xOff);
                 } while(x <= world.W);
@@ -316,7 +323,7 @@ namespace VIP
                         
                         const BGMapData &data = mapLookup.GetMapData();
                         const Chr& chr = chrRam[data.charNum];  
-                        rightFrameBuffer[0].DrawChr(chr, row, xPos, y + world.GY, xOff, yOff, w, 1, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
+                        rightFrameBuffer[drawingFB].DrawChr(chr, row, xPos, y + world.GY, xOff, yOff, w, 1, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
                     }
                     x += (8 - xOff);
                 } while(x <= world.W);
@@ -372,6 +379,189 @@ namespace VIP
     
     uint16_t VIP::Step(int32_t cycles)
     {
+        int32_t clocks = cycles - lastFrameBuffer;
+        int32_t running_timestamp = cycles;
+        
+        if (cycles < sbOutResetTime)
+            XPSTTS.SBOUT = 0;
+        if (!(displayRegion & 0x1))
+            DPSTTS.SCANRDY = 1;
+        else 
+            DPSTTS.SCANRDY = 0;
+        while (clocks > 0)
+        {
+            int32_t chunk_clocks = clocks;
+            
+            if (drawingCounter > 0 && chunk_clocks > drawingCounter)
+                chunk_clocks = drawingCounter;
+            if (chunk_clocks > columnCounter)
+                chunk_clocks = columnCounter;
+            
+            running_timestamp += chunk_clocks;
+            
+            if (drawingCounter > 0)
+            {
+                drawingCounter -= chunk_clocks;
+                if (drawingCounter <= 0)
+                {
+                    Draw(rowCount);
+                    
+                    char * internalDataLeft = (char*)&leftFrameBuffer[displayFB];
+                    char * internalDataRight = (char*)&rightFrameBuffer[displayFB];    
+                    
+                    for (int x = 0; x < 384; ++x)
+                    {
+                        for (int y = rowCount * 2; y < rowCount * 2 + 2; ++y)
+                        {
+                            for (int bt = 0; bt < 4; ++bt)
+                            {
+                                uint32_t pixel = 0xFF000000;
+                                
+                                char leftPx = (*(internalDataLeft + (x * 64) + y) >> (bt * 2)) & 0x3;
+                                char rightPx = (*(internalDataRight + (x * 64) + y) >> (bt * 2)) & 0x3;
+                                
+                                if (leftPx == 1)
+                                    pixel |= BRT[0].val;
+                                else if (leftPx == 2)
+                                    pixel |= BRT[1].val;
+                                else if (leftPx == 3)
+                                    pixel |= (BRT[2].val + BRT[1].val + BRT[0].val);
+                                
+                                if (rightPx == 1)
+                                    pixel |= BRT[0].val << 16;
+                                else if (rightPx == 2)
+                                    pixel |= BRT[1].val << 16;
+                                else if (rightPx == 3)
+                                    pixel |= (BRT[2].val + BRT[1].val + BRT[0].val) << 16;
+                                
+                                *(bmpData + (384 * (y * 4 + bt)) + x) = pixel;
+                            }
+                        }
+                    }
+                    
+                    sbOutResetTime = running_timestamp + 1120;
+                    XPSTTS.SBCOUNT = rowCount;
+                    
+                    rowCount++;
+                    if(rowCount == 28)
+                    {
+                        drawingActive = false;
+                        XPSTTS.XPBSY = 0;
+                        INTPND.XPEND |= 1;
+                        DPSTTS.FCLK = 0;
+                        if (INTENB.XPEND)
+                            cpu->processInterrupt((CPU::InterruptCode)4);
+                    }
+                    else
+                        drawingCounter += 1120 * 4;
+                }
+            }
+            
+            columnCounter -= chunk_clocks;
+            if (columnCounter == 0)
+            {
+                if (displayRegion & 1)
+                {
+                    if (!(column & 3))
+                    {
+//                        const int lr = (displayRegion & 2) >> 1;
+//                        uint16 ctdata = VIP_MA16R16(DRAM, 0x1DFFE - ((Column >> 2) * 2) - (lr ? 0 : 0x200));
+//                        
+//                        if((ctdata >> 8) != Repeat)
+//                        {
+//                            Repeat = ctdata >> 8;
+//                            RecalcBrightnessCache();
+//                        }
+                    }
+//                    CopyFBColumnToTarget();
+                }
+                
+                columnCounter = 259;
+                column++;
+                if (column == 384)
+                {
+                    column = 0;
+                    
+                    if (DPSTTS.DISP)
+                    {
+                        if (displayRegion & 1)	// Did we just finish displaying an active region?
+                        {
+                            if (displayRegion & 2)	// finished displaying right eye
+                            {
+                                INTPND.RFBEND |= 1;
+                                if (INTENB.RFBEND)
+                                    cpu->processInterrupt((CPU::InterruptCode)4);
+                            }
+                            else		// Otherwise, left eye
+                            {
+                                INTPND.LFBEND |= 1;
+                                if (INTENB.LFBEND)
+                                    cpu->processInterrupt((CPU::InterruptCode)4);
+
+                            }
+                        }
+                    }
+                    
+                    displayRegion = (displayRegion + 1) & 3;
+                    DPSTTS.DPBSY = displayRegion;
+                    if (displayRegion == 0)	// New frame start
+                    {
+                        if (DPSTTS.DISP)
+                        {
+                            DPSTTS.FCLK = 1;
+                            
+                            INTPND.FRAMESTART |= 1;
+                            if (INTENB.FRAMESTART)
+                                cpu->processInterrupt((CPU::InterruptCode)4);
+                        }
+                        frame++;
+                        if(frame > FRMCYC) // New game frame start?
+                        {
+                            
+                            INTPND.GAMESTART |= 1;
+                            if (INTENB.GAMESTART)
+                                cpu->processInterrupt((CPU::InterruptCode)4);
+                            
+                            if (XPSTTS.XPEN)
+                            {
+                                displayFB ^= 1;
+                                rowCount = 0;
+                                drawingActive = true;
+                                drawingCounter = 1120 * 4;
+                                drawingFB = displayFB ^ 1;
+                                memset((char*)&rightFrameBuffer[drawingFB], 0, 0x6000);
+                                memset((char*)&leftFrameBuffer[drawingFB], 0, 0x6000);
+                                
+
+                                XPSTTS.XPBSY = 1 + drawingFB;
+                            }
+                            
+                            frame = 0;
+                        }
+                        
+                        break;
+//                        VB_ExitLoop();
+                    }
+                }
+            }
+            
+            clocks -= chunk_clocks;
+        }
+        
+        lastFrameBuffer = cycles;
+        
+        
+        
+        
+        
+        
+        return 0;
+        
+        
+        
+        
+        
+        
         //There are 400,000 cycles in one frame (1 cycle = 50ns, 1 frame = 20ms)
         uint32_t timeSinceBuffer = cycles - lastFrameBuffer;
         

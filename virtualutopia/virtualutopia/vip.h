@@ -44,8 +44,23 @@ namespace VIP
         template <typename T>
         inline void store(T& val, const int offset)
         {
-            if (offset == 0x5F804)
+            if (offset == 0x5F804) //INTCLR
                 INTPND &= ~val;
+            else if (offset == 0x5F822) //DPCTRL
+            {
+                _DPCTRL *dp = (_DPCTRL*)&val;
+                DPSTTS.LOCK = dp->LOCK;
+                DPSTTS.SYNCE = dp->SYNCE;
+                DPSTTS.RE = dp->RE;
+                DPSTTS.DISP = dp->DISP;
+                //TODO handle reset
+            }
+            else if (offset == 0x5F842) //XPCTRL
+            {
+                _XPCTRL *xp = (_XPCTRL*)&val;
+                XPSTTS.XPEN = xp->XPEN;
+                //TODO handle reset
+            }
             *((T*)&(*this)[offset]) = val;
         }
         
@@ -147,6 +162,15 @@ namespace VIP
         int32_t columnCounter;
         int32_t sbOutResetTime;
         
+        
+        int displayFB;
+        int drawingFB;
+        
+        int displayRegion;
+        int drawingRegion;
+        int column;
+        
+        bool drawingActive;
         
         uint32_t lastFrameBuffer;
         char frame;
@@ -287,6 +311,7 @@ namespace VIP
         yChar(0),
         xChar(0)
         {
+            requiresReload = true;
             if (over)
             {
                 overPlaneChar = &vip.read<BGMapData>(overplaneChrAddress * 2 + 0x20000);

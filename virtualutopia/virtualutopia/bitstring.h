@@ -69,7 +69,6 @@ namespace CPU
         inline void Read(uint32_t &data, uint8_t &readLength)
         {
             uint32_t readWord = mmu.read<uint32_t>(currentLocation);
-            currentLocation += 4;
             
             readLength = min<uint32_t>(stringLength, 32);
             uint8_t bitsLeft = 32 - offset;
@@ -78,11 +77,13 @@ namespace CPU
             
             if (readLength > bitsLeft)
             {
+                currentLocation += 4;
                 leftover = readLength - bitsLeft;
                 mask = (mask >> offset);
             }
             else
             {
+                offset = 32 - readLength;
                 mask = mask >> (32 - readLength);
             }
             
@@ -94,7 +95,7 @@ namespace CPU
             if (leftover)
             {
                 uint32_t nextWord = mmu.read<uint32_t>(currentLocation);
-                currentLocation += 4;
+                offset = 32 - leftover;
                 mask = 0xFFFFFFFF << leftover;
                 nextWord &= ~mask;
                 nextWord = nextWord << (32 - leftover);

@@ -298,8 +298,8 @@ namespace CPU
 //        nvc.SCR.STAT = 1;
 //        nvc.SDHR.STA = 1;
 //        
-        vip.Step(cycles);
         nvc.Step(cycles);
+        vip.Step(cycles);
         
         fetchAndDecode();
     }
