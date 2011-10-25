@@ -25,7 +25,9 @@ struct Fixed16x16
     
     const int16_t operator+(const Fixed16x16& other)
     {
-        return ((int64_t)integer + (int64_t)other.integer) >> 16;
+        
+        int64_t combined = ((int64_t)integer + (int64_t)other.integer + 0x7FFF);
+        return combined >> 16;
     }
  
     const Fixed16x16 operator*(const Fixed16x16& other)

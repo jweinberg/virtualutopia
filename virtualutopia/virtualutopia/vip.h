@@ -53,13 +53,29 @@ namespace VIP
                 DPSTTS.SYNCE = dp->SYNCE;
                 DPSTTS.RE = dp->RE;
                 DPSTTS.DISP = dp->DISP;
-                //TODO handle reset
+                
+                if (dp->DPRST)
+                {
+                    INTENB.SCANERR = 0;
+                    INTENB.LFBEND = 0;
+                    INTENB.RFBEND = 0;
+                    INTENB.GAMESTART = 0;
+                    INTENB.FRAMESTART = 0;
+                    INTENB.TIMERR = 0;   
+                }
             }
             else if (offset == 0x5F842) //XPCTRL
             {
                 _XPCTRL *xp = (_XPCTRL*)&val;
-                XPSTTS.XPEN = xp->XPEN;
-                //TODO handle reset
+                if (xp->XPRST)
+                {
+                    INTENB.TIMERR = 0;
+                    INTENB.XPEND = 0;
+                    INTENB.SBHIT = 0;
+                    XPSTTS.XPEN = 0;
+                }
+                else
+                    XPSTTS.XPEN = xp->XPEN;
             }
             *((T*)&(*this)[offset]) = val;
         }

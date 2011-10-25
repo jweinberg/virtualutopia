@@ -18,11 +18,8 @@ namespace VIP
 {
     VIP::VIP()
     {
-        DPSTTS.DPBSY = 1;
-        DPSTTS.SCANRDY = 1;
-        DPSTTS.FCLK = 1;
-        
-        XPSTTS.XPEN = 1;
+        DPSTTS = 0;
+        XPSTTS = 0;
         
         sbOutResetTime = -1;
         column = 0;
@@ -202,8 +199,8 @@ namespace VIP
         {
             const AffineTable affineTable = read<AffineTable>(((world.PARAM_BASE & 0xFFF0) * 2 + 0x00020000) + y * sizeof(AffineTable));
             
-            int rightParalax = (affineTable.MP < 0 ? affineTable.MP : 0);
-            int leftParalax = (affineTable.MP >= 0 ? affineTable.MP : 0);
+            int rightParalax = (affineTable.MP >= 0 ? affineTable.MP : 0);
+            int leftParalax = (affineTable.MP < 0 ? affineTable.MP : 0);
             
             for (int x = 0; x < world.W; ++x)
             {
@@ -406,35 +403,38 @@ namespace VIP
                 {
                     Draw(rowCount);
                     
-                    char * internalDataLeft = (char*)&leftFrameBuffer[displayFB];
-                    char * internalDataRight = (char*)&rightFrameBuffer[displayFB];    
-                    
-                    for (int x = 0; x < 384; ++x)
+                    if (DPSTTS.DISP)
                     {
-                        for (int y = rowCount * 2; y < rowCount * 2 + 2; ++y)
+                        char * internalDataLeft = (char*)&leftFrameBuffer[displayFB];
+                        char * internalDataRight = (char*)&rightFrameBuffer[displayFB];    
+                        
+                        for (int x = 0; x < 384; ++x)
                         {
-                            for (int bt = 0; bt < 4; ++bt)
+                            for (int y = rowCount * 2; y < rowCount * 2 + 2; ++y)
                             {
-                                uint32_t pixel = 0xFF000000;
-                                
-                                char leftPx = (*(internalDataLeft + (x * 64) + y) >> (bt * 2)) & 0x3;
-                                char rightPx = (*(internalDataRight + (x * 64) + y) >> (bt * 2)) & 0x3;
-                                
-                                if (leftPx == 1)
-                                    pixel |= BRT[0].val;
-                                else if (leftPx == 2)
-                                    pixel |= BRT[1].val;
-                                else if (leftPx == 3)
-                                    pixel |= (BRT[2].val + BRT[1].val + BRT[0].val);
-                                
-                                if (rightPx == 1)
-                                    pixel |= BRT[0].val << 16;
-                                else if (rightPx == 2)
-                                    pixel |= BRT[1].val << 16;
-                                else if (rightPx == 3)
-                                    pixel |= (BRT[2].val + BRT[1].val + BRT[0].val) << 16;
-                                
-                                *(bmpData + (384 * (y * 4 + bt)) + x) = pixel;
+                                for (int bt = 0; bt < 4; ++bt)
+                                {
+                                    uint32_t pixel = 0xFF000000;
+                                    
+                                    char leftPx = (*(internalDataLeft + (x * 64) + y) >> (bt * 2)) & 0x3;
+                                    char rightPx = (*(internalDataRight + (x * 64) + y) >> (bt * 2)) & 0x3;
+                                    
+                                    if (leftPx == 1)
+                                        pixel |= BRT[0].val;
+                                    else if (leftPx == 2)
+                                        pixel |= BRT[1].val;
+                                    else if (leftPx == 3)
+                                        pixel |= (BRT[2].val + BRT[1].val + BRT[0].val);
+                                    
+                                    if (rightPx == 1)
+                                        pixel |= BRT[0].val << 16;
+                                    else if (rightPx == 2)
+                                        pixel |= BRT[1].val << 16;
+                                    else if (rightPx == 3)
+                                        pixel |= (BRT[2].val + BRT[1].val + BRT[0].val) << 16;
+                                    
+                                    *(bmpData + (384 * (y * 4 + bt)) + x) = pixel;
+                                }
                             }
                         }
                     }
@@ -506,10 +506,10 @@ namespace VIP
                     DPSTTS.DPBSY = displayRegion;
                     if (displayRegion == 0)	// New frame start
                     {
+                        DPSTTS.FCLK = 1;
+                        
                         if (DPSTTS.DISP)
-                        {
-                            DPSTTS.FCLK = 1;
-                            
+                        {                            
                             INTPND.FRAMESTART |= 1;
                             if (INTENB.FRAMESTART)
                                 cpu->processInterrupt((CPU::InterruptCode)4);

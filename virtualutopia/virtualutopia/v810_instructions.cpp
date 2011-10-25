@@ -1121,8 +1121,8 @@ void CPU::v810::multiplyHalfWord(uint8_t reg1, uint8_t reg2)
 void CPU::v810::moveBitString(uint8_t reg1, uint8_t reg2)
 {
     d_printf("MOVBSU\n");
-    uint32_t startAddress = generalRegisters[30];
-    uint32_t destAddress = generalRegisters[29];
+    uint32_t startAddress = generalRegisters[30] & 0xFFFFFFFC;
+    uint32_t destAddress = generalRegisters[29] & 0xFFFFFFFC;
     uint32_t length = generalRegisters[28];
     uint32_t offsetInSource = generalRegisters[27];
     uint32_t offsetInDest = generalRegisters[26];
