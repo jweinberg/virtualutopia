@@ -166,6 +166,8 @@
         default:
             break;
     }
+    if (!vb->nvc->SCR.INT)
+        vb->cpu->processInterrupt(CPU::INTKEY);
 }
 
 - (void)didReleaseVBButton:(OEVBButton)button
