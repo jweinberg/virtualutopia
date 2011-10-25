@@ -36,8 +36,13 @@ namespace CPU
     
     enum InterruptCode
     {
-        Dunno,
+        INTKEY,
+        INTTIM,
+        INTCRO,
+        INTCOM,
+        INTVPU,
     };
+    
     class v810 
     {
     public:

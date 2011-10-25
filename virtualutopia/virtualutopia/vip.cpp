@@ -465,7 +465,7 @@ namespace VIP
                         INTPND.XPEND |= 1;
                         DPSTTS.FCLK = 0;
                         if (INTENB.XPEND)
-                            cpu->processInterrupt((CPU::InterruptCode)4);
+                            cpu->processInterrupt(CPU::INTVPU);
                     }
                     else
                         drawingCounter += 1120 * 4;
@@ -505,13 +505,13 @@ namespace VIP
                             {
                                 INTPND.RFBEND |= 1;
                                 if (INTENB.RFBEND)
-                                    cpu->processInterrupt((CPU::InterruptCode)4);
+                                    cpu->processInterrupt(CPU::INTVPU);
                             }
                             else		// Otherwise, left eye
                             {
                                 INTPND.LFBEND |= 1;
                                 if (INTENB.LFBEND)
-                                    cpu->processInterrupt((CPU::InterruptCode)4);
+                                    cpu->processInterrupt(CPU::INTVPU);
 
                             }
                         }
@@ -527,7 +527,7 @@ namespace VIP
                         {                            
                             INTPND.FRAMESTART |= 1;
                             if (INTENB.FRAMESTART)
-                                cpu->processInterrupt((CPU::InterruptCode)4);
+                                cpu->processInterrupt(CPU::INTVPU);
                         }
                         frame++;
                         if(frame > FRMCYC) // New game frame start?
@@ -535,7 +535,7 @@ namespace VIP
                             
                             INTPND.GAMESTART |= 1;
                             if (INTENB.GAMESTART)
-                                cpu->processInterrupt((CPU::InterruptCode)4);
+                                cpu->processInterrupt(CPU::INTVPU);
                             
                             if (XPSTTS.XPEN)
                             {
@@ -611,7 +611,7 @@ namespace VIP
 
                 if (INTENB.FRAMESTART || INTENB.GAMESTART)
                 {
-                    cpu->processInterrupt((CPU::InterruptCode)4);
+                    cpu->processInterrupt(CPU::INTVPU);
                 }
 
                 return 1;
@@ -633,7 +633,7 @@ namespace VIP
                 {
                     INTPND.SBHIT |= true;
                     if (INTENB.SBHIT)
-                        cpu->processInterrupt((CPU::InterruptCode)4);
+                        cpu->processInterrupt(CPU::INTVPU);
                 }
                 
                 if (DPSTTS.DISP)
@@ -697,7 +697,7 @@ namespace VIP
                 XPSTTS.XPEN = XPCTRL.XPEN;
              
                 INTPND.XPEND |= true;
-                if (INTENB.XPEND) cpu->processInterrupt((CPU::InterruptCode)4);
+                if (INTENB.XPEND) cpu->processInterrupt(CPU::INTVPU);
                 
                 rowCount++;
             }
@@ -712,7 +712,7 @@ namespace VIP
                 DPSTTS.LOCK = 0;
                 
                 INTPND.LFBEND |= true;                
-                if (INTENB.LFBEND) cpu->processInterrupt((CPU::InterruptCode)4);
+                if (INTENB.LFBEND) cpu->processInterrupt(CPU::INTVPU);
 
                 rowCount++;
             }
@@ -727,7 +727,7 @@ namespace VIP
                 DPSTTS.LOCK = 0;
                 
                 INTPND.RFBEND |= true;
-                if (INTENB.RFBEND) cpu->processInterrupt((CPU::InterruptCode)4);
+                if (INTENB.RFBEND) cpu->processInterrupt(CPU::INTVPU);
 
                 rowCount++;
             }

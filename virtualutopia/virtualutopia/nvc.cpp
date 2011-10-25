@@ -94,7 +94,7 @@ void NVC::NVC::Step(uint32_t cycles)
 //    if (!SCR.DIS && (SDHR != 0 || SDLR & 0xF8))
 //    {
 //        SCR.STAT = 0;
-//        cpu->processInterrupt((CPU::InterruptCode)0);
+//        cpu->processInterrupt(CPU::INTKEY);
 //    }
     
     if (TCR.T_ENB)
@@ -110,7 +110,7 @@ void NVC::NVC::Step(uint32_t cycles)
                 
                 TCR.Z_STAT = 1;
                 if (TCR.TIM_Z_INT)
-                    cpu->processInterrupt((CPU::InterruptCode)1);
+                    cpu->processInterrupt(CPU::INTTIM);
             }
         }
     }
