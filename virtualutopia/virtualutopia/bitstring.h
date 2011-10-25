@@ -9,6 +9,7 @@
 #include <assert.h>
 #include <cmath>
 #include "mmu.h"
+
 namespace CPU
 {
     class Bitstring {
@@ -19,91 +20,72 @@ namespace CPU
         
         template <typename Functype>
         inline void SetNext(const Functype& op, uint32_t bits, uint8_t length)
-        {
-            assert(length > 0 && length <= 32);
-            assert(stringLength >= length);
-            
+        {   
+            uint8_t bitsFromWord = 32-offset;
             uint32_t currentWord = mmu.read<uint32_t>(currentLocation);
-            currentWord = op(currentWord, bits);
+            uint32_t modifiedWord = op(currentWord >> offset, bits);
+            currentWord &= ~(~(0xFFFFFFFF << bitsFromWord) << offset);
+            currentWord |= modifiedWord << offset;
             
-            
-            //How much of THIS word is left to work with after the offsetting
-            uint8_t bitsLeft = 32-offset;
-            uint32_t mask = 0xFFFFFFFF;
-            uint8_t leftover = 0;
-            
-            if (length < bitsLeft)
-                mask = (mask >> (32 - length));
-            else
-                leftover = length - bitsLeft;
-            
-            mask = (mask << offset);
-            
-            currentWord &= ~mask;
-            currentWord |= (bits << offset); 
             mmu.store(currentWord, currentLocation);
             
-            if (leftover)
+            if (bitsFromWord < length)
             {
+                uint32_t leftToWrite = length - bitsFromWord;
                 currentLocation += 4;
-                currentWord = mmu.read<uint32_t>(currentLocation);
-                currentWord = op(currentWord, bits);
-                bits = (bits >> bitsLeft);
-                mask = 0xFFFFFFFF << leftover;
-                currentWord &= mask;
-                currentWord |= bits;
-                offset = leftover;
+                uint32_t nextWord = mmu.read<uint32_t>(currentLocation);
+                uint32_t modifiedWord = op(nextWord & ~(0xFFFFFFFF << leftToWrite), bits >> bitsFromWord);
+                nextWord &= 0xFFFFFFFF << leftToWrite;
+                nextWord |= modifiedWord;
+                mmu.store(nextWord, currentLocation);
                 
-                mmu.store(currentWord, currentLocation);
+                offset = leftToWrite;
             }
             else
             {
-                offset = (offset + length) % 32;
-                if (offset == 0)
+                offset += length;
+                if (offset == 32)
+                {
+                    offset = 0;
                     currentLocation += 4;
+                }
             }
             
             stringLength -= length;
         }
         
+        
         inline void Read(uint32_t &data, uint8_t &readLength)
-        {
-            uint32_t readWord = mmu.read<uint32_t>(currentLocation);
+        {   
+            readLength = min<uint32_t>(32, stringLength);
             
-            readLength = min<uint32_t>(stringLength, 32);
-            uint8_t bitsLeft = 32 - offset;
-            uint32_t mask = 0xFFFFFFFF;
-            uint32_t leftover = 0;
+            //Read in the entire current word (cache this?) and remove the data that has already been processed
+            uint32_t readWord = mmu.read<uint32_t>(currentLocation) >> offset;
+
+            uint8_t bitsFromWord = 32-offset;
             
-            if (readLength > bitsLeft)
+            //We need to read a bit from the next word
+            if (bitsFromWord < readLength)
             {
+                uint32_t leftToRead = readLength - bitsFromWord;
                 currentLocation += 4;
-                leftover = readLength - bitsLeft;
-                mask = (mask >> offset);
+                uint32_t nextWord = mmu.read<uint32_t>(currentLocation);
+                offset = leftToRead;
+                readWord |= nextWord << bitsFromWord;
             }
             else
             {
-                offset = 32 - readLength;
-                mask = mask >> (32 - readLength);
+                offset += readLength;
+                if (offset == 32)
+                {
+                    offset = 0;
+                    currentLocation += 4;
+                }
             }
             
-            readWord = (readWord >> offset);
             
-            
-            readWord &= mask;
-            
-            if (leftover)
-            {
-                uint32_t nextWord = mmu.read<uint32_t>(currentLocation);
-                offset = 32 - leftover;
-                mask = 0xFFFFFFFF << leftover;
-                nextWord &= ~mask;
-                nextWord = nextWord << (32 - leftover);
-                readWord |= nextWord;
-            }
             stringLength -= readLength;
-            
-            data = readWord;
+            data = readWord & (0xFFFFFFFF >> (32 - readLength));
         }
         
         inline bool HasData()
