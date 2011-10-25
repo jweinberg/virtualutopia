@@ -109,7 +109,7 @@ namespace VIP
 
             if (!chrCache[obj.JCA].valid)
                 chrCache[obj.JCA].LoadData(chrRam[obj.JCA].data);
-            leftFrameBuffer[0].DrawCachedChr(chrCache[obj.JCA], row, obj.JX - obj.JP, obj.JY, 0, 0, 8, 8, obj.JHFLP, obj.JVFLP, JPLT[obj.JPLTS]);
+            leftFrameBuffer[drawingFB].DrawCachedChr(chrCache[obj.JCA], row, obj.JX - obj.JP, obj.JY, 0, 0, 8, 8, obj.JHFLP, obj.JVFLP, JPLT[obj.JPLTS]);
         }
         if (obj.JRON)
         {
@@ -119,7 +119,7 @@ namespace VIP
             
             if (!chrCache[obj.JCA].valid)
                 chrCache[obj.JCA].LoadData(chrRam[obj.JCA].data);
-            rightFrameBuffer[0].DrawCachedChr(chrCache[obj.JCA], row, obj.JX + obj.JP, obj.JY, 0, 0, 8, 8, obj.JHFLP, obj.JVFLP, JPLT[obj.JPLTS]);
+            rightFrameBuffer[drawingFB].DrawCachedChr(chrCache[obj.JCA], row, obj.JX + obj.JP, obj.JY, 0, 0, 8, 8, obj.JHFLP, obj.JVFLP, JPLT[obj.JPLTS]);
         }
             
     }
@@ -162,7 +162,7 @@ namespace VIP
 
                         if (!chrCache[data.charNum].valid)
                             chrCache[data.charNum].LoadData(chrRam[data.charNum].data);
-                       leftFrameBuffer[0].DrawCachedChr(chrCache[data.charNum], row, xPos, y + world.GY, xOff, yOff, w, h, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
+                       leftFrameBuffer[drawingFB].DrawCachedChr(chrCache[data.charNum], row, xPos, y + world.GY, xOff, yOff, w, h, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
                     }
                     x += (8 - xOff);
                 } while(x <= world.W);
@@ -188,7 +188,7 @@ namespace VIP
                         if (!chrCache[data.charNum].valid)
                             chrCache[data.charNum].LoadData(chrRam[data.charNum].data);
                         
-                        rightFrameBuffer[0].DrawCachedChr(chrCache[data.charNum], row, xPos, y + world.GY, xOff, yOff, w, h, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
+                        rightFrameBuffer[drawingFB].DrawCachedChr(chrCache[data.charNum], row, xPos, y + world.GY, xOff, yOff, w, h, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
                     }
                     x += (8 - xOff);
                 } while(x <= world.W);
@@ -308,7 +308,7 @@ namespace VIP
                         if (!chrCache[data.charNum].valid)
                             chrCache[data.charNum].LoadData(chrRam[data.charNum].data);
                         
-                        leftFrameBuffer[0].DrawCachedChr(chrCache[data.charNum], row, xPos, y + world.GY, xOff, yOff, w, 1, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
+                        leftFrameBuffer[drawingFB].DrawCachedChr(chrCache[data.charNum], row, xPos, y + world.GY, xOff, yOff, w, 1, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
                     }
                     x += (8 - xOff);
                 } while(x <= world.W);
@@ -335,7 +335,7 @@ namespace VIP
                         if (!chrCache[data.charNum].valid)
                             chrCache[data.charNum].LoadData(chrRam[data.charNum].data);
                         
-                        rightFrameBuffer[0].DrawCachedChr(chrCache[data.charNum], row, xPos, y + world.GY, xOff, yOff, w, 1, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
+                        rightFrameBuffer[drawingFB].DrawCachedChr(chrCache[data.charNum], row, xPos, y + world.GY, xOff, yOff, w, 1, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
                     }
                     x += (8 - xOff);
                 } while(x <= world.W);
