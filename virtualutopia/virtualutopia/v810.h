@@ -52,7 +52,6 @@ namespace CPU
         const std::string registerDescription() const;
         uint32_t cycles;
 
-        bool debugOutput;
         void fetchAndDecode();
         void bitstringDecode(const Instruction &instruction);
         void floatingPointDecode(const Instruction &instruction);

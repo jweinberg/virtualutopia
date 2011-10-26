@@ -95,14 +95,17 @@ namespace NVC
                 case 0x2000020:
                 {
                     _TCR *incomingTCR = (_TCR*)&val;
-                    if (incomingTCR->T_ENB)
-                        timerCount = internalTimerCount;
-                    
-                    TCR.T_ENB = incomingTCR->T_ENB;
-                    TCR.TIM_Z_INT = incomingTCR->TIM_Z_INT;
-                    TCR.T_CLK_SEL = incomingTCR->T_CLK_SEL;
                     if (!(TCR.T_ENB && timerCount > 0) && incomingTCR->Z_STAT_CLR)
                         TCR.Z_STAT = 0;
+                    else
+                    {
+                        if (incomingTCR->T_ENB)
+                            timerCount = internalTimerCount;                    
+                        TCR.T_ENB = incomingTCR->T_ENB;
+                    }
+                    TCR.TIM_Z_INT = incomingTCR->TIM_Z_INT;
+                    TCR.T_CLK_SEL = incomingTCR->T_CLK_SEL;
+
                     break;
                 }
                 case 0x2000024:

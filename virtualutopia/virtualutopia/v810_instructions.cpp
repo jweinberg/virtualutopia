@@ -4,6 +4,8 @@
 //
 
 #include "v810.h"
+#include <deque>
+#include <fstream>
 //#include "instruction.h"
 //#include "cpu_utils.h"
 //#include "mmu.h"
@@ -12,8 +14,18 @@
 
 #ifndef v810_instructions_guard
 #define v810_instructions_guard
+
+static std::deque<std::string> instructions;
+
+//std::ofstream outFile("/Users/jweinberg/log.asm");
+static volatile bool debugOutput = false;
+
 #define d_printf(A, ...)
-//#define d_printf(A, ...) do{ if(debugOutput) { printf("%X: " A, (0x07000000 + (uint32_t)((char*)programCounter - ((char*)memoryManagmentUnit.rom.data))), ##__VA_ARGS__); } }while(0)
+//#define d_printf(A, ...) do{ if(debugOutput) {\
+    char buffer[255];\
+    sprintf(buffer, "%X: " A, (0x07000000 + (uint32_t)((char*)programCounter - ((char*)memoryManagmentUnit.rom.data))), ##__VA_ARGS__);\
+    outFile << buffer;\
+} }while(0)
 
 struct OrNoter
 {
@@ -194,7 +206,7 @@ void CPU::v810::divide(uint8_t reg1, uint8_t reg2)
     generalRegisters[30] = b % a;
     generalRegisters[reg2] = result;
     
-    systemRegisters.PSW.OV = (b == 0x80000000 && a == 0xFFFFFFF) ? 1 : 0;
+    systemRegisters.PSW.OV = (b == 0x80000000 && a == 0xFFFFFFFF) ? 1 : 0;
     systemRegisters.PSW.S = (result < 0) ? 1 : 0;
     systemRegisters.PSW.Z = (result == 0) ? 1 : 0;
     
@@ -232,10 +244,10 @@ void CPU::v810::multiply(uint8_t reg1, uint8_t reg2)
     d_printf("MUL: GR[%d] <- GR[%d](0x%X) * GR[%d](0x%X)\n", reg2, reg2, generalRegisters[reg2], reg1, generalRegisters[reg1]);
     int32_t a = generalRegisters[reg1];
     int32_t b = generalRegisters[reg2];
-    int64_t result = b * a;
+    int64_t result = a * b;
     
     generalRegisters[30] = (int32_t)(result >> 32);
-    generalRegisters[reg2] = (int32_t)(result & 0xFFFFFFFF);
+    generalRegisters[reg2] = (int32_t)result;
     
     systemRegisters.PSW.OV = (generalRegisters[30] == 0) ? 0 : 1;
     systemRegisters.PSW.S = (generalRegisters[reg2] < 0) ? 1 : 0;

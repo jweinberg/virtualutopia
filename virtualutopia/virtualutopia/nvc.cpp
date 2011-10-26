@@ -106,11 +106,12 @@ void NVC::NVC::Step(uint32_t cycles)
             lastTimer=cycles;
             if (timerCount == 0) 
             {
-                timerCount = internalTimerCount; //reset counter
+                //timerCount = internalTimerCount; //reset counter
                 
                 TCR.Z_STAT = 1;
                 if (TCR.TIM_Z_INT)
                     cpu->processInterrupt(CPU::INTTIM);
+                TCR.T_ENB = 0;
             }
         }
     }

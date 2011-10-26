@@ -21,16 +21,16 @@
         return (a < b) ? b : a;
     }
 
-    inline int sign(int32_t v)
+    inline uint8_t sign(int32_t v)
     {
-        return (v >> 31);
+        return ((uint32_t)v >> 31);
     }
     
 int32_t sign_extend(int bits, uint32_t rawValue);
 
     inline bool calculate_overflow_subtract(int32_t a, int32_t b)
     {
-        int32_t result = b - a;
+        uint32_t result = b - a;
         if (sign(b) == 1 && sign(a) == 0 && sign(result) == 0)
             return true;
         if (sign(b) == 0 && sign(a) == 1 && sign(result) == 1)

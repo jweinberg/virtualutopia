@@ -25,7 +25,6 @@ namespace CPU
 {
     v810::v810(MMU &_mmu, VIP::VIP &_vip, NVC::NVC &_nvc, VSU::VSU &_vsu) : memoryManagmentUnit(_mmu), vip(_vip), nvc(_nvc), vsu(_vsu)
     {
-        debugOutput = false;
         systemRegisters.TKCW = 0x000000E0;
         systemRegisters.PIR = 0x00005346;
     }
@@ -295,11 +294,12 @@ namespace CPU
     {    
         //Some instructions think its FUNNY to assign to reg 0 as an optimization
         generalRegisters[0] = 0;   
-//        nvc.SCR.STAT = 1;
-//        nvc.SDHR.STA = 1;
-//        
+        
         nvc.Step(cycles);
         vip.Step(cycles);
+        
+        if (vip.INTENB & vip.INTPND)
+            processInterrupt(INTVPU);
         
         fetchAndDecode();
     }
@@ -310,6 +310,31 @@ namespace CPU
         if (systemRegisters.PSW.EP) return;
         if (systemRegisters.PSW.ID) return;
         if (systemRegisters.PSW.IntLevel > interruptCode) return;
+        
+        
+//        printf("Proccessing interrupt:\n");
+//        switch (interruptCode)
+//        {
+//            case INTKEY:
+//                printf("\tINTKEY\n");
+//                break;
+//            case INTTIM:
+//                printf("\tINTTIM\n");
+//                break;
+//            case INTVPU:                
+//                printf("\tINTVPU:\n"
+//                       "\t\tSCANERR: %d\n"
+//                       "\t\tLFBEND: %d\n"
+//                       "\t\tRFBEND: %d\n"
+//                       "\t\tGAMESTART: %d\n"
+//                       "\t\tFRAMESTART: %d\n"
+//                       "\t\tSBHIT: %d\n"
+//                       "\t\tXPEND: %d\n"
+//                       "\t\tTIMERR: %d\n",vip.INTPND.SCANERR, vip.INTPND.LFBEND, vip.INTPND.RFBEND, vip.INTPND.GAMESTART, vip.INTPND.FRAMESTART, vip.INTPND.SBHIT, vip.INTPND.XPEND, vip.INTPND.TIMERR);
+//                break;
+//            default:
+//                break;
+//        }
         
         systemRegisters.EIPC = (0x07000000 + (uint32_t)(programCounter - memoryManagmentUnit.rom.data));
         systemRegisters.EIPSW = systemRegisters.PSW;

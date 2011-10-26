@@ -21,10 +21,12 @@ namespace VIP
         DPSTTS = 0;
         XPSTTS = 0;
         
+        INTPND = 0;
+        INTENB = 0;
+        
         sbOutResetTime = -1;
         column = 0;
         columnCounter = 259;
-        
     }
     
     void VIP::DumpCHR()
@@ -416,6 +418,7 @@ namespace VIP
                 drawingCounter -= chunk_clocks;
                 if (drawingCounter <= 0)
                 {
+                    
                     Draw(rowCount);
                     
                     if (DPSTTS.DISP)
@@ -456,7 +459,10 @@ namespace VIP
                     
                     sbOutResetTime = running_timestamp + 1120;
                     XPSTTS.SBCOUNT = rowCount;
-                    
+                    if (rowCount == XPCTRL.SBCMP)
+                    {
+                        INTPND.SBHIT |= true;
+                    }
                     rowCount++;
                     if(rowCount == 28)
                     {
@@ -464,8 +470,6 @@ namespace VIP
                         XPSTTS.XPBSY = 0;
                         INTPND.XPEND |= 1;
                         DPSTTS.FCLK = 0;
-                        if (INTENB.XPEND)
-                            cpu->processInterrupt(CPU::INTVPU);
                     }
                     else
                         drawingCounter += 1120 * 4;
@@ -504,15 +508,10 @@ namespace VIP
                             if (displayRegion & 2)	// finished displaying right eye
                             {
                                 INTPND.RFBEND |= 1;
-                                if (INTENB.RFBEND)
-                                    cpu->processInterrupt(CPU::INTVPU);
                             }
                             else		// Otherwise, left eye
                             {
                                 INTPND.LFBEND |= 1;
-                                if (INTENB.LFBEND)
-                                    cpu->processInterrupt(CPU::INTVPU);
-
                             }
                         }
                     }
@@ -526,17 +525,13 @@ namespace VIP
                         if (DPSTTS.DISP)
                         {                            
                             INTPND.FRAMESTART |= 1;
-                            if (INTENB.FRAMESTART)
-                                cpu->processInterrupt(CPU::INTVPU);
                         }
                         frame++;
                         if(frame > FRMCYC) // New game frame start?
                         {
                             
-                            INTPND.GAMESTART |= 1;
-                            if (INTENB.GAMESTART)
-                                cpu->processInterrupt(CPU::INTVPU);
-                            
+                            INTPND.GAMESTART |= 1;                               
+
                             if (XPSTTS.XPEN)
                             {
                                 displayFB ^= 1;
