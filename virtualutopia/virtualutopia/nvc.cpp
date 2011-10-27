@@ -18,6 +18,7 @@ void NVC::NVC::Reset()
     TCR = 0;
     THR = 0xFF;
     TLR = 0xFF;
+    lastTimer = 0;
 }
 
 void NVC::NVC::ApplyReadWait(uint32_t address)
@@ -106,12 +107,12 @@ void NVC::NVC::Step(uint32_t cycles)
             lastTimer=cycles;
             if (timerCount == 0) 
             {
-                //timerCount = internalTimerCount; //reset counter
+                timerCount = internalTimerCount; //reset counter
                 
                 TCR.Z_STAT = 1;
                 if (TCR.TIM_Z_INT)
                     cpu->processInterrupt(CPU::INTTIM);
-                TCR.T_ENB = 0;
+                //TCR.T_ENB = 0;
             }
         }
     }

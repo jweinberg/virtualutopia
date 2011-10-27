@@ -12,6 +12,9 @@
 #include <iterator>
 #include "vsu.h"
 
+std::ofstream outFile("/Users/jweinberg/log.asm");
+volatile bool debugOutput = false;
+
 int32_t sign_extend(int bits, uint32_t rawValue)
 {
     bits -= 1;
@@ -34,11 +37,17 @@ namespace CPU
         programCounter = &memoryManagmentUnit.read<char>(0xFFFFFFF0);
         systemRegisters.PSW = 0x00008000;
         generalRegisters[0] = 0;
+        cycles = 0;
         nvc.Reset();
     }
     
     void v810::fetchAndDecode()
     {
+        
+        uint32_t address =  (0x07000000 + (uint32_t)((char*)programCounter - ((char*)memoryManagmentUnit.rom.data)));
+        if (address == 0x7001410)
+            debugOutput = true;
+//        
         const uint16_t& partialDecode = *(uint16_t*)programCounter;
         OpcodeMnumonic opcode;
         uint8_t arg1, arg2;
@@ -295,12 +304,12 @@ namespace CPU
         //Some instructions think its FUNNY to assign to reg 0 as an optimization
         generalRegisters[0] = 0;   
         
-        nvc.Step(cycles);
         vip.Step(cycles);
-        
-        if (vip.INTENB & vip.INTPND)
-            processInterrupt(INTVPU);
-        
+        nvc.Step(cycles);
+//        
+//        if (vip.INTENB & vip.INTPND)
+//            processInterrupt(INTVPU);
+//        
         fetchAndDecode();
     }
     
@@ -312,29 +321,29 @@ namespace CPU
         if (systemRegisters.PSW.IntLevel > interruptCode) return;
         
         
-//        printf("Proccessing interrupt:\n");
-//        switch (interruptCode)
-//        {
-//            case INTKEY:
-//                printf("\tINTKEY\n");
-//                break;
-//            case INTTIM:
-//                printf("\tINTTIM\n");
-//                break;
-//            case INTVPU:                
-//                printf("\tINTVPU:\n"
-//                       "\t\tSCANERR: %d\n"
-//                       "\t\tLFBEND: %d\n"
-//                       "\t\tRFBEND: %d\n"
-//                       "\t\tGAMESTART: %d\n"
-//                       "\t\tFRAMESTART: %d\n"
-//                       "\t\tSBHIT: %d\n"
-//                       "\t\tXPEND: %d\n"
-//                       "\t\tTIMERR: %d\n",vip.INTPND.SCANERR, vip.INTPND.LFBEND, vip.INTPND.RFBEND, vip.INTPND.GAMESTART, vip.INTPND.FRAMESTART, vip.INTPND.SBHIT, vip.INTPND.XPEND, vip.INTPND.TIMERR);
-//                break;
-//            default:
-//                break;
-//        }
+        d_printf("Proccessing interrupt:\n");
+        switch (interruptCode)
+        {
+            case INTKEY:
+                d_printf("\tINTKEY\n");
+                break;
+            case INTTIM:
+                d_printf("\tINTTIM\n");
+                break;
+            case INTVPU:                
+                d_printf("\tINTVPU:\n"
+                       "\t\tSCANERR: %d\n"
+                       "\t\tLFBEND: %d\n"
+                       "\t\tRFBEND: %d\n"
+                       "\t\tGAMESTART: %d\n"
+                       "\t\tFRAMESTART: %d\n"
+                       "\t\tSBHIT: %d\n"
+                       "\t\tXPEND: %d\n"
+                       "\t\tTIMERR: %d\n",vip.INTPND.SCANERR, vip.INTPND.LFBEND, vip.INTPND.RFBEND, vip.INTPND.GAMESTART, vip.INTPND.FRAMESTART, vip.INTPND.SBHIT, vip.INTPND.XPEND, vip.INTPND.TIMERR);
+                break;
+            default:
+                break;
+        }
         
         systemRegisters.EIPC = (0x07000000 + (uint32_t)(programCounter - memoryManagmentUnit.rom.data));
         systemRegisters.EIPSW = systemRegisters.PSW;

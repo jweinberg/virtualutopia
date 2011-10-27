@@ -15,17 +15,8 @@
 #ifndef v810_instructions_guard
 #define v810_instructions_guard
 
-static std::deque<std::string> instructions;
-
-//std::ofstream outFile("/Users/jweinberg/log.asm");
-static volatile bool debugOutput = false;
-
-#define d_printf(A, ...)
-//#define d_printf(A, ...) do{ if(debugOutput) {\
-    char buffer[255];\
-    sprintf(buffer, "%X: " A, (0x07000000 + (uint32_t)((char*)programCounter - ((char*)memoryManagmentUnit.rom.data))), ##__VA_ARGS__);\
-    outFile << buffer;\
-} }while(0)
+#undef d_printf
+#define d_printf(A, ...) 
 
 struct OrNoter
 {
@@ -120,7 +111,7 @@ void CPU::v810::add(uint8_t reg1, uint8_t reg2)
     int32_t a = generalRegisters[reg1];
     int32_t b = generalRegisters[reg2];
     int64_t r = a+b;
-    int32_t truncatedResult = (int32_t)r;
+    int32_t truncatedResult = r & 0xFFFFFFFF;
     generalRegisters[reg2] = truncatedResult;           
     
     systemRegisters.PSW.OV = (sign(a) == sign(b)) ? (sign(truncatedResult) != sign(a)) : 0;
@@ -139,7 +130,7 @@ void CPU::v810::addImmediate5(uint8_t imm5, uint8_t reg2)
     int32_t a = sign_extend(5, imm5);
     int32_t b = generalRegisters[reg2];
     int64_t r = a+b;
-    int32_t truncatedResult = (int32_t)r;
+    int32_t truncatedResult = r & 0xFFFFFFFF;
     generalRegisters[reg2] = truncatedResult;           
     
     systemRegisters.PSW.OV = (sign(a) == sign(b)) ? (sign(truncatedResult) != sign(a)) : 0;
@@ -159,7 +150,7 @@ void CPU::v810::addImmediate(uint8_t reg1, uint8_t reg2, int16_t imm16)
     int32_t a = sign_extend(16, imm16);
     int32_t b = generalRegisters[reg1];
     int64_t r = a+b;
-    int32_t truncatedResult = (int32_t)r;
+    int32_t truncatedResult = r & 0xFFFFFFFF;
     generalRegisters[reg2] = truncatedResult;           
     
     systemRegisters.PSW.OV = (sign(a) == sign(b)) ? (sign(truncatedResult) != sign(a)) : 0;
@@ -844,7 +835,8 @@ void CPU::v810::storeByte(uint8_t reg1, uint8_t reg2, uint16_t disp16)
     uint32_t address = (generalRegisters[reg1] + (int16_t)disp16);
     d_printf("ST.B: [GR[%d](0x%X) + %d](0x%X) <- [GR[%d](0x%X)\n", reg1, generalRegisters[reg1], sign_extend(16, disp16), address, reg2, generalRegisters[reg2]);
 
-
+//    if (address == 0x5004194)
+//        printf("Writing %d val\n", generalRegisters[reg2] & 0xFF);
     memoryManagmentUnit.store<uint8_t>(generalRegisters[reg2] & 0xFF, address);
     programCounter += 4;
     cycles += 1;
@@ -855,7 +847,12 @@ void CPU::v810::loadByte(uint8_t reg1, uint8_t reg2, uint16_t disp16)
     d_printf("LD.B: GR[%d] <- [GR[%d](0x%X) + %d\n", reg2, reg1, generalRegisters[reg1], sign_extend(16, disp16));
 
     uint32_t address = (generalRegisters[reg1] + (int16_t)disp16);
-    generalRegisters[reg2] = sign_extend(8, memoryManagmentUnit.read<int8_t>(address));
+    
+    int8_t val = memoryManagmentUnit.read<int8_t>(address);
+//    if (address == 0x5004194)
+//        printf("Reading %d val\n", val);
+    
+    generalRegisters[reg2] = sign_extend(8, val);
     programCounter += 4;    
     cycles += 3;
 }

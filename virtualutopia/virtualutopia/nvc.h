@@ -185,8 +185,8 @@ namespace NVC
         {
             struct
             {
-                uint8_t internalTHR;
                 uint8_t internalTLR;
+                uint8_t internalTHR;
             };
             uint16_t internalTimerCount;
         };

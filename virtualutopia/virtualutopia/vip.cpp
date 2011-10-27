@@ -21,12 +21,10 @@ namespace VIP
         DPSTTS = 0;
         XPSTTS = 0;
         
-        INTPND = 0;
-        INTENB = 0;
-        
         sbOutResetTime = -1;
         column = 0;
         columnCounter = 259;
+        
     }
     
     void VIP::DumpCHR()
@@ -59,8 +57,8 @@ namespace VIP
                 
                 *(bmpdata + (8 * y + x)) = pixel;
                 
-          }
-          internalData++;
+            }
+            internalData++;
         }
         
         CGContextRef context = CGBitmapContextCreate(bmpdata,
@@ -92,23 +90,23 @@ namespace VIP
     void VIP::DrawObj(const Obj &obj, int row)
     {
         int h = 8;
-    //    int w = 8;
+        //    int w = 8;
         
         int topInset = (row * 8) - (obj.JY + h);
         int bottomInset = ((row * 8) + 8) - obj.JY;
         
         if (topInset >= 0)
             return;
-            
+        
         if (bottomInset < 0)
             return;
-
+        
         if (obj.JLON)
         {
             int x = obj.JX - obj.JP;
             if (x + 8 < 0 || x >= 384)
                 return;
-
+            
             if (!chrCache[obj.JCA].valid)
                 chrCache[obj.JCA].LoadData(chrRam[obj.JCA].data);
             leftFrameBuffer[drawingFB].DrawCachedChr(chrCache[obj.JCA], row, obj.JX - obj.JP, obj.JY, 0, 0, 8, 8, obj.JHFLP, obj.JVFLP, JPLT[obj.JPLTS]);
@@ -123,7 +121,7 @@ namespace VIP
                 chrCache[obj.JCA].LoadData(chrRam[obj.JCA].data);
             rightFrameBuffer[drawingFB].DrawCachedChr(chrCache[obj.JCA], row, obj.JX + obj.JP, obj.JY, 0, 0, 8, 8, obj.JHFLP, obj.JVFLP, JPLT[obj.JPLTS]);
         }
-            
+        
     }
     
     void VIP::DrawNormalWorld(int row, const World &world)
@@ -138,7 +136,7 @@ namespace VIP
         {   
             int srcY = (y + world.MY);
             int yOff = srcY & 7;
-
+            
             mapLookup.SetY(srcY);
             
             int h = 8 - yOff;
@@ -151,7 +149,7 @@ namespace VIP
                 {
                     int srcX = (x + world.MX - world.MP);
                     int xOff = srcX & 7;
-
+                    
                     mapLookup.SetX(srcX);
                     
                     int w = 8 - xOff;
@@ -161,10 +159,10 @@ namespace VIP
                     if (!(xPos + w < 0 || xPos >= 384))
                     {
                         const BGMapData& data = mapLookup.GetMapData();
-
+                        
                         if (!chrCache[data.charNum].valid)
                             chrCache[data.charNum].LoadData(chrRam[data.charNum].data);
-                       leftFrameBuffer[drawingFB].DrawCachedChr(chrCache[data.charNum], row, xPos, y + world.GY, xOff, yOff, w, h, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
+                        leftFrameBuffer[drawingFB].DrawCachedChr(chrCache[data.charNum], row, xPos, y + world.GY, xOff, yOff, w, h, data.BHFLP, data.BVFLP, GPLT[data.GPLTS]);
                     }
                     x += (8 - xOff);
                 } while(x <= world.W);
@@ -177,7 +175,7 @@ namespace VIP
                 {
                     int srcX = (x + world.MX + world.MP);
                     int xOff = srcX & 7;
-
+                    
                     mapLookup.SetX(srcX);
                     
                     int w = 8 - xOff;
@@ -228,9 +226,9 @@ namespace VIP
                     if (!(xPos < 0 || xPos >= 384))
                     {
                         int srcX = (Fixed16x16(affineTable.MX) + (Fixed16x16(affineTable.DX) * (((int64_t)(x + leftParalax)) << 16)));
-
+                        
                         mapLookup.SetX(srcX);
-                            
+                        
                         uint8_t xOff = srcX & 7;
                         
                         const BGMapData &data = mapLookup.GetMapData();
@@ -296,7 +294,7 @@ namespace VIP
                 do
                 {
                     int srcX = (x + world.MX - world.MP + hBiasTable.HOFSTL);
-
+                    
                     mapLookup.SetX(srcX);
                     int xOff = srcX & 7;
                     
@@ -322,7 +320,7 @@ namespace VIP
                 do
                 {
                     int srcX = (x + world.MX + world.MP + hBiasTable.HOFSTR);
-
+                    
                     mapLookup.SetX(srcX);
                     int xOff = srcX & 7;
                     
@@ -367,8 +365,8 @@ namespace VIP
                     stopIndex = 0;
                 for (int objIdx = objControl[objSearchIndex].SPT; objIdx >= stopIndex; --objIdx)
                 {
-                     if (test ? testVal == n : true)
-                         DrawObj(oam[objIdx], row);
+                    if (test ? testVal == n : true)
+                        DrawObj(oam[objIdx], row);
                 }
                 if (objSearchIndex)
                     objSearchIndex--;   
@@ -418,7 +416,6 @@ namespace VIP
                 drawingCounter -= chunk_clocks;
                 if (drawingCounter <= 0)
                 {
-                    
                     Draw(rowCount);
                     
                     if (DPSTTS.DISP)
@@ -459,10 +456,7 @@ namespace VIP
                     
                     sbOutResetTime = running_timestamp + 1120;
                     XPSTTS.SBCOUNT = rowCount;
-                    if (rowCount == XPCTRL.SBCMP)
-                    {
-                        INTPND.SBHIT |= true;
-                    }
+                    
                     rowCount++;
                     if(rowCount == 28)
                     {
@@ -470,6 +464,8 @@ namespace VIP
                         XPSTTS.XPBSY = 0;
                         INTPND.XPEND |= 1;
                         DPSTTS.FCLK = 0;
+                        if (INTENB.XPEND)
+                            cpu->processInterrupt(CPU::INTVPU);
                     }
                     else
                         drawingCounter += 1120 * 4;
@@ -483,16 +479,16 @@ namespace VIP
                 {
                     if (!(column & 3))
                     {
-//                        const int lr = (displayRegion & 2) >> 1;
-//                        uint16 ctdata = VIP_MA16R16(DRAM, 0x1DFFE - ((Column >> 2) * 2) - (lr ? 0 : 0x200));
-//                        
-//                        if((ctdata >> 8) != Repeat)
-//                        {
-//                            Repeat = ctdata >> 8;
-//                            RecalcBrightnessCache();
-//                        }
+                        //                        const int lr = (displayRegion & 2) >> 1;
+                        //                        uint16 ctdata = VIP_MA16R16(DRAM, 0x1DFFE - ((Column >> 2) * 2) - (lr ? 0 : 0x200));
+                        //                        
+                        //                        if((ctdata >> 8) != Repeat)
+                        //                        {
+                        //                            Repeat = ctdata >> 8;
+                        //                            RecalcBrightnessCache();
+                        //                        }
                     }
-//                    CopyFBColumnToTarget();
+                    //                    CopyFBColumnToTarget();
                 }
                 
                 columnCounter = 259;
@@ -508,10 +504,15 @@ namespace VIP
                             if (displayRegion & 2)	// finished displaying right eye
                             {
                                 INTPND.RFBEND |= 1;
+                                if (INTENB.RFBEND)
+                                    cpu->processInterrupt(CPU::INTVPU);
                             }
                             else		// Otherwise, left eye
                             {
                                 INTPND.LFBEND |= 1;
+                                if (INTENB.LFBEND)
+                                    cpu->processInterrupt(CPU::INTVPU);
+                                
                             }
                         }
                     }
@@ -521,28 +522,31 @@ namespace VIP
                     if (displayRegion == 0)	// New frame start
                     {
                         DPSTTS.FCLK = 1;
-                        
-                        if (DPSTTS.DISP)
-                        {                            
-                            INTPND.FRAMESTART |= 1;
-                        }
+                    
+                        INTPND.FRAMESTART |= 1;
+                        if (INTENB.FRAMESTART)
+                            cpu->processInterrupt(CPU::INTVPU);
                         frame++;
                         if(frame > FRMCYC) // New game frame start?
                         {
                             
-                            INTPND.GAMESTART |= 1;                               
+                            INTPND.GAMESTART |= 1;
+                            if (INTENB.GAMESTART)
+                                cpu->processInterrupt(CPU::INTVPU);
 
-                            if (XPSTTS.XPEN)
+                            rowCount = 0;
+                            drawingCounter = 1120 * 4;
+                            
+                            if (XPCTRL.XPEN)
                             {
                                 displayFB ^= 1;
-                                rowCount = 0;
+
                                 drawingActive = true;
-                                drawingCounter = 1120 * 4;
                                 drawingFB = displayFB ^ 1;
                                 memset((char*)&rightFrameBuffer[drawingFB], 0, 0x6000);
                                 memset((char*)&leftFrameBuffer[drawingFB], 0, 0x6000);
                                 
-
+                                
                                 XPSTTS.XPBSY = 1 + drawingFB;
                             }
                             
@@ -550,7 +554,7 @@ namespace VIP
                         }
                         
                         break;
-//                        VB_ExitLoop();
+                        //                        VB_ExitLoop();
                     }
                 }
             }
@@ -600,15 +604,15 @@ namespace VIP
                 framesWaited++;
                 if (framesWaited > FRMCYC) //We've triggered a GCLK
                     framesWaited = 0;
-
+                
                 INTPND.FRAMESTART |= true; //Trigger an FCLK
                 INTPND.GAMESTART |= (framesWaited == 0);
-
+                
                 if (INTENB.FRAMESTART || INTENB.GAMESTART)
                 {
                     cpu->processInterrupt(CPU::INTVPU);
                 }
-
+                
                 return 1;
             }
             
@@ -690,7 +694,7 @@ namespace VIP
                 XPSTTS = 0;
                 XPSTTS.SBCOUNT = 27;
                 XPSTTS.XPEN = XPCTRL.XPEN;
-             
+                
                 INTPND.XPEND |= true;
                 if (INTENB.XPEND) cpu->processInterrupt(CPU::INTVPU);
                 
@@ -708,7 +712,7 @@ namespace VIP
                 
                 INTPND.LFBEND |= true;                
                 if (INTENB.LFBEND) cpu->processInterrupt(CPU::INTVPU);
-
+                
                 rowCount++;
             }
             else if (rowCount == 30 && timeSinceBuffer > 131072)
@@ -723,7 +727,7 @@ namespace VIP
                 
                 INTPND.RFBEND |= true;
                 if (INTENB.RFBEND) cpu->processInterrupt(CPU::INTVPU);
-
+                
                 rowCount++;
             }
             else if (rowCount == 31 && timeSinceBuffer > 163840)
@@ -761,6 +765,6 @@ namespace VIP
             }
         }
         return 0;
-
+        
     }
 }
