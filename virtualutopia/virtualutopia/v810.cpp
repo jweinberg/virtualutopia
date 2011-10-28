@@ -12,7 +12,7 @@
 #include <iterator>
 #include "vsu.h"
 
-std::ofstream outFile("/Users/jweinberg/log.asm");
+//std::ofstream outFile("/Users/jweinberg/log.asm");
 volatile bool debugOutput = false;
 
 int32_t sign_extend(int bits, uint32_t rawValue)
@@ -44,10 +44,10 @@ namespace CPU
     void v810::fetchAndDecode()
     {
         
-        uint32_t address =  (0x07000000 + (uint32_t)((char*)programCounter - ((char*)memoryManagmentUnit.rom.data)));
-        if (address == 0x7001410)
-            debugOutput = true;
-//        
+//        uint32_t address =  (0x07000000 + (uint32_t)((char*)programCounter - ((char*)memoryManagmentUnit.rom.data)));
+//        if (address == 0x070000E0)
+//            debugOutput = true;
+////        
         const uint16_t& partialDecode = *(uint16_t*)programCounter;
         OpcodeMnumonic opcode;
         uint8_t arg1, arg2;
@@ -304,8 +304,8 @@ namespace CPU
         //Some instructions think its FUNNY to assign to reg 0 as an optimization
         generalRegisters[0] = 0;   
         
-        vip.Step(cycles);
         nvc.Step(cycles);
+        vip.Step(cycles);
 //        
 //        if (vip.INTENB & vip.INTPND)
 //            processInterrupt(INTVPU);

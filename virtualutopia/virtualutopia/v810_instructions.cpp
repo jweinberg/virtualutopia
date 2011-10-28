@@ -15,8 +15,8 @@
 #ifndef v810_instructions_guard
 #define v810_instructions_guard
 
-#undef d_printf
-#define d_printf(A, ...) 
+//#undef d_printf
+//#define d_printf(A, ...) 
 
 struct OrNoter
 {
