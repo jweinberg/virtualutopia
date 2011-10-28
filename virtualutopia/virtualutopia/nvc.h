@@ -17,8 +17,31 @@ namespace CPU
     class v810;
 }
 
+
+
 namespace NVC 
 {
+    enum Button
+    {
+        PWR,
+        SGN,
+        A,
+        B,
+        RT,
+        LT,
+        RU,
+        RR,
+        LR,
+        LL,
+        LD,
+        LU,
+        STA,
+        SELECT,
+        RL,
+        RD,
+        INVALID,
+    };
+    
     class NVC
     {
     public:
@@ -27,10 +50,16 @@ namespace NVC
         }
         void Reset();
         CPU::v810 *cpu;
+        int32_t readCounter;
+        int32_t lastInputUpdate;
         uint32_t lastTimer;
+        bool setKey;
+        Button currentReadButton;
         void Step(uint32_t cycles);
+        void SetButton(Button button, bool val);
         void ApplyReadWait(uint32_t address);
         void ApplyWriteWait(uint32_t address);
+        
         template <typename T>
         inline const T& read(uint32_t address) const
         {
@@ -45,9 +74,9 @@ namespace NVC
                 case 0x200000C:
                     return *((T*)&CDRR);
                 case 0x2000010:
-                    return *((T*)&SDLR);
+                    return *((T*)(((uint8_t*)&SDR_HW)));
                 case 0x2000014:
-                    return *((T*)&SDHR);
+                    return *((T*)(((uint8_t*)&SDR_HW) + 1));
                 case 0x2000018:
                     return *((T*)&TLR);
                 case 0x200001C:
@@ -81,10 +110,10 @@ namespace NVC
                     *((T*)&CDRR) = val;
                     break;
                 case 0x2000010:
-                    *((T*)&SDLR) = val;
+                    *((T*)&SDR.SDLR) = val;
                     break;
                 case 0x2000014:
-                    *((T*)&SDHR) = val;
+                    *((T*)&SDR.SDHR) = val;
                     break;
                 case 0x2000018:
                     *((T*)&internalTLR) = val;
@@ -110,42 +139,35 @@ namespace NVC
                 }
                 case 0x2000024:
                     *((T*)&WCR) = val;
+                    break;
                 case 0x2000028:
-                    *((T*)&SCR) = val;
+//                    *((T*)&SCR) = val;
+                    _SCR *incomingSCR = (_SCR*)&val;
+
+                    SCR.DIS = incomingSCR->DIS;
+                    SCR.SOFTCK = incomingSCR->SOFTCK;
+                    SCR.PARA = incomingSCR->PARA;
+                    SCR.INT = incomingSCR->INT;
+                    
+                    if (incomingSCR->HWSI && !SCR.DIS && readCounter <= 0)
+                    {
+                        SCR.STAT = true;
+                        currentReadButton = (Button)0;
+                        SDR_LATCHED = SDR_HW;
+                        readCounter = 640;
+                    }
+                    
+                    if (incomingSCR->DIS)
+                    {
+                        readCounter = 0;
+                        currentReadButton = (Button)0;
+                    }
                     break;
                 //default:
                  //   assert(false);
             }
         }
-        
-        inline char &operator[](uint32_t address) const
-        {
-            switch (address)
-            {
-                case 0x2000000:
-                    return *((char*)&CCR);
-                case 0x2000004:
-                    return *((char*)&CCSR);
-                case 0x2000008:
-                    return *((char*)&CDTR);
-                case 0x200000C:
-                    return *((char*)&CDRR);
-                case 0x2000010:
-                    return *((char*)&SDLR);
-                case 0x2000014:
-                    return *((char*)&SDHR);
-                case 0x2000018:
-                    return *((char*)&TLR);
-                case 0x200001C:
-                    return *((char*)&THR);
-                case 0x2000020:
-                    return *((char*)&TCR);
-                case 0x2000028:
-                default:
-                    return *((char*)&SCR);
-            }
-        }
-        
+                
         REGISTER_BITFIELD(SCR,
                           uint8_t DIS:1;
                           uint8_t STAT:1;
@@ -190,27 +212,34 @@ namespace NVC
             };
             uint16_t internalTimerCount;
         };
-        REGISTER_BITFIELD(SDHR,
-                          uint8_t LR:1;
-                          uint8_t LL:1;
-                          uint8_t LD:1;
-                          uint8_t LU:1;
-                          uint8_t STA:1;
-                          uint8_t SEL:1;
-                          uint8_t RL:1;
-                          uint8_t RD:1;
+
+        REGISTER_BITFIELD(SDR,
+            REGISTER_BITFIELD(SDLR,
+                              uint8_t PWR:1;
+                              uint8_t SGN:1;
+                              uint8_t A:1;
+                              uint8_t B:1;
+                              uint8_t RT:1;
+                              uint8_t LT:1;
+                              uint8_t RU:1;
+                              uint8_t RR:1;
+                              );
+            REGISTER_BITFIELD(SDHR,
+                              uint8_t LR:1;
+                              uint8_t LL:1;
+                              uint8_t LD:1;
+                              uint8_t LU:1;
+                              uint8_t STA:1;
+                              uint8_t SEL:1;
+                              uint8_t RL:1;
+                              uint8_t RD:1;
+                              );
+                          
                           );
+
+        uint16_t SDR_HW;
+        uint16_t SDR_LATCHED;
         
-        REGISTER_BITFIELD(SDLR,
-                          uint8_t PWR:1;
-                          uint8_t SGN:1;
-                          uint8_t A:1;
-                          uint8_t B:1;
-                          uint8_t RT:1;
-                          uint8_t LT:1;
-                          uint8_t RU:1;
-                          uint8_t RR:1;
-                          );
         uint8_t CDRR;
         uint8_t CDTR;
         uint8_t CCSR;

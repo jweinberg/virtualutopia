@@ -122,52 +122,50 @@
     switch (button)
     {
         case OEVBButtonLeftUp:
-            vb->nvc->SDHR.LU = 1;
+            vb->nvc->SetButton(NVC::LU, true);
             break;
         case OEVBButtonLeftDown:
-            vb->nvc->SDHR.LD = 1;
+            vb->nvc->SetButton(NVC::LD, true);
             break;
         case OEVBButtonLeftLeft:
-            vb->nvc->SDHR.LL = 1;
+            vb->nvc->SetButton(NVC::LL, true);
             break;
         case OEVBButtonLeftRight:
-            vb->nvc->SDHR.LR = 1;
+            vb->nvc->SetButton(NVC::LR, true);
             break;
         case OEVBButtonRightUp:
-            vb->nvc->SDLR.RU = 1;
+            vb->nvc->SetButton(NVC::RU, true);
             break;
         case OEVBButtonRightDown:
-            vb->nvc->SDHR.RD = 1;
+            vb->nvc->SetButton(NVC::RD, true);
             break;
         case OEVBButtonRightLeft:
-            vb->nvc->SDHR.RL = 1;
+            vb->nvc->SetButton(NVC::RL, true);
             break;
         case OEVBButtonRightRight:
-            vb->nvc->SDLR.RR = 1;
+            vb->nvc->SetButton(NVC::RR, true);
             break;
         case OEVBButtonL:
-            vb->nvc->SDLR.LT = 1;
+            vb->nvc->SetButton(NVC::LT, true);
             break;
         case OEVBButtonR:
-            vb->nvc->SDLR.RT = 1;
+            vb->nvc->SetButton(NVC::RT, true);
             break;
         case OEVBButtonA:
-            vb->nvc->SDLR.A = 1;
+            vb->nvc->SetButton(NVC::A, true);
             break;
         case OEVBButtonB:
-            vb->nvc->SDLR.B = 1;
+            vb->nvc->SetButton(NVC::B, true);
             break;
         case OEVBButtonSelect:
-            vb->nvc->SDHR.SEL = 1;
+            vb->nvc->SetButton(NVC::SELECT, true);
             break;
         case OEVBButtonStart:
-            vb->nvc->SDHR.STA = 1;
+            vb->nvc->SetButton(NVC::STA, true);
             break;
         default:
             break;
     }
-    if (!vb->nvc->SCR.INT)
-        vb->cpu->processInterrupt(CPU::INTKEY);
 }
 
 - (void)didReleaseVBButton:(OEVBButton)button
@@ -175,50 +173,50 @@
     switch (button)
     {
         case OEVBButtonLeftUp:
-            vb->nvc->SDHR.LU = 0;
+            vb->nvc->SetButton(NVC::LU, false);
             break;
         case OEVBButtonLeftDown:
-            vb->nvc->SDHR.LD = 0;
+            vb->nvc->SetButton(NVC::LD, false);
             break;
         case OEVBButtonLeftLeft:
-            vb->nvc->SDHR.LL = 0;
+            vb->nvc->SetButton(NVC::LL, false);
             break;
         case OEVBButtonLeftRight:
-            vb->nvc->SDHR.LR = 0;
+            vb->nvc->SetButton(NVC::LR, false);
             break;
         case OEVBButtonRightUp:
-            vb->nvc->SDLR.RU = 0;
+            vb->nvc->SetButton(NVC::RU, false);
             break;
         case OEVBButtonRightDown:
-            vb->nvc->SDHR.RD = 0;
+            vb->nvc->SetButton(NVC::RD, false);
             break;
         case OEVBButtonRightLeft:
-            vb->nvc->SDHR.RL = 0;
+            vb->nvc->SetButton(NVC::RL, false);
             break;
         case OEVBButtonRightRight:
-            vb->nvc->SDLR.RR = 0;
+            vb->nvc->SetButton(NVC::RR, false);
             break;
         case OEVBButtonL:
-            vb->nvc->SDLR.LT = 0;
+            vb->nvc->SetButton(NVC::LT, false);
             break;
         case OEVBButtonR:
-            vb->nvc->SDLR.RT = 0;
+            vb->nvc->SetButton(NVC::RT, false);
             break;
         case OEVBButtonA:
-            vb->nvc->SDLR.A = 0;
+            vb->nvc->SetButton(NVC::A, false);
             break;
         case OEVBButtonB:
-            vb->nvc->SDLR.B = 0;
+            vb->nvc->SetButton(NVC::B, false);
             break;
         case OEVBButtonSelect:
-            vb->nvc->SDHR.SEL = 0;
+            vb->nvc->SetButton(NVC::SELECT, false);
             break;
         case OEVBButtonStart:
-            vb->nvc->SDHR.STA = 0;
+            vb->nvc->SetButton(NVC::STA, false);
             break;
         default:
             break;
-    }   
+    }
 }
 
 @end
