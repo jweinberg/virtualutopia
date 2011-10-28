@@ -168,6 +168,8 @@ namespace VIP
                     return *(((char*)&GPLT[0]) + (offset - 0x5F860));
                 case 0x5F868 ... 0x5F86E:
                     return *(((char*)&JPLT[0]) + (offset - 0x5F868));
+                case 0x5F870:
+                    return *(char*)&BKCOL;
                 case 0x78000 ... 0x7FFFF:
                     return *(((char*)&chrRam[0]) + (offset - 0x78000));
                 default:

@@ -526,6 +526,7 @@ namespace VIP
                         INTPND.FRAMESTART |= 1;
                         if (INTENB.FRAMESTART)
                             cpu->processInterrupt(CPU::INTVPU);
+
                         frame++;
                         if(frame > FRMCYC) // New game frame start?
                         {
@@ -543,10 +544,10 @@ namespace VIP
 
                                 drawingActive = true;
                                 drawingFB = displayFB ^ 1;
-                                memset((char*)&rightFrameBuffer[drawingFB], 0, 0x6000);
-                                memset((char*)&leftFrameBuffer[drawingFB], 0, 0x6000);
+                                char col = (BKCOL & 3) | (BKCOL & 3) << 2 |  (BKCOL & 3) << 4 |  (BKCOL & 3) << 6 ;
                                 
-                                
+                                memset((char*)&rightFrameBuffer[drawingFB], col, 0x6000);
+                                memset((char*)&leftFrameBuffer[drawingFB], col, 0x6000);
                                 XPSTTS.XPBSY = 1 + drawingFB;
                             }
                             
