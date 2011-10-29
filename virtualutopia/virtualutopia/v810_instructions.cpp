@@ -842,6 +842,40 @@ void CPU::v810::storeByte(uint8_t reg1, uint8_t reg2, uint16_t disp16)
     cycles += 1;
 }
 
+void CPU::v810::outWord(uint8_t reg1, uint8_t reg2, uint16_t disp16)
+{
+    uint32_t address = (generalRegisters[reg1] + (int16_t)disp16) & 0xFFFFFFFC;
+    d_printf("OUT.W: [GR[%d](0x%X) + %d](0x%X) <- [GR[%d](0x%X)\n", reg1, generalRegisters[reg1], sign_extend(16, disp16) & 0xFFFFFFFC, address, reg2, generalRegisters[reg2]);
+    
+    memoryManagmentUnit.store<uint32_t>(generalRegisters[reg2], address);
+    programCounter += 4;
+    cycles += 1;
+}
+
+void CPU::v810::outHWord(uint8_t reg1, uint8_t reg2, uint16_t disp16)
+{
+    uint32_t address = (generalRegisters[reg1] + (int16_t)disp16) & 0xFFFFFFFE;
+    d_printf("OUT.H: [GR[%d](0x%X) + %d](0x%X) <- [GR[%d](0x%X)\n", reg1, generalRegisters[reg1], sign_extend(16, disp16) & 0xFFFFFFFE, address, reg2, generalRegisters[reg2]);
+    
+    
+    memoryManagmentUnit.store<uint16_t>(generalRegisters[reg2] & 0xFFFF, address);
+    programCounter += 4;
+    cycles += 1;
+}
+
+void CPU::v810::outByte(uint8_t reg1, uint8_t reg2, uint16_t disp16)
+{
+    uint32_t address = (generalRegisters[reg1] + (int16_t)disp16);
+    d_printf("OUT.B: [GR[%d](0x%X) + %d](0x%X) <- [GR[%d](0x%X)\n", reg1, generalRegisters[reg1], sign_extend(16, disp16), address, reg2, generalRegisters[reg2]);
+    
+    //    if (address == 0x5004194)
+    //        printf("Writing %d val\n", generalRegisters[reg2] & 0xFF);
+    memoryManagmentUnit.store<uint8_t>(generalRegisters[reg2] & 0xFF, address);
+    programCounter += 4;
+    cycles += 1;
+}
+
+
 void CPU::v810::loadByte(uint8_t reg1, uint8_t reg2, uint16_t disp16)
 {
     d_printf("LD.B: GR[%d] <- [GR[%d](0x%X) + %d\n", reg2, reg1, generalRegisters[reg1], sign_extend(16, disp16));
@@ -874,6 +908,42 @@ void CPU::v810::loadWord(uint8_t reg1, uint8_t reg2, uint16_t disp16)
     d_printf("LD.W: GR[%d] <- [GR[%d](0x%X) + %d\n", reg2, reg1, generalRegisters[reg1], sign_extend(16, disp16));
     
     generalRegisters[reg2] = memoryManagmentUnit.read<int32_t>(address);
+    programCounter += 4;    
+    cycles += 3;
+}
+
+void CPU::v810::inByte(uint8_t reg1, uint8_t reg2, uint16_t disp16)
+{
+    d_printf("IN.B: GR[%d] <- [GR[%d](0x%X) + %d\n", reg2, reg1, generalRegisters[reg1], sign_extend(16, disp16));
+    
+    uint32_t address = (generalRegisters[reg1] + (int16_t)disp16);
+    
+    uint8_t val = memoryManagmentUnit.read<uint8_t>(address);
+    //    if (address == 0x5004194)
+    //        printf("Reading %d val\n", val);
+    
+    generalRegisters[reg2] = val;
+    programCounter += 4;    
+    cycles += 3;
+}
+
+void CPU::v810::inHWord(uint8_t reg1, uint8_t reg2, uint16_t disp16)
+{
+    uint32_t address = (generalRegisters[reg1] + (int16_t)disp16);
+    address &= 0xFFFFFFFE;
+    d_printf("IN.H: GR[%d] <- [GR[%d](0x%X) + %d\n", reg2, reg1, generalRegisters[reg1], sign_extend(16, disp16));
+    
+    generalRegisters[reg2] = memoryManagmentUnit.read<uint16_t>(address);
+    programCounter += 4;    
+    cycles += 3;
+}
+
+void CPU::v810::inWord(uint8_t reg1, uint8_t reg2, uint16_t disp16)
+{
+    uint32_t address = (generalRegisters[reg1] + (int16_t)disp16) & 0xFFFFFFFC;
+    d_printf("IN.W: GR[%d] <- [GR[%d](0x%X) + %d\n", reg2, reg1, generalRegisters[reg1], sign_extend(16, disp16));
+    
+    generalRegisters[reg2] = memoryManagmentUnit.read<uint32_t>(address);
     programCounter += 4;    
     cycles += 3;
 }

@@ -15,8 +15,8 @@
 extern std::ofstream outFile;
 extern volatile bool debugOutput;
 
-#define d_printf(A, ...)
-//#define d_printf(A, ...) do{ if(debugOutput) {\
+//#define d_printf(A, ...)
+#define d_printf(A, ...) do{ if(debugOutput) {\
 char buffer[255];\
 sprintf(buffer, "%X (%u): " A, (0x07000000 + (uint32_t)((char*)programCounter - ((char*)memoryManagmentUnit.rom.data))),cycles , ##__VA_ARGS__);\
 outFile << buffer;\
@@ -177,9 +177,16 @@ namespace CPU
         void storeWord(uint8_t reg1, uint8_t reg2, uint16_t disp16);
         void storeHWord(uint8_t reg1, uint8_t reg2, uint16_t disp16);
         void storeByte(uint8_t reg1, uint8_t reg2, uint16_t disp16);
+        void outWord(uint8_t reg1, uint8_t reg2, uint16_t disp16);
+        void outHWord(uint8_t reg1, uint8_t reg2, uint16_t disp16);
+        void outByte(uint8_t reg1, uint8_t reg2, uint16_t disp16);
         void loadByte(uint8_t reg1, uint8_t reg2, uint16_t disp16);
         void loadHWord(uint8_t reg1, uint8_t reg2, uint16_t disp16);
         void loadWord(uint8_t reg1, uint8_t reg2, uint16_t disp16);
+        void inByte(uint8_t reg1, uint8_t reg2, uint16_t disp16);
+        void inHWord(uint8_t reg1, uint8_t reg2, uint16_t disp16);
+        void inWord(uint8_t reg1, uint8_t reg2, uint16_t disp16);
+
         void loadSystemRegister(uint8_t reg1, uint8_t reg2);
         void storeSystemRegister(uint8_t reg1, uint8_t reg2);
         void jumpAndLink(uint32_t disp26);

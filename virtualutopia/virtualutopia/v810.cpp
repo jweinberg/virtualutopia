@@ -12,7 +12,7 @@
 #include <iterator>
 #include "vsu.h"
 
-//std::ofstream outFile("/Users/jweinberg/log.asm");
+std::ofstream outFile("/Users/jweinberg/log.asm");
 volatile bool debugOutput = false;
 
 int32_t sign_extend(int bits, uint32_t rawValue)
@@ -44,10 +44,10 @@ namespace CPU
     void v810::fetchAndDecode()
     {
         
-//        uint32_t address =  (0x07000000 + (uint32_t)((char*)programCounter - ((char*)memoryManagmentUnit.rom.data)));
-//        if (address == 0x070000E0)
+        uint32_t address =  (0x07000000 + (uint32_t)((char*)programCounter - ((char*)memoryManagmentUnit.rom.data)));
+//        if (address == 0x70F73B2)
 //            debugOutput = true;
-////        
+//        
         const uint16_t& partialDecode = *(uint16_t*)programCounter;
         OpcodeMnumonic opcode;
         uint8_t arg1, arg2;
@@ -82,16 +82,11 @@ namespace CPU
                 }
                 break;
             case 0xC000:
-                opcode = (OpcodeMnumonic)(partialDecode >> 10);
-                arg1 = partialDecode & 0x1F;
-                arg2 = (partialDecode >> 5) & 0x1F;
-                arg3 = *(uint16_t*)(programCounter + 2);
-                break;
             case 0xE000:
                 opcode = (OpcodeMnumonic)(partialDecode >> 10);
                 arg1 = partialDecode & 0x1F;
                 arg2 = (partialDecode >> 5) & 0x1F;
-                arg3 = (*(uint16_t*)(programCounter + 2)) >> 10;
+                arg3 = *(uint16_t*)(programCounter + 2);
                 break;
         }
         
@@ -254,15 +249,15 @@ namespace CPU
             OPCODE_DECODE_VI(ST_B, storeByte);  
             OPCODE_DECODE_VI(ST_H, storeHWord);  
             OPCODE_DECODE_VI(ST_W, storeWord);  
-            OPCODE_DECODE_VI(IN_B, outWrite);  
-            OPCODE_DECODE_VI(IN_H, outWrite);  
+            OPCODE_DECODE_VI(IN_B, inByte);
+            OPCODE_DECODE_VI(IN_H, inHWord);  
             OPCODE_DECODE_VI(CAXI, outWrite);  
-            OPCODE_DECODE_VI(IN_W, outWrite);  
-            OPCODE_DECODE_VI(OUT_B, outWrite); 
-            OPCODE_DECODE_VI(OUT_H, outWrite); 
+            OPCODE_DECODE_VI(IN_W, inWord);  
+            OPCODE_DECODE_VI(OUT_B, outByte); 
+            OPCODE_DECODE_VI(OUT_H, outHWord); 
             Fpp:
         
-                switch ((FloatingPointMnumonic)arg3)
+                switch ((FloatingPointMnumonic)(arg3 >> 10))
                 {
                     case OPCODE_DECODE_I(CMPF_S, compareFloat);
                     case OPCODE_DECODE_I(CVT_WS, convertWordToFloat);
@@ -277,7 +272,7 @@ namespace CPU
                     case OPCODE_DECODE_I(TRNC_SW, truncateFloat);
                     case OPCODE_DECODE_I(MPYHW, multiplyHalfWord);
                 }
-            OPCODE_DECODE_VI(OUT_W, outWrite);  
+            OPCODE_DECODE_VI(OUT_W, outWord); 
             OPCODE_DECODE_III(BV, branchIfOverflow);    
             OPCODE_DECODE_III(BC, branchIfCarry);    
             OPCODE_DECODE_III(BZ, branchIfZero);    
@@ -304,8 +299,8 @@ namespace CPU
         //Some instructions think its FUNNY to assign to reg 0 as an optimization
         generalRegisters[0] = 0;   
         
-        nvc.Step(cycles);
         vip.Step(cycles);
+        nvc.Step(cycles);
 //        
 //        if (vip.INTENB & vip.INTPND)
 //            processInterrupt(INTVPU);
@@ -319,7 +314,7 @@ namespace CPU
         if (systemRegisters.PSW.EP) return;
         if (systemRegisters.PSW.ID) return;
         if (systemRegisters.PSW.IntLevel > interruptCode) return;
-        
+        return;
         
         d_printf("Proccessing interrupt:\n");
         switch (interruptCode)
