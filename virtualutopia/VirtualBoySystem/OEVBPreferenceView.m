@@ -50,17 +50,20 @@
 {
     OEGameControllerView *view = (OEGameControllerView *)[self view];
     
-	[view addButtonWithName:@"OEVBButtonLeftUp[@]" label:@"L-Up:" target:self highlightPoint:NSMakePoint(113, 144)];
-	[view addButtonWithName:@"OEVBButtonLeftDown[@]" label:@"L-Down:" target:self highlightPoint:NSMakePoint(113, 59)];
-	[view addButtonWithName:@"OEVBButtonLeftLeft[@]" label:@"L-Left:" target:self highlightPoint:NSMakePoint(75, 106)];
-	[view addButtonWithName:@"OEVBButtonLeftRight[@]" label:@"L-Right:" target:self highlightPoint:NSMakePoint(152, 106)];
-
+    [view addColumnLabel:@"Left D-Pad"];
+	[view addButtonWithName:@"OEVBButtonLeftUp[@]" label:@"Up:" target:self highlightPoint:NSMakePoint(113, 144)];
+	[view addButtonWithName:@"OEVBButtonLeftDown[@]" label:@"Down:" target:self highlightPoint:NSMakePoint(113, 59)];
+	[view addButtonWithName:@"OEVBButtonLeftLeft[@]" label:@"Left:" target:self highlightPoint:NSMakePoint(75, 106)];
+	[view addButtonWithName:@"OEVBButtonLeftRight[@]" label:@"Right:" target:self highlightPoint:NSMakePoint(152, 106)];
+    [view nextColumn];
     
-    [view addButtonWithName:@"OEVBButtonRightUp[@]" label:@"R-Up:" target:self highlightPoint:NSMakePoint(113, 144)];
-	[view addButtonWithName:@"OEVBButtonRightDown[@]" label:@"R-Down:" target:self highlightPoint:NSMakePoint(113, 59)];
-	[view addButtonWithName:@"OEVBButtonRightLeft[@]" label:@"R-Left:" target:self highlightPoint:NSMakePoint(75, 106)];
-	[view addButtonWithName:@"OEVBButtonRightRight[@]" label:@"R-Right:" target:self highlightPoint:NSMakePoint(152, 106)];
-	
+    [view addColumnLabel:@"Right D-Pad"];	
+    [view addButtonWithName:@"OEVBButtonRightUp[@]" label:@"Up:" target:self highlightPoint:NSMakePoint(113, 144)];
+	[view addButtonWithName:@"OEVBButtonRightDown[@]" label:@"Down:" target:self highlightPoint:NSMakePoint(113, 59)];
+	[view addButtonWithName:@"OEVBButtonRightLeft[@]" label:@"Left:" target:self highlightPoint:NSMakePoint(75, 106)];
+	[view addButtonWithName:@"OEVBButtonRightRight[@]" label:@"Right:" target:self highlightPoint:NSMakePoint(152, 106)];
+    [view nextColumn];
+    
 	[view addButtonWithName:@"OEVBButtonL[@]" label:@"L:" target:self highlightPoint:NSMakePoint(152, 106)];
 
     [view addButtonWithName:@"OEVBButtonR[@]" label:@"R:" target:self highlightPoint:NSMakePoint(152, 106)];
@@ -68,12 +71,13 @@
 	[view addButtonWithName:@"OEVBButtonA[@]" label:@"A:" target:self highlightPoint:NSMakePoint(301, 82)];
 	[view addButtonWithName:@"OEVBButtonB[@]" label:@"B:" target:self highlightPoint:NSMakePoint(371, 82)];
     
+    [view nextColumn];
     
 	[view addButtonWithName:@"OEVBButtonSelect[@]" label:@"Select:" target:self highlightPoint:NSMakePoint(301, 82)];
 	[view addButtonWithName:@"OEVBButtonStart[@]" label:@"Start:" target:self highlightPoint:NSMakePoint(371, 82)];
     
     
-	
+	[view updateButtons];
 	return;
 }
 

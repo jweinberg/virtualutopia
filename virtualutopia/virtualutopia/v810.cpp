@@ -45,7 +45,7 @@ namespace CPU
     {
         
         uint32_t address =  (0x07000000 + (uint32_t)((char*)programCounter - ((char*)memoryManagmentUnit.rom.data)));
-//        if (address == 0x70F73B2)
+//        if (address == 0x701EB58)
 //            debugOutput = true;
 //        
         const uint16_t& partialDecode = *(uint16_t*)programCounter;
@@ -314,13 +314,14 @@ namespace CPU
         if (systemRegisters.PSW.EP) return;
         if (systemRegisters.PSW.ID) return;
         if (systemRegisters.PSW.IntLevel > interruptCode) return;
-        return;
+
         
         d_printf("Proccessing interrupt:\n");
         switch (interruptCode)
         {
             case INTKEY:
                 d_printf("\tINTKEY\n");
+                return;
                 break;
             case INTTIM:
                 d_printf("\tINTTIM\n");

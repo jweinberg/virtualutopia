@@ -75,6 +75,20 @@
 			remoteGlobalIDString = 8225309E14424E9A0065B088;
 			remoteInfo = VirtualBoySystem;
 		};
+		823A56921494188B00FDDDF0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 82EB1CC9144226B9007A22EA /* OpenEmu.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8227754F148946DF00B19E27;
+			remoteInfo = GameGear;
+		};
+		827532081485620900D9B9BC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 82EB1CC9144226B9007A22EA /* OpenEmu.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 820EB74A1483F9A2008EC398;
+			remoteInfo = NeoGeoPocket;
+		};
 		82EB1CDA144226BA007A22EA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 82EB1CC9144226B9007A22EA /* OpenEmu.xcodeproj */;
@@ -435,6 +449,8 @@
 				82EB1CED144226BA007A22EA /* Genesis.oesystemplugin */,
 				82EB1CEF144226BA007A22EA /* GameBoy Advance.oesystemplugin */,
 				82EE73C71443C1B400080CCB /* N64.oesystemplugin */,
+				827532091485620900D9B9BC /* NeoGeo Pocket.oesystemplugin */,
+				823A56931494188B00FDDDF0 /* GameGear.oesystemplugin */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -562,6 +578,20 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
+		823A56931494188B00FDDDF0 /* GameGear.oesystemplugin */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = GameGear.oesystemplugin;
+			remoteRef = 823A56921494188B00FDDDF0 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		827532091485620900D9B9BC /* NeoGeo Pocket.oesystemplugin */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = "NeoGeo Pocket.oesystemplugin";
+			remoteRef = 827532081485620900D9B9BC /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		82EB1CDB144226BA007A22EA /* OpenEmu.app */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.application;

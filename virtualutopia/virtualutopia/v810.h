@@ -186,7 +186,6 @@ namespace CPU
         void inByte(uint8_t reg1, uint8_t reg2, uint16_t disp16);
         void inHWord(uint8_t reg1, uint8_t reg2, uint16_t disp16);
         void inWord(uint8_t reg1, uint8_t reg2, uint16_t disp16);
-
         void loadSystemRegister(uint8_t reg1, uint8_t reg2);
         void storeSystemRegister(uint8_t reg1, uint8_t reg2);
         void jumpAndLink(uint32_t disp26);
