@@ -36,6 +36,7 @@
     
     while ((vb->cpu->cycles - currentCycles) < 333333)
         vb->cpu->step();
+    
 }
 
 + (NSTimeInterval)defaultTimeInterval

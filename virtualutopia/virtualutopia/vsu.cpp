@@ -7,3 +7,22 @@
 //
 
 #include "vsu.h"
+
+namespace VSU
+{
+
+    VSU::VSU()
+    {
+        lastUpdate = 0;
+    }
+
+    void VSU::Step(uint32_t cycles)
+    {
+        
+        
+        
+        
+        lastUpdate = cycles;
+    }
+
+}
