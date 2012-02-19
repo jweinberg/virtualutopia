@@ -27,7 +27,6 @@
 
 #import "OEVBSystemController.h"
 #import "OEVBSystemResponder.h"
-#import "OEVBPreferenceView.h"
 #import "OEVBSystemResponderClient.h"
 
 @implementation OEVBSystemController
@@ -35,11 +34,6 @@
 - (NSUInteger)numberOfPlayers;
 {
     return 1;
-}
-
-- (NSDictionary *)preferenceViewControllerClasses;
-{
-    return [NSDictionary dictionaryWithObject:[OEVBPreferenceView class] forKey:OEControlsPreferenceKey];
 }
 
 - (Class)responderClass;

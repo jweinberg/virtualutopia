@@ -29,10 +29,10 @@
 		821438DC14146D1500A98E34 /* v810.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 821438DB14146D1500A98E34 /* v810.cpp */; };
 		821438DF14148B2600A98E34 /* mmu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 821438DE14148B2600A98E34 /* mmu.cpp */; };
 		821438E514149B9E00A98E34 /* rom.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 821438E414149B9E00A98E34 /* rom.cpp */; };
+		8220231314F1BFB700902FB1 /* Controller-Preferences-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8220231214F1BFB700902FB1 /* Controller-Preferences-Info.plist */; };
 		822530A014424E9A0065B088 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 82EB1D0E14422703007A22EA /* Cocoa.framework */; };
 		822530A614424E9A0065B088 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 822530A414424E9A0065B088 /* InfoPlist.strings */; };
 		822530C514424EE00065B088 /* OpenEmuSystem.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 82EB1CE1144226BA007A22EA /* OpenEmuSystem.framework */; };
-		822530CD14424F200065B088 /* OEVBPreferenceView.m in Sources */ = {isa = PBXBuildFile; fileRef = 822530C714424F200065B088 /* OEVBPreferenceView.m */; };
 		822530CE14424F200065B088 /* OEVBSystemController.m in Sources */ = {isa = PBXBuildFile; fileRef = 822530C914424F200065B088 /* OEVBSystemController.m */; };
 		822530CF14424F200065B088 /* OEVBSystemResponder.m in Sources */ = {isa = PBXBuildFile; fileRef = 822530CB14424F200065B088 /* OEVBSystemResponder.m */; };
 		822530D3144254D80065B088 /* VB-Controller.png in Resources */ = {isa = PBXBuildFile; fileRef = 822530D2144254D70065B088 /* VB-Controller.png */; };
@@ -58,6 +58,7 @@
 		82EB1D2814422742007A22EA /* OpenEmuBase.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 82EB1CDF144226BA007A22EA /* OpenEmuBase.framework */; };
 		82EB1D2F144227F6007A22EA /* VBGameCore.mm in Sources */ = {isa = PBXBuildFile; fileRef = 82EB1D2E144227F6007A22EA /* VBGameCore.mm */; };
 		82EB1D34144228C2007A22EA /* VBGameCoreController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 82EB1D33144228C2007A22EA /* VBGameCoreController.mm */; };
+		82F9E2FD14E6E9EF004D82BA /* channel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82A9197914E6E5BE00A015B8 /* channel.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -214,12 +215,11 @@
 		821438E014148B2F00A98E34 /* mmu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mmu.h; sourceTree = "<group>"; };
 		821438E414149B9E00A98E34 /* rom.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = rom.cpp; sourceTree = "<group>"; };
 		821438E614149BA700A98E34 /* rom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rom.h; sourceTree = "<group>"; };
+		8220231214F1BFB700902FB1 /* Controller-Preferences-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Controller-Preferences-Info.plist"; sourceTree = "<group>"; };
 		8225309F14424E9A0065B088 /* VirtualBoySystem.oesystemplugin */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VirtualBoySystem.oesystemplugin; sourceTree = BUILT_PRODUCTS_DIR; };
 		822530A314424E9A0065B088 /* VirtualBoySystem-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "VirtualBoySystem-Info.plist"; sourceTree = "<group>"; };
 		822530A514424E9A0065B088 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		822530A714424E9A0065B088 /* VirtualBoySystem-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "VirtualBoySystem-Prefix.pch"; sourceTree = "<group>"; };
-		822530C614424F200065B088 /* OEVBPreferenceView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OEVBPreferenceView.h; sourceTree = "<group>"; };
-		822530C714424F200065B088 /* OEVBPreferenceView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OEVBPreferenceView.m; sourceTree = "<group>"; };
 		822530C814424F200065B088 /* OEVBSystemController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OEVBSystemController.h; sourceTree = "<group>"; };
 		822530C914424F200065B088 /* OEVBSystemController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OEVBSystemController.m; sourceTree = "<group>"; };
 		822530CA14424F200065B088 /* OEVBSystemResponder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OEVBSystemResponder.h; sourceTree = "<group>"; };
@@ -233,6 +233,8 @@
 		8260EDFD143FA374004CC416 /* obj.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = obj.h; sourceTree = "<group>"; };
 		8260EDFE143FA88C004CC416 /* chr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = chr.h; sourceTree = "<group>"; };
 		8284A975144BD64C00265708 /* affinetable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = affinetable.h; sourceTree = "<group>"; };
+		82A9197914E6E5BE00A015B8 /* channel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = channel.cpp; sourceTree = "<group>"; };
+		82A9197B14E6E5C900A015B8 /* channel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = channel.h; sourceTree = "<group>"; };
 		82C8AB591417D5B0006213AA /* cpu_utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cpu_utils.h; sourceTree = "<group>"; };
 		82C8AB5C1417DFB3006213AA /* instruction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = instruction.cpp; sourceTree = "<group>"; };
 		82C8AB5E1417DFBE006213AA /* instruction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = instruction.h; sourceTree = "<group>"; };
@@ -301,6 +303,8 @@
 			children = (
 				820E0E861454CEB80065AE37 /* vsu.cpp */,
 				820E0E891454CEC00065AE37 /* vsu.h */,
+				82A9197914E6E5BE00A015B8 /* channel.cpp */,
+				82A9197B14E6E5C900A015B8 /* channel.h */,
 			);
 			name = VSU;
 			sourceTree = "<group>";
@@ -346,8 +350,6 @@
 			isa = PBXGroup;
 			children = (
 				822530D2144254D70065B088 /* VB-Controller.png */,
-				822530C614424F200065B088 /* OEVBPreferenceView.h */,
-				822530C714424F200065B088 /* OEVBPreferenceView.m */,
 				822530C814424F200065B088 /* OEVBSystemController.h */,
 				822530C914424F200065B088 /* OEVBSystemController.m */,
 				822530CA14424F200065B088 /* OEVBSystemResponder.h */,
@@ -365,6 +367,7 @@
 				822530A314424E9A0065B088 /* VirtualBoySystem-Info.plist */,
 				822530A414424E9A0065B088 /* InfoPlist.strings */,
 				822530A714424E9A0065B088 /* VirtualBoySystem-Prefix.pch */,
+				8220231214F1BFB700902FB1 /* Controller-Preferences-Info.plist */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -686,6 +689,7 @@
 				822530A614424E9A0065B088 /* InfoPlist.strings in Resources */,
 				822530D3144254D80065B088 /* VB-Controller.png in Resources */,
 				822530D7144256180065B088 /* ControlsPreference.xib in Resources */,
+				8220231314F1BFB700902FB1 /* Controller-Preferences-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -737,7 +741,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				822530CD14424F200065B088 /* OEVBPreferenceView.m in Sources */,
 				822530CE14424F200065B088 /* OEVBSystemController.m in Sources */,
 				822530CF14424F200065B088 /* OEVBSystemResponder.m in Sources */,
 			);
@@ -758,6 +761,7 @@
 				82EB1D34144228C2007A22EA /* VBGameCoreController.mm in Sources */,
 				82AA7356144D20A6008BF178 /* v810_instructions.cpp in Sources */,
 				820E0E881454CEB80065AE37 /* vsu.cpp in Sources */,
+				82F9E2FD14E6E9EF004D82BA /* channel.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -14,15 +14,16 @@ namespace VSU
     VSU::VSU()
     {
         lastUpdate = 0;
+        sampleTimer = 41700;
     }
 
+    //1 cycle == 50ns
     void VSU::Step(uint32_t cycles)
     {
-        
-        
-        
-        
-        lastUpdate = cycles;
+        for (int i = 0; i < 6; ++i)
+        {
+            channels[i].update(cycles * 50);
+        }
     }
 
-}
+} 
