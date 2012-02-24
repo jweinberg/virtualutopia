@@ -13,6 +13,13 @@ static int envelopeStepTimes[8] = {154, 307, 461, 614, 768, 922, 1075, 1229};
 
 namespace VSU
 {
+    
+double Channel::frequency()
+{
+    float hz = 5000000.0 / ((2048 - ((SxFRQH.upper3Bits << 8) | SxFRQL)) * 32);
+    return hz;
+}
+    
 void Channel::update(long nanoseconds)
 {
     //Update envelope

@@ -23,6 +23,7 @@ class Channel
 {
     
 public:
+    double frequency();
     void update(long nanoseconds);
     
     REGISTER_BITFIELD(SxINT, 
