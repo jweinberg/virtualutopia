@@ -301,7 +301,7 @@ namespace CPU
         
         vip.Step(cycles);
         nvc.Step(cycles);
-        vsu.Step(cycles);
+        //        vsu.Step(cycles);
 //        
 //        if (vip.INTENB & vip.INTPND)
 //            processInterrupt(INTVPU);
