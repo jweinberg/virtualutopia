@@ -31,7 +31,7 @@ typedef enum _OEVBButton
 
 @protocol OEVBSystemResponderClient <OESystemResponderClient, NSObject>
 
-- (void)didPushVBButton:(OEVBButton)button;
+- (oneway void)didPushVBButton:(OEVBButton)button;
 - (void)didReleaseVBButton:(OEVBButton)button;
 
 @end

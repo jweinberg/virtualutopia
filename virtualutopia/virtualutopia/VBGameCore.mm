@@ -39,6 +39,11 @@
     
 }
 
+- (double)audioSampleRate
+{
+    return 48000;
+}
+
 + (NSTimeInterval)defaultTimeInterval
 {
     return 60.0f;
@@ -118,7 +123,7 @@
     return 2;
 }
 
-- (void)didPushVBButton:(OEVBButton)button
+- (oneway void)didPushVBButton:(OEVBButton)button
 {
     switch (button)
     {
