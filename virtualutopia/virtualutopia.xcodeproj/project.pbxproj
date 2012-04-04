@@ -58,6 +58,7 @@
 		82EB1D2814422742007A22EA /* OpenEmuBase.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 82EB1CDF144226BA007A22EA /* OpenEmuBase.framework */; };
 		82EB1D2F144227F6007A22EA /* VBGameCore.mm in Sources */ = {isa = PBXBuildFile; fileRef = 82EB1D2E144227F6007A22EA /* VBGameCore.mm */; };
 		82EB1D34144228C2007A22EA /* VBGameCoreController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 82EB1D33144228C2007A22EA /* VBGameCoreController.mm */; };
+		82ECA3BA152C1837002F7BAC /* vb_library.png in Resources */ = {isa = PBXBuildFile; fileRef = 82ECA3B9152C1837002F7BAC /* vb_library.png */; };
 		82F9E2FD14E6E9EF004D82BA /* channel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82A9197914E6E5BE00A015B8 /* channel.cpp */; };
 /* End PBXBuildFile section */
 
@@ -278,6 +279,7 @@
 		82EB1D2E144227F6007A22EA /* VBGameCore.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = VBGameCore.mm; path = virtualutopia/VBGameCore.mm; sourceTree = SOURCE_ROOT; };
 		82EB1D32144228C2007A22EA /* VBGameCoreController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VBGameCoreController.h; path = virtualutopia/VBGameCoreController.h; sourceTree = SOURCE_ROOT; };
 		82EB1D33144228C2007A22EA /* VBGameCoreController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = VBGameCoreController.mm; path = virtualutopia/VBGameCoreController.mm; sourceTree = SOURCE_ROOT; };
+		82ECA3B9152C1837002F7BAC /* vb_library.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = vb_library.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -363,6 +365,7 @@
 		822530A114424E9A0065B088 /* VirtualBoySystem */ = {
 			isa = PBXGroup;
 			children = (
+				82ECA3B9152C1837002F7BAC /* vb_library.png */,
 				822530D2144254D70065B088 /* VB-Controller.png */,
 				822530C814424F200065B088 /* OEVBSystemController.h */,
 				822530C914424F200065B088 /* OEVBSystemController.m */,
@@ -720,6 +723,7 @@
 				822530D3144254D80065B088 /* VB-Controller.png in Resources */,
 				822530D7144256180065B088 /* ControlsPreference.xib in Resources */,
 				8220231314F1BFB700902FB1 /* Controller-Preferences-Info.plist in Resources */,
+				82ECA3BA152C1837002F7BAC /* vb_library.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

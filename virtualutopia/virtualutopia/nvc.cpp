@@ -137,19 +137,23 @@ void NVC::NVC::Step(uint32_t cycles)
     //Update timer
     if (TCR.T_ENB)
     {
-        if ((cycles-lastTimer) > (TCR.T_CLK_SEL ? 400 : 2000))
+        if ((cycles-lastTimer) > (TCR.T_CLK_SEL ? 500 : 2000))
         {
+            if (timerCount == 0 || awaitingReload) 
+            {
+                timerCount = internalTimerCount; //reset counter
+                awaitingReload = false;
+            }
+            
             if (timerCount)
                 timerCount--;
             lastTimer=cycles;
-            if (timerCount == 0) 
+
+            if (timerCount == 0)
             {
-                timerCount = internalTimerCount; //reset counter
-                
                 TCR.Z_STAT = 1;
                 if (TCR.TIM_Z_INT)
                     cpu->processInterrupt(CPU::INTTIM);
-                //TCR.T_ENB = 0;
             }
         }
     }

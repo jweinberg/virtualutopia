@@ -39,7 +39,7 @@
 		<string>vb</string>
 		<string>bin</string>
 	</array>
-    <key>OEControlListKey</key>
+	<key>OEControlListKey</key>
 	<array>
 		<array>
 			<array>
@@ -68,7 +68,7 @@
 					<string>OEVBButtonLeftRight[@]</string>
 				</dict>
 			</array>
-            <array>
+			<array>
 				<dict>
 					<key>OEControlListKeyLabelKey</key>
 					<string>Up</string>
@@ -128,7 +128,7 @@
 					<string>OEVBButtonStart[@]</string>
 				</dict>
 			</array>
-            <array>
+			<array>
 				<dict>
 					<key>OEControlListKeyLabelKey</key>
 					<string>Select</string>
@@ -138,5 +138,7 @@
 			</array>
 		</array>
 	</array>
+	<key>OESystemIcon</key>
+	<string>vb_library</string>
 </dict>
 </plist>

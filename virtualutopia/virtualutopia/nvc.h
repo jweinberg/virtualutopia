@@ -54,6 +54,7 @@ namespace NVC
         int32_t lastInputUpdate;
         uint32_t lastTimer;
         bool setKey;
+        bool awaitingReload;
         Button currentReadButton;
         void Step(uint32_t cycles);
         void SetButton(Button button, bool val);
@@ -117,9 +118,11 @@ namespace NVC
                     break;
                 case 0x2000018:
                     *((T*)&internalTLR) = val;
+                    awaitingReload = true;
                     break;
                 case 0x200001C:
                     *((T*)&internalTHR) = val;
+                    awaitingReload = true;
                     break;
                 case 0x2000020:
                 {
@@ -128,8 +131,6 @@ namespace NVC
                         TCR.Z_STAT = 0;
                     else
                     {
-                        if (incomingTCR->T_ENB)
-                            timerCount = internalTimerCount;                    
                         TCR.T_ENB = incomingTCR->T_ENB;
                     }
                     TCR.TIM_Z_INT = incomingTCR->TIM_Z_INT;
