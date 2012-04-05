@@ -18,15 +18,29 @@ namespace VIP
 {
     VIP::VIP()
     {
+        FRMCYC = 0;
+        INTPND = 0;
+        INTENB = 0;
         DPSTTS = 0;
         XPSTTS = 0;
-        
+        XPCTRL = 0;
+        BRT[0] = 0;
+        BRT[1] = 0;
+        BRT[2] = 0;
+        lastFrameBuffer = 0;
+        drawingCounter = 0;
+        displayRegion = 0;
         sbOutResetTime = -1;
         column = 0;
         columnCounter = 259;
         displayFB = 0;
         drawingFB = 1;
+        frame = 0;
         
+        memset((char*)&rightFrameBuffer[0], 0, 0x6000);
+        memset((char*)&leftFrameBuffer[0], 0, 0x6000);
+        memset((char*)&rightFrameBuffer[1], 0, 0x6000);
+        memset((char*)&leftFrameBuffer[1], 0, 0x6000);
     }
     
     void VIP::DumpCHR()

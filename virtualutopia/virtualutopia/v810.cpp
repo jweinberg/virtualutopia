@@ -55,6 +55,7 @@ namespace CPU
         programCounter = &memoryManagmentUnit.read<char>(0xFFFFFFF0);
 #endif
         systemRegisters.PSW = 0x00008000;
+        memset(generalRegisters, 0, sizeof(generalRegisters));
         generalRegisters[0] = 0;
         cycles = 0;
         nvc.Reset();

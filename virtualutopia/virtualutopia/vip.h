@@ -277,11 +277,10 @@ namespace VIP
             uint16_t LOCK:1;
             uint16_t padding_1:5;
         );
-        struct
-        {
+        REGISTER_BITFIELD(uint16_t, BRT,
             uint8_t val;
             uint8_t reserved;
-        } BRT[3];
+        )[3];
         uint16_t REST;
         uint16_t FRMCYC;
         uint16_t CTA;
@@ -349,7 +348,9 @@ namespace VIP
         maxX(xMaps * 512),
         maxY(yMaps * 512),
         xChar(0),
-        yChar(0)
+        yChar(0),
+        yMap(INT_MAX),
+        xMap(INT_MAX)
         {
             requiresReload = true;
             if (over)

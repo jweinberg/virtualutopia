@@ -34,7 +34,7 @@ int main (int argc, const char * argv[])
     tcsetattr(STDIN_FILENO, TCSANOW, &ttystate);
     
     
-    VB vb("/Users/jweinberg/Downloads/pong.vb");
+    VB vb("/Users/jweinberg/base.vb");
     
     bool wait = true;
     int steps = 0;
@@ -80,7 +80,7 @@ int main (int argc, const char * argv[])
                 
                 // fgetc(stdin);
 //                printf("%d\n", );
-                vb.nvc->SDHR.LR = 1;
+                vb.nvc->SDR.SDHR.LR = 1;
 //                nvc.SDHR.LD = 1;
              
             }

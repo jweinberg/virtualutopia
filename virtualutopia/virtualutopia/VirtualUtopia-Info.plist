@@ -30,5 +30,7 @@
 	<array>
 		<string>openemu.system.vb</string>
 	</array>
+	<key>SUFeedURLKey</key>
+	<string></string>
 </dict>
 </plist>

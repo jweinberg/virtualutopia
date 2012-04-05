@@ -60,6 +60,7 @@
 		82EB1D34144228C2007A22EA /* VBGameCoreController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 82EB1D33144228C2007A22EA /* VBGameCoreController.mm */; };
 		82ECA3BA152C1837002F7BAC /* vb_library.png in Resources */ = {isa = PBXBuildFile; fileRef = 82ECA3B9152C1837002F7BAC /* vb_library.png */; };
 		82F9E2FD14E6E9EF004D82BA /* channel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82A9197914E6E5BE00A015B8 /* channel.cpp */; };
+		82FF24A3152D7A0A009366CB /* channel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82A9197914E6E5BE00A015B8 /* channel.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -758,6 +759,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				82FF24A3152D7A0A009366CB /* channel.cpp in Sources */,
 				821438D314146AD100A98E34 /* main.cpp in Sources */,
 				821438DC14146D1500A98E34 /* v810.cpp in Sources */,
 				821438DF14148B2600A98E34 /* mmu.cpp in Sources */,
