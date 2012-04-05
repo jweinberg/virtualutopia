@@ -75,9 +75,9 @@ namespace NVC
                 case 0x200000C:
                     return *((T*)&CDRR);
                 case 0x2000010:
-                    return *((T*)(((uint8_t*)&SDR_LATCHED)));
+                    return *((T*)(((uint8_t*)&SDR_HW)));
                 case 0x2000014:
-                    return *((T*)(((uint8_t*)&SDR_LATCHED) + 1));
+                    return *((T*)(((uint8_t*)&SDR_HW) + 1));
                 case 0x2000018:
                     return *((T*)&TLR);
                 case 0x200001C:

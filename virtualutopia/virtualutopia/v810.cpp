@@ -62,17 +62,6 @@ namespace CPU
     
     void v810::fetchAndDecode()
     {
-        
-//        if (programCounter == 0x7001fe2)
-//            dumpPCs();
-        //        uint32_t address =  (0x07000000 + (uint32_t)((char*)programCounter - ((char*)memoryManagmentUnit.rom.data)));
-//        if (address == 0x701EB58)
-//            debugOutput = true;
-//        
-//        pcs.push_back(programCounter);
-//        if (pcs.size() > 50000)
-//            pcs.pop_front();
-        
 #if VIRTUAL_PC
         const uint16_t& partialDecode = memoryManagmentUnit.rom.read<uint16_t>(programCounter);
 #else

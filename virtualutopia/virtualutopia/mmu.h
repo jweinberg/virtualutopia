@@ -23,7 +23,7 @@ public:
     MMU(const ROM &rom, VIP::VIP &vip, NVC::NVC &nvc, VSU::VSU &vsu);
 
     template <typename T>
-    inline const T& read(uint32_t virtualAddress) const
+    inline const T read(uint32_t virtualAddress) const
     {
         virtualAddress = virtualAddress & 0x07FFFFFF;
         //nvc.ApplyReadWait(virtualAddress);
@@ -42,9 +42,7 @@ public:
             case 0x07000000 ... 0x07FFFFFF: //Cartridge ROM
                 return rom.read<T>(virtualAddress);
         }
-//        printf("Out of bounds access %X\n", virtualAddress);
-//        return *(new T);
-        assert(false);
+        return 0;
     }
     
     template <typename T>
