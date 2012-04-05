@@ -26,7 +26,7 @@
  */
 
 #import <Cocoa/Cocoa.h>
-#import <OpenEmuSystem/OpenEmuSystem.h>
+#import <OpenEmuSystem/OESystemController.h>
 
 @interface OEVBSystemController : OESystemController
 {

@@ -15,12 +15,25 @@
 extern std::ofstream outFile;
 extern volatile bool debugOutput;
 
+
+#define VIRTUAL_PC 1
+
+#if VIRTUAL_PC
 //#define d_printf(A, ...)
+#define d_printf(A, ...) do{ if(debugOutput) {\
+char buffer[255];\
+sprintf(buffer, "%X (%u): " A, programCounter, cycles , ##__VA_ARGS__);\
+outFile << buffer;\
+outFile.flush();\
+} }while(0)
+#else
 #define d_printf(A, ...) do{ if(debugOutput) {\
 char buffer[255];\
 sprintf(buffer, "%X (%u): " A, (0x07000000 + (uint32_t)((char*)programCounter - ((char*)memoryManagmentUnit.rom.data))),cycles , ##__VA_ARGS__);\
 outFile << buffer;\
+outFile.flush();\
 } }while(0)
+#endif
 
 
 class MMU;
@@ -70,7 +83,11 @@ namespace CPU
         void throwException(ExceptionCode exceptionCode);
         void processInterrupt(InterruptCode interruptCode);
     private: 
+#if VIRTUAL_PC
+        uint32_t programCounter;
+#else
         const char *programCounter;
+#endif
         union
         {
             int32_t generalRegisters[32];
@@ -85,11 +102,11 @@ namespace CPU
             int32_t EIPSW;
             int32_t FEPC;
             int32_t FEPSW;
-            REGISTER_BITFIELD (ECR,
+            REGISTER_BITFIELD (uint32_t, ECR,
                 uint16_t EICC;
                 uint16_t FECC;
             );
-            REGISTER_BITFIELD (PSW,
+            REGISTER_BITFIELD (uint32_t, PSW,
                 uint32_t Z:1; //Zero, result is zero
                 uint32_t S:1; //Sign, result is negative
                 uint32_t OV:1; //Overflow
@@ -109,7 +126,7 @@ namespace CPU
                 uint32_t IntLevel:4; //Maskable interrupt level (0-15)
                 uint32_t RESERVED_LAST:12; //Unused, always zero
             );
-            REGISTER_BITFIELD(PIR,
+            REGISTER_BITFIELD(uint32_t, PIR,
                 uint32_t NECRV:4;
                 uint32_t PT:12;
                 uint32_t RESERVED:16;

@@ -42,6 +42,8 @@ public:
             case 0x07000000 ... 0x07FFFFFF: //Cartridge ROM
                 return rom.read<T>(virtualAddress);
         }
+//        printf("Out of bounds access %X\n", virtualAddress);
+//        return *(new T);
         assert(false);
     }
     

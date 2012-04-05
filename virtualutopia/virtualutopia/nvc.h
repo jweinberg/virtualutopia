@@ -75,9 +75,9 @@ namespace NVC
                 case 0x200000C:
                     return *((T*)&CDRR);
                 case 0x2000010:
-                    return *((T*)(((uint8_t*)&SDR_HW)));
+                    return *((T*)(((uint8_t*)&SDR_LATCHED)));
                 case 0x2000014:
-                    return *((T*)(((uint8_t*)&SDR_HW) + 1));
+                    return *((T*)(((uint8_t*)&SDR_LATCHED) + 1));
                 case 0x2000018:
                     return *((T*)&TLR);
                 case 0x200001C:
@@ -169,7 +169,7 @@ namespace NVC
             }
         }
                 
-        REGISTER_BITFIELD(SCR,
+        REGISTER_BITFIELD(uint8_t, SCR,
                           uint8_t DIS:1;
                           uint8_t STAT:1;
                           uint8_t HWSI:1;
@@ -180,13 +180,13 @@ namespace NVC
                           uint8_t INT:1;
                           );
                           
-        REGISTER_BITFIELD(WCR,
+        REGISTER_BITFIELD(uint8_t, WCR,
                           uint8_t ROM1W:1;
                           uint8_t EXP1W:1;
                           uint8_t padding:6;
                           );
         
-        REGISTER_BITFIELD(TCR, 
+        REGISTER_BITFIELD(uint8_t, TCR, 
                           uint8_t T_ENB:1;
                           uint8_t Z_STAT:1;
                           uint8_t Z_STAT_CLR:1;
@@ -214,8 +214,8 @@ namespace NVC
             uint16_t internalTimerCount;
         };
 
-        REGISTER_BITFIELD(SDR,
-            REGISTER_BITFIELD(SDLR,
+        REGISTER_BITFIELD(uint16_t, SDR,
+            REGISTER_BITFIELD(uint8_t, SDLR,
                               uint8_t PWR:1;
                               uint8_t SGN:1;
                               uint8_t A:1;
@@ -225,7 +225,7 @@ namespace NVC
                               uint8_t RU:1;
                               uint8_t RR:1;
                               );
-            REGISTER_BITFIELD(SDHR,
+            REGISTER_BITFIELD(uint8_t, SDHR,
                               uint8_t LR:1;
                               uint8_t LL:1;
                               uint8_t LD:1;

@@ -24,6 +24,8 @@ namespace VIP
         sbOutResetTime = -1;
         column = 0;
         columnCounter = 259;
+        displayFB = 0;
+        drawingFB = 1;
         
     }
     
@@ -44,7 +46,7 @@ namespace VIP
         {
             for (int x = 0; x < 8; ++x)
             {
-                uint32_t pixel;
+                uint32_t pixel = 0;
                 char px = (*internalData >> (x * 2)) & 0x3;
                 if (px == 1)
                     pixel = 0xFF520052;
@@ -429,26 +431,32 @@ namespace VIP
                             {
                                 for (int bt = 0; bt < 4; ++bt)
                                 {
-                                    uint32_t pixel = 0xFF000000;
+                                    uint8_t color = 0;
                                     
                                     char leftPx = (*(internalDataLeft + (x * 64) + y) >> (bt * 2)) & 0x3;
-                                    char rightPx = (*(internalDataRight + (x * 64) + y) >> (bt * 2)) & 0x3;
-                                    
                                     if (leftPx == 1)
-                                        pixel |= BRT[0].val;
+                                        color = BRT[0].val;
                                     else if (leftPx == 2)
-                                        pixel |= BRT[1].val;
+                                        color = BRT[1].val;
                                     else if (leftPx == 3)
-                                        pixel |= (BRT[2].val + BRT[1].val + BRT[0].val);
+                                        color = (BRT[2].val + BRT[1].val + BRT[0].val);
                                     
+                                    leftBmpData[(384 * (y * 4 + bt)) + x] = color;
+                                    
+                                    color = 0;
+                                    char rightPx = (*(internalDataRight + (x * 64) + y) >> (bt * 2)) & 0x3;
                                     if (rightPx == 1)
-                                        pixel |= BRT[0].val << 16;
+                                        color = BRT[0].val;// << 16;
                                     else if (rightPx == 2)
-                                        pixel |= BRT[1].val << 16;
+                                        color = BRT[1].val;// << 16;
                                     else if (rightPx == 3)
-                                        pixel |= (BRT[2].val + BRT[1].val + BRT[0].val) << 16;
+                                        color = (BRT[2].val + BRT[1].val + BRT[0].val);// << 16;
                                     
-                                    *(bmpData + (384 * (y * 4 + bt)) + x) = pixel;
+                                    
+                                    rightBmpData[(384 * (y * 4 + bt)) + x] = color;
+                                    
+                                    
+
                                 }
                             }
                         }
@@ -578,7 +586,7 @@ namespace VIP
         
         
         //There are 400,000 cycles in one frame (1 cycle = 50ns, 1 frame = 20ms)
-        uint32_t timeSinceBuffer = cycles - lastFrameBuffer;
+        int32_t timeSinceBuffer = cycles - lastFrameBuffer;
         
         
         if (rowCount < 28)
@@ -669,7 +677,7 @@ namespace VIP
                             else if (rightPx == 3)
                                 pixel |= (BRT[2].val + BRT[1].val + BRT[0].val) << 16;
                             
-                            *(bmpData + (384 * (y * 4 + bt)) + x) = pixel;
+                            //*(bmpData + (384 * (y * 4 + bt)) + x) = pixel;
                         }
                     }
                 }

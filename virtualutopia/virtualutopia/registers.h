@@ -9,12 +9,12 @@
 #ifndef virtualutopia_registers_h
 #define virtualutopia_registers_h
 
-#define REGISTER_BITFIELD(NAME, ...) \
+#define REGISTER_BITFIELD(T, NAME, ...) \
 struct _##NAME \
 {\
     __VA_ARGS__\
-    operator uint32_t&() { return *(uint32_t*)this; }\
-    uint32_t &operator =(const uint32_t& val) { *(uint32_t*)this = val; return *(uint32_t*)this; }\
+    operator T&() { return *(T*)this; }\
+    T &operator =(const T& val) { *(T*)this = val; return *(T*)this; }\
 } NAME
 
 

@@ -187,7 +187,8 @@ namespace VIP
         ChrCacheEntry chrCache[2048];
         Obj oam[1024];
         
-        uint32_t bmpData[384 * 256];
+        uint8_t leftBmpData[384 * 256];
+        uint8_t rightBmpData[384 * 256];
         BGMap bgMaps[14];
         
         Framebuffer leftFrameBuffer[2];
@@ -216,7 +217,7 @@ namespace VIP
         int8_t objSearchIndex;
 
 #pragma mark - 4.1 Interrupt Registers
-        REGISTER_BITFIELD(INTPND,
+        REGISTER_BITFIELD(uint16_t, INTPND,
             uint16_t SCANERR:1;
             uint16_t LFBEND:1;
             uint16_t RFBEND:1;
@@ -228,7 +229,7 @@ namespace VIP
             uint16_t TIMERR:1;
         );
 
-        REGISTER_BITFIELD(INTENB,
+        REGISTER_BITFIELD(uint16_t, INTENB,
             uint16_t SCANERR:1;
             uint16_t LFBEND:1;
             uint16_t RFBEND:1;
@@ -240,7 +241,7 @@ namespace VIP
             uint16_t TIMERR:1;
         );
         
-        REGISTER_BITFIELD(INTCLR,
+        REGISTER_BITFIELD(uint16_t, INTCLR,
             uint16_t SCANERR:1;
             uint16_t LFBEND:1;
             uint16_t RFBEND:1;
@@ -255,7 +256,7 @@ namespace VIP
 #pragma mark - 4.2 Image Display Registers
 
         
-        REGISTER_BITFIELD(DPSTTS,
+        REGISTER_BITFIELD(uint16_t, DPSTTS,
             uint16_t padding_0:1;
             uint16_t DISP:1;
             uint16_t DPBSY:4;
@@ -267,7 +268,7 @@ namespace VIP
             uint16_t padding_1:5;
         );
         
-        REGISTER_BITFIELD(DPCTRL,
+        REGISTER_BITFIELD(uint16_t, DPCTRL,
             uint16_t DPRST:1;
             uint16_t DISP:1;
             uint16_t padding_0:6;
@@ -286,7 +287,7 @@ namespace VIP
         uint16_t CTA;
         
 #pragma mark - 4.3 Image Drawing Registers
-        REGISTER_BITFIELD(XPSTTS,
+        REGISTER_BITFIELD(uint16_t, XPSTTS,
             uint16_t padding_0:1;
             uint16_t XPEN:1;
             uint16_t XPBSY:2;
@@ -296,7 +297,7 @@ namespace VIP
             uint16_t padding_2:2;
             uint16_t SBOUT:1;
         );
-        REGISTER_BITFIELD(XPCTRL, 
+        REGISTER_BITFIELD(uint16_t, XPCTRL, 
             uint16_t XPRST:1;
             uint16_t XPEN:1;
             uint16_t padding_0:6;
@@ -320,9 +321,9 @@ namespace VIP
     {
     private:
         VIP& vip;
+        const BGMap * const baseMap;
         const uint8_t xMaps;
         const uint8_t yMaps;
-        const BGMap * const baseMap;
         const bool over;
         const uint16_t overplaneChrAddress;
         bool requiresReload;
@@ -347,8 +348,8 @@ namespace VIP
         overplaneChrAddress(_overAddress),
         maxX(xMaps * 512),
         maxY(yMaps * 512),
-        yChar(0),
-        xChar(0)
+        xChar(0),
+        yChar(0)
         {
             requiresReload = true;
             if (over)

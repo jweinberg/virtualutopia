@@ -11,9 +11,12 @@
 #include <iomanip>
 #include <iterator>
 #include "vsu.h"
+#include <deque>
 
 std::ofstream outFile("/Users/jweinberg/log.asm");
 volatile bool debugOutput = false;
+volatile uint32_t lowAdr = 0x7030000;
+std::deque<uint32_t> pcs;
 
 int32_t sign_extend(int bits, uint32_t rawValue)
 {
@@ -22,19 +25,35 @@ int32_t sign_extend(int bits, uint32_t rawValue)
     char signValue = (rawValue & signBitMask) >> bits;
     return rawValue | (signValue ? (0xFFFFFFFF << bits) : 0);
 }
+void dumpPCs();
 
+void dumpPCs()
+{
+    std::deque<uint32_t>::iterator itr = pcs.begin();
+    for (; itr < pcs.end(); ++itr)
+    {
+        char buffer[255];
+        sprintf(buffer, "%X\n", *itr);
+        outFile << buffer;
+    }
+}
 
 namespace CPU
 {
     v810::v810(MMU &_mmu, VIP::VIP &_vip, NVC::NVC &_nvc, VSU::VSU &_vsu) : memoryManagmentUnit(_mmu), vip(_vip), nvc(_nvc), vsu(_vsu)
     {
+        debugOutput = false;
         systemRegisters.TKCW = 0x000000E0;
         systemRegisters.PIR = 0x00005346;
     }
     
     void v810::reset()
     {   
+#if VIRTUAL_PC
+        programCounter = 0xFFFFFFF0;
+#else
         programCounter = &memoryManagmentUnit.read<char>(0xFFFFFFF0);
+#endif
         systemRegisters.PSW = 0x00008000;
         generalRegisters[0] = 0;
         cycles = 0;
@@ -44,14 +63,25 @@ namespace CPU
     void v810::fetchAndDecode()
     {
         
-        uint32_t address =  (0x07000000 + (uint32_t)((char*)programCounter - ((char*)memoryManagmentUnit.rom.data)));
+//        if (programCounter == 0x7001fe2)
+//            dumpPCs();
+        //        uint32_t address =  (0x07000000 + (uint32_t)((char*)programCounter - ((char*)memoryManagmentUnit.rom.data)));
 //        if (address == 0x701EB58)
 //            debugOutput = true;
 //        
+//        pcs.push_back(programCounter);
+//        if (pcs.size() > 50000)
+//            pcs.pop_front();
+        
+#if VIRTUAL_PC
+        const uint16_t& partialDecode = memoryManagmentUnit.rom.read<uint16_t>(programCounter);
+#else
         const uint16_t& partialDecode = *(uint16_t*)programCounter;
+#endif
         OpcodeMnumonic opcode;
-        uint8_t arg1, arg2;
-        uint32_t arg3;
+        uint8_t arg1 = 0;
+        uint8_t arg2 = 0;
+        uint32_t arg3 = 0;
         switch (partialDecode & 0xE000)
         {
             case 0x0000:
@@ -68,7 +98,11 @@ namespace CPU
                 break;
             case 0xA000:
                 opcode = (OpcodeMnumonic)(partialDecode >> 10);
+#if VIRTUAL_PC
+                arg3 = memoryManagmentUnit.rom.read<uint16_t>(programCounter + 2);
+#else
                 arg3 = *(uint16_t*)(programCounter + 2);
+#endif
                 switch (opcode)
                 {
                     case JR:
@@ -86,8 +120,14 @@ namespace CPU
                 opcode = (OpcodeMnumonic)(partialDecode >> 10);
                 arg1 = partialDecode & 0x1F;
                 arg2 = (partialDecode >> 5) & 0x1F;
+#if VIRTUAL_PC
+                arg3 = memoryManagmentUnit.rom.read<uint16_t>(programCounter + 2);
+#else
                 arg3 = *(uint16_t*)(programCounter + 2);
+#endif
                 break;
+            default:
+                assert(false);
         }
         
 #define OPCODE_DECODE_I(OPCODE, FUNCTION) OPCODE: \
@@ -103,7 +143,7 @@ namespace CPU
 #define OPCODE_DECODE_VI(OPCODE, FUNCTION) OPCODE: \
         FUNCTION(arg1, arg2, arg3); goto END;
         
-        static const void * jmp_entry[] =
+        const void * jmp_entry[] =
         {
             &&MOV_1,
             &&ADD_1,
@@ -243,7 +283,7 @@ namespace CPU
             OPCODE_DECODE_V(ANDI, andImmediate);  
             OPCODE_DECODE_V(XORI, xorImmediate);  
             OPCODE_DECODE_V(MOVHI, moveHigh); 
-            OPCODE_DECODE_V(LD_B, loadByte);  
+            OPCODE_DECODE_VI(LD_B, loadByte);  
             OPCODE_DECODE_VI(LD_H, loadHWord);  
             OPCODE_DECODE_VI(LD_W, loadWord);  
             OPCODE_DECODE_VI(ST_B, storeByte);  
@@ -322,7 +362,6 @@ namespace CPU
         {
             case INTKEY:
                 d_printf("\tINTKEY\n");
-                return;
                 break;
             case INTTIM:
                 d_printf("\tINTTIM\n");
@@ -341,8 +380,11 @@ namespace CPU
             default:
                 break;
         }
-        
+#if VIRTUAL_PC
+        systemRegisters.EIPC = programCounter;
+#else
         systemRegisters.EIPC = (0x07000000 + (uint32_t)(programCounter - memoryManagmentUnit.rom.data));
+#endif
         systemRegisters.EIPSW = systemRegisters.PSW;
         systemRegisters.ECR.EICC = interruptCode;
         systemRegisters.PSW.EP = 1;
@@ -350,7 +392,11 @@ namespace CPU
         systemRegisters.PSW.AE = 0;
         
         systemRegisters.PSW.IntLevel = min(interruptCode+1, 16);
+#if VIRTUAL_PC
+        programCounter = 0xFFFFFE00 | interruptCode << 4;
+#else
         programCounter = &memoryManagmentUnit.read<char>(0xFFFFFE00 | interruptCode << 4);
+#endif
     }
     
     void v810::throwException(ExceptionCode exceptionCode)
@@ -360,24 +406,41 @@ namespace CPU
         {
             memoryManagmentUnit.store((uint32_t)(0xFFFF0000 | exceptionCode), (uint32_t)0x0);
             memoryManagmentUnit.store(systemRegisters.PSW, 0x4);
+#if VIRTUAL_PC
+            memoryManagmentUnit.store(programCounter, 0x8);
+      
+#else
             memoryManagmentUnit.store(0x07000000 + (uint32_t)(programCounter - memoryManagmentUnit.rom.data), 0x8);
+#endif
             return;
         }
         
         //Duplexed Exception
         if (systemRegisters.PSW.EP)
         {
+#if VIRTUAL_PC
+            systemRegisters.FEPC = programCounter;
+#else
             systemRegisters.FEPC = (0x07000000 + (uint32_t)(programCounter - memoryManagmentUnit.rom.data));
+#endif
             systemRegisters.FEPSW = systemRegisters.PSW;
             systemRegisters.ECR.FECC = exceptionCode;
             systemRegisters.PSW.NP = 1;
             systemRegisters.PSW.ID = 1;
             systemRegisters.PSW.AE = 0;
+#if VIRTUAL_PC
+            programCounter = 0xFFFFFFD0;
+#else
             programCounter = &memoryManagmentUnit.read<char>(0xFFFFFFD0);
+#endif
         }
         else
         {
+#if VIRTUAL_PC
+            systemRegisters.EIPC = programCounter;
+#else
             systemRegisters.EIPC = (0x07000000 + (uint32_t)(programCounter - memoryManagmentUnit.rom.data));
+#endif
             systemRegisters.EIPSW = systemRegisters.PSW;
             systemRegisters.ECR.EICC = exceptionCode;
             systemRegisters.PSW.EP = 1;
@@ -385,7 +448,11 @@ namespace CPU
             systemRegisters.PSW.AE = 0;
             
             //TODO: Lookup the proper handler, this is DIV0
+#if VIRTUAL_PC
+            programCounter = 0xFFFFFF80;
+#else
             programCounter = &memoryManagmentUnit.read<char>(0xFFFFFF80);
+#endif
         }
         
     }

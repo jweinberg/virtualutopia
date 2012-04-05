@@ -21,49 +21,49 @@
 struct OrNoter
 {
     OrNoter() {}
-    const uint32_t operator()(uint32_t a, uint32_t b) const { return a | (~b); };
+    uint32_t operator()(uint32_t a, uint32_t b) const { return a | (~b); };
 };
 
 struct XorNoter
 {
     XorNoter() {}
-    const uint32_t operator()(uint32_t a, uint32_t b) const { return a | (~b); };
+    uint32_t operator()(uint32_t a, uint32_t b) const { return a | (~b); };
 };
 
 struct Noter
 {
     Noter() {}
-    const uint32_t operator()(uint32_t a, uint32_t b) const { return ~b; };
+    uint32_t operator()(uint32_t a, uint32_t b) const { return ~b; };
 };
 
 struct Mover
 {
     Mover() {}
-    const uint32_t operator()(uint32_t a, uint32_t b) const { return b; };
+    uint32_t operator()(uint32_t a, uint32_t b) const { return b; };
 };
 
 struct Xorer
 {
     Xorer() {}
-    const uint32_t operator()(uint32_t a, uint32_t b) const { return a ^ b; };
+    uint32_t operator()(uint32_t a, uint32_t b) const { return a ^ b; };
 };
 
 struct AndNoter
 {
     AndNoter() {}
-    const uint32_t operator()(uint32_t a, uint32_t b) const { return a & (~b); };
+    uint32_t operator()(uint32_t a, uint32_t b) const { return a & (~b); };
 };
 
 struct Ander
 {
     Ander() {}
-    const uint32_t operator()(uint32_t a, uint32_t b) const { return a & b; };
+    uint32_t operator()(uint32_t a, uint32_t b) const { return a & b; };
 };
 
 struct Orer
 {
     Orer() {}
-    const uint32_t operator()(uint32_t a, uint32_t b) const { return a | b; };
+    uint32_t operator()(uint32_t a, uint32_t b) const { return a | b; };
 };
 
 enum FlagCondition
@@ -172,7 +172,7 @@ void CPU::v810::subtract(uint8_t reg1, uint8_t reg2)
     generalRegisters[reg2] = (int32_t)r;           
     
     systemRegisters.PSW.OV = calculate_overflow_subtract(a, b);
-    systemRegisters.PSW.CY = r > b;
+    systemRegisters.PSW.CY = r > (uint32_t)b;
     systemRegisters.PSW.S = (int32_t)r < 0;
     systemRegisters.PSW.Z = (int32_t)r == 0;
     
@@ -197,7 +197,7 @@ void CPU::v810::divide(uint8_t reg1, uint8_t reg2)
     generalRegisters[30] = b % a;
     generalRegisters[reg2] = result;
     
-    systemRegisters.PSW.OV = (b == 0x80000000 && a == 0xFFFFFFFF) ? 1 : 0;
+    systemRegisters.PSW.OV = ((uint32_t)b == 0x80000000 && (uint32_t)a == 0xFFFFFFFF) ? 1 : 0;
     systemRegisters.PSW.S = (result < 0) ? 1 : 0;
     systemRegisters.PSW.Z = (result == 0) ? 1 : 0;
     
@@ -279,7 +279,7 @@ void CPU::v810::compare(uint8_t reg1, uint8_t reg2)
     systemRegisters.PSW.Z = (result == 0) ? 1 : 0;
     systemRegisters.PSW.S = ((int32_t)result < 0) ? 1 : 0;
     systemRegisters.PSW.OV = calculate_overflow_subtract((int32_t)a, (int32_t)b);
-    systemRegisters.PSW.CY = (result > b);
+    systemRegisters.PSW.CY = (result > (uint32_t)b);
     programCounter += 2;
     cycles += 1;
 }
@@ -297,7 +297,7 @@ void CPU::v810::compareImmediate(uint8_t imm5, uint8_t reg2)
     systemRegisters.PSW.Z = (result == 0) ? 1 : 0;
     systemRegisters.PSW.S = ((int32_t)result < 0) ? 1 : 0;
     systemRegisters.PSW.OV = calculate_overflow_subtract((int32_t)a, (int32_t)b);
-    systemRegisters.PSW.CY = (result > b);
+    systemRegisters.PSW.CY = (result > (uint32_t)b);
     programCounter += 2;
 
     cycles += 1;
@@ -555,7 +555,11 @@ void CPU::v810::xorImmediate(uint8_t reg1, uint8_t reg2, uint16_t imm16)
 void CPU::v810::jump(uint8_t reg1, uint8_t unused)
 {
     d_printf("JMP: PC <- GR[%d](0x%X)\n", reg1, generalRegisters[reg1]);
+#if VIRTUAL_PC
+    programCounter = generalRegisters[reg1];
+#else
     programCounter = &memoryManagmentUnit.read<char>(generalRegisters[reg1]);
+#endif
     cycles += 3;
 }
 
@@ -895,7 +899,7 @@ void CPU::v810::loadHWord(uint8_t reg1, uint8_t reg2, uint16_t disp16)
 {
     uint32_t address = (generalRegisters[reg1] + (int16_t)disp16);
     address &= 0xFFFFFFFE;
-    d_printf("LD.H: GR[%d] <- [GR[%d](0x%X) + %d\n", reg2, reg1, generalRegisters[reg1], sign_extend(16, disp16));
+    d_printf("LD.H: GR[%d] <- [GR[%d](0x%X) + %d]\n", reg2, reg1, generalRegisters[reg1], sign_extend(16, disp16));
     
     generalRegisters[reg2] = sign_extend(16, memoryManagmentUnit.read<int16_t>(address));
     programCounter += 4;    
@@ -905,7 +909,7 @@ void CPU::v810::loadHWord(uint8_t reg1, uint8_t reg2, uint16_t disp16)
 void CPU::v810::loadWord(uint8_t reg1, uint8_t reg2, uint16_t disp16)
 {
     uint32_t address = (generalRegisters[reg1] + (int16_t)disp16) & 0xFFFFFFFC;
-    d_printf("LD.W: GR[%d] <- [GR[%d](0x%X) + %d\n", reg2, reg1, generalRegisters[reg1], sign_extend(16, disp16));
+    d_printf("LD.W: GR[%d] <- [GR[%d](0x%X) + %d]\n", reg2, reg1, generalRegisters[reg1], sign_extend(16, disp16));
     
     generalRegisters[reg2] = memoryManagmentUnit.read<int32_t>(address);
     programCounter += 4;    
@@ -914,7 +918,7 @@ void CPU::v810::loadWord(uint8_t reg1, uint8_t reg2, uint16_t disp16)
 
 void CPU::v810::inByte(uint8_t reg1, uint8_t reg2, uint16_t disp16)
 {
-    d_printf("IN.B: GR[%d] <- [GR[%d](0x%X) + %d\n", reg2, reg1, generalRegisters[reg1], sign_extend(16, disp16));
+    d_printf("IN.B: GR[%d] <- [GR[%d](0x%X) + %d]\n", reg2, reg1, generalRegisters[reg1], sign_extend(16, disp16));
     
     uint32_t address = (generalRegisters[reg1] + (int16_t)disp16);
     
@@ -969,13 +973,21 @@ void CPU::v810::storeSystemRegister(uint8_t reg1, uint8_t reg2)
 void CPU::v810::jumpAndLink(uint32_t disp26)
 {
     d_printf("JAL\n");
+#if VIRTUAL_PC
+    uint32_t currentPC = programCounter + 4;
+#else
     uint32_t currentPC = (0x07000000 + (uint32_t)(((char*)programCounter + 4) - ((char*)memoryManagmentUnit.rom.data)));
+#endif
     generalRegisters[31] = currentPC;
     currentPC -= 4;
     int32_t relativeJump = sign_extend(26, disp26);
     currentPC += relativeJump;
     
+#if VIRTUAL_PC
+    programCounter = currentPC;
+#else
     programCounter = &memoryManagmentUnit.read<char>(currentPC);
+#endif
     cycles += 3;
 }
 
@@ -1006,12 +1018,21 @@ void CPU::v810::returnFromTrap(uint8_t imm5, uint8_t reg2)
     d_printf("RETI\n");
     if (systemRegisters.PSW.NP)
     {
+#if VIRTUAL_PC
+        programCounter = systemRegisters.FEPC;
+#else
         programCounter = &memoryManagmentUnit.read<char>(systemRegisters.FEPC);
+#endif
         systemRegisters.PSW = systemRegisters.FEPSW;
     }
     else
     {
+#if VIRTUAL_PC
+        programCounter = systemRegisters.EIPC;
+#else
         programCounter = &memoryManagmentUnit.read<char>(systemRegisters.EIPC);
+#endif
+
         systemRegisters.PSW = systemRegisters.EIPSW;            
     }
     cycles += 10;

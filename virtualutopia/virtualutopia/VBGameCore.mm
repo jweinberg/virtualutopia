@@ -84,7 +84,16 @@
 - (const void *)videoBuffer
 {
     //memset(bmpData, 0xFF00FFFF, 384 * 256);
-    memcpy(bmpData,  vb->vip->bmpData, sizeof(uint32_t) * 384 * 256);
+    for (int y = 0; y < 256; ++y)
+    {
+        for (int x = 0; x < 384; ++x)
+        {
+            int left = *(vb->vip->leftBmpData + (y * 384) + x);
+            int right = *(vb->vip->rightBmpData + (y * 384) + x);
+            bmpData[x + (y * 384)] = (0xFF << 24) | (left << 16) | right;
+        }
+    }
+    
     return bmpData;
 }
 

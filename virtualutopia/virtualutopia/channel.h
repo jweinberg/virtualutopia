@@ -21,32 +21,32 @@ namespace VSU
     
 class Channel
 {
-    
 public:
+    Channel();
     double frequency();
     void update(long nanoseconds);
     
-    REGISTER_BITFIELD(SxINT, 
+    REGISTER_BITFIELD(uint8_t, SxINT, 
                       uint8_t counter : 5;
                       uint8_t data : 1;
                       uint8_t reserved : 1;
                       uint8_t enabled : 1;
                       );
-    REGISTER_BITFIELD(SxLRV, 
+    REGISTER_BITFIELD(uint8_t, SxLRV, 
                       uint8_t right : 4;
                       uint8_t left : 4;
                       );
     uint8_t SxFRQL;
-    REGISTER_BITFIELD(SxFRQH,
+    REGISTER_BITFIELD(uint8_t, SxFRQH,
                       uint8_t upper3Bits : 3;
                       uint8_t reserved : 5;
                       );
-    REGISTER_BITFIELD(SxEV0,
+    REGISTER_BITFIELD(uint8_t, SxEV0,
                       uint8_t step : 3;
                       uint8_t u_d : 1;
                       uint8_t initialValue : 4;
                       );
-    REGISTER_BITFIELD(SxEV1,
+    REGISTER_BITFIELD(uint8_t, SxEV1,
                       uint8_t enabled : 1;
                       uint8_t r_s : 1;
                       uint8_t reserved_0 : 2;
@@ -55,7 +55,7 @@ public:
                       uint8_t enable_sweep : 1;
                       uint8_t reserved : 1;
                       );
-    REGISTER_BITFIELD(SxRAM,
+    REGISTER_BITFIELD(uint8_t, SxRAM,
                       uint8_t waveformAddress : 4;
                       uint8_t reserved : 4;
                       );

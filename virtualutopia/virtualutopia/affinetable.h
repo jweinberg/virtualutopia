@@ -23,7 +23,7 @@ struct Fixed16x16
 {
     int32_t integer;
     
-    const int16_t operator+(const Fixed16x16& other)
+    int16_t operator+(const Fixed16x16& other)
     {
         
         int64_t combined = ((int64_t)integer + (int64_t)other.integer + 0x7FFF);

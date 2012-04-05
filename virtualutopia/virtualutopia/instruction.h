@@ -154,22 +154,22 @@ namespace CPU
             };
         };
     public:
-        const uint32_t disp26() const
+        uint32_t disp26() const
         {
             return ((instruction & 0x3FF) << 16) | (instruction >> 16);
         }
 
-        const uint16_t disp9() const
+        uint16_t disp9() const
         {
             return instruction & 0x1FF;
         }
         
-        const uint8_t subopcode() const
+        uint8_t subopcode() const
         {
             return instruction >> 26;
         }
         
-        const OpcodeMnumonic opcode() const
+        OpcodeMnumonic opcode() const
         {
             return (OpcodeMnumonic)((instruction & 0xE000) == 0x8000 ? (instruction & 0xFFFF) >> 9 : (instruction & 0xFFFF) >> 10);
         }

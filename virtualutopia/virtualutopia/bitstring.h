@@ -14,7 +14,7 @@ namespace CPU
 {
     class Bitstring {
     public:
-        Bitstring(MMU& _mmu, uint32_t _address, uint8_t _offset, uint32_t _length) : mmu(_mmu), currentLocation(_address), offset(_offset), stringLength(_length)
+        Bitstring(MMU& _mmu, uint32_t _address, uint8_t _offset, uint32_t _length) : mmu(_mmu), stringLength(_length), offset(_offset), currentLocation(_address)
         {
         }
         
