@@ -158,6 +158,8 @@ namespace VIP
                     return (T*)(((char*)&chrRam[1536]) + (offset - 0x1E000));
                 case 0x20000 ... 0x3BFFF:
                     return (T*)(((char*)&bgMaps[0]) + (offset - 0x20000));
+                case 0x3C000 ... 0x3D7FF:
+                    return (T*)((char*)&paramTables[0] + (offset - 0x3C000));
                 case 0x3D800 ... 0x3DBFF:
                     return (T*)(((char*)&worlds[0]) + (offset - 0x3D800));
                 case 0x3DC00 ... 0x3DFFF:
@@ -225,7 +227,7 @@ namespace VIP
         uint8_t leftBmpData[384 * 256];
         uint8_t rightBmpData[384 * 256];
         BGMap bgMaps[14];
-        
+        char paramTables[0x1800];
         Framebuffer leftFrameBuffer[2];
         Framebuffer rightFrameBuffer[2];
         char columnTable[0x400];
@@ -391,6 +393,7 @@ namespace VIP
             if (over)
             {
                 overPlaneChar = vip.read<BGMapData*>(overplaneChrAddress * 2 + 0x20000);
+                assert(overPlaneChar);
             }
         }
         
