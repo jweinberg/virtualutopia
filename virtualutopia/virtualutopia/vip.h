@@ -36,14 +36,66 @@ namespace VIP
         CPU::v810 *cpu;
         
         template <typename T>
-        inline const T& read(const int offset)
+        class Reader
         {
-            return *((T*)&(*this)[offset]);
+            VIP &vip;
+        public:
+            Reader(VIP &_vip) : vip(_vip)
+            {}
+            
+            inline T operator()(const int offset)
+            {
+                T *ptr = vip.memoryLookup<T>(offset);
+                if (ptr)
+                    return *ptr;
+                assert(false);
+            }
+        };
+
+        template <typename T>
+        class Reader<T*>
+        {
+            VIP &vip;
+        public:
+            Reader(VIP &_vip) : vip(_vip)
+            {}
+            
+            inline T* operator()(const int offset)
+            {
+                return vip.memoryLookup<T>(offset);
+            }
+        };
+
+        template <typename T>
+        inline const T read(const int offset)
+        {
+            Reader<T> r = Reader<T>(*this);
+            return r(offset);
         }
-        
+
         template <typename T>
         inline void store(T& val, const int offset)
         {
+            //Invalidate the CHR cache
+            switch (offset)
+            {
+                case 0x06000 ... 0x07FFF:
+                    chrCache[(offset - 0x06000) / sizeof(Chr)].valid = false;
+                    break;
+                case 0x0E000 ... 0x0FFFF:
+                    chrCache[(offset - 0x0E000) / sizeof(Chr) + 512].valid = false;
+                    break;
+                case 0x16000 ... 0x17FFF:
+                    chrCache[(offset - 0x16000) / sizeof(Chr) + 1024].valid = false;
+                    break;
+                case 0x1E000 ... 0x1FFFF:
+                    chrCache[(offset - 0x1E000) / sizeof(Chr) + 1536].valid = false;
+                    break;
+                case 0x78000 ... 0x7FFFF:
+                    chrCache[(offset - 0x78000) / sizeof(Chr)].valid = false;
+                    break;
+            }
+            
             if (offset == 0x5F804) //INTCLR
                 INTPND &= ~val;
             else if (offset == 0x5F822) //DPCTRL
@@ -77,104 +129,87 @@ namespace VIP
                 else
                     XPSTTS.XPEN = xp->XPEN;
             }
-            
-            //Invalidate the CHR cache
-            switch (offset)
-            {
-                case 0x06000 ... 0x07FFF:
-                    chrCache[(offset - 0x06000) / sizeof(Chr)].valid = false;
-                    break;
-                case 0x0E000 ... 0x0FFFF:
-                    chrCache[(offset - 0x0E000) / sizeof(Chr) + 512].valid = false;
-                    break;
-                case 0x16000 ... 0x17FFF:
-                    chrCache[(offset - 0x16000) / sizeof(Chr) + 1024].valid = false;
-                    break;
-                case 0x1E000 ... 0x1FFFF:
-                    chrCache[(offset - 0x1E000) / sizeof(Chr) + 1536].valid = false;
-                    break;
-                case 0x78000 ... 0x7FFFF:
-                    chrCache[(offset - 0x78000) / sizeof(Chr)].valid = false;
-                    break;
-            }
-            *((T*)&(*this)[offset]) = val;
+           
+            T *ptr = memoryLookup<T>(offset);
+            if (ptr)
+                *ptr = val;
         }
         
-        char& operator[](const int offset)
+        template <typename T>
+        T* memoryLookup(const int offset)
         {
             switch (offset)
             {
                 case 0x00000 ... 0x05FFF:
-                    return *((char*)&leftFrameBuffer[0] + offset);
+                    return (T*)((char*)&leftFrameBuffer[0] + offset);
                 case 0x06000 ... 0x07FFF:
-                    return *(((char*)&chrRam[0]) + (offset - 0x06000));
+                    return (T*)(((char*)&chrRam[0]) + (offset - 0x06000));
                 case 0x08000 ... 0x0DFFF:
-                    return *((char*)&leftFrameBuffer[1] + (offset - 0x08000));
+                    return (T*)((char*)&leftFrameBuffer[1] + (offset - 0x08000));
                 case 0x0E000 ... 0x0FFFF:
-                    return *(((char*)&chrRam[512]) + (offset - 0x0E000));
+                    return (T*)(((char*)&chrRam[512]) + (offset - 0x0E000));
                 case 0x10000 ... 0x15FFF:
-                    return *((char*)&rightFrameBuffer[0] + (offset - 0x10000));
+                    return (T*)((char*)&rightFrameBuffer[0] + (offset - 0x10000));
                 case 0x16000 ... 0x17FFF:
-                    return *(((char*)&chrRam[1024]) + (offset - 0x16000));
+                    return (T*)(((char*)&chrRam[1024]) + (offset - 0x16000));
                 case 0x18000 ... 0x1DFFF:
-                    return *((char*)&rightFrameBuffer[1] + (offset - 0x18000));
+                    return (T*)((char*)&rightFrameBuffer[1] + (offset - 0x18000));
                 case 0x1E000 ... 0x1FFFF:
-                    return *(((char*)&chrRam[1536]) + (offset - 0x1E000));
+                    return (T*)(((char*)&chrRam[1536]) + (offset - 0x1E000));
                 case 0x20000 ... 0x3BFFF:
-                    return *(((char*)&bgMaps[0]) + (offset - 0x20000));
+                    return (T*)(((char*)&bgMaps[0]) + (offset - 0x20000));
                 case 0x3D800 ... 0x3DBFF:
-                    return *(((char*)&worlds[0]) + (offset - 0x3D800));
+                    return (T*)(((char*)&worlds[0]) + (offset - 0x3D800));
                 case 0x3DC00 ... 0x3DFFF:
-                    return *(((char*)&columnTable[0]) + (offset - 0x3DC00));
+                    return (T*)(((char*)&columnTable[0]) + (offset - 0x3DC00));
                 case 0x3E000 ... 0x3FFFF:
-                    return *(((char*)&oam[0]) + (offset - 0x3E000));
+                    return (T*)(((char*)&oam[0]) + (offset - 0x3E000));
                 case 0x5F800:
-                    return *(char*)&INTPND;
+                    return (T*)&INTPND;
                 case 0x5F802:
-                    return *(char*)&INTENB;
+                    return (T*)&INTENB;
                 case 0x5F804:
-                    return *(char*)&INTCLR;
+                    return (T*)&INTCLR;
                 case 0x5F820:
-                    return *(char*)&DPSTTS;
+                    return (T*)&DPSTTS;
                 case 0x5F822:
-                    return *(char*)&DPCTRL;
+                    return (T*)&DPCTRL;
                 case 0x5F824:
-                    return *(char*)&BRT[0];
+                    return (T*)&BRT[0];
                 case 0x5F826:
-                    return *(char*)&BRT[1];
+                    return (T*)&BRT[1];
                 case 0x5F828:
-                    return *(char*)&BRT[2];
+                    return (T*)&BRT[2];
                 case 0x5F82A:
-                    return *(char*)&REST;
+                    return (T*)&REST;
                 case 0x5F82E:
-                    return *(char*)&FRMCYC;
+                    return (T*)&FRMCYC;
                 case 0x5F830:
-                    return *(char*)&CTA;
+                    return (T*)&CTA;
                 case 0x5F840:
-                    return *(char*)&XPSTTS;
+                    return (T*)&XPSTTS;
                 case 0x5F842:
-                    return *(char*)&XPCTRL;
+                    return (T*)&XPCTRL;
                 case 0x5F844:
-                    return *(char*)&VER;
+                    return (T*)&VER;
                 case 0x5F848:
-                    return *(char*)&objControl[0];
+                    return (T*)&objControl[0];
                 case 0x5F84A:
-                    return *(char*)&objControl[1];
+                    return (T*)&objControl[1];
                 case 0x5F84C:
-                    return *(char*)&objControl[2];
+                    return (T*)&objControl[2];
                 case 0x5F84E:
-                    return *(char*)&objControl[3];
+                    return (T*)&objControl[3];
                 case 0x5F860 ... 0x5F867:
-                    return *(((char*)&GPLT[0]) + (offset - 0x5F860));
+                    return (T*)(((char*)&GPLT[0]) + (offset - 0x5F860));
                 case 0x5F868 ... 0x5F86E:
-                    return *(((char*)&JPLT[0]) + (offset - 0x5F868));
+                    return (T*)(((char*)&JPLT[0]) + (offset - 0x5F868));
                 case 0x5F870:
-                    return *(char*)&BKCOL;
+                    return (T*)(char*)&BKCOL;
                 case 0x78000 ... 0x7FFFF:
-                    return *(((char*)&chrRam[0]) + (offset - 0x78000));
+                    return (T*)(((char*)&chrRam[0]) + (offset - 0x78000));
                 default:
-                    //printf("Accessing memory: %x\n", offset);
-                    return videoRam[offset];
+                    return NULL;
             }
         }
         
@@ -194,7 +229,7 @@ namespace VIP
         Framebuffer leftFrameBuffer[2];
         Framebuffer rightFrameBuffer[2];
         char columnTable[0x400];
-        char videoRam[0x80000];
+        
         bool gameStartTriggered;
         uint8_t framesWaited;
         int8_t rowCount;
@@ -347,15 +382,15 @@ namespace VIP
         overplaneChrAddress(_overAddress),
         maxX(xMaps * 512),
         maxY(yMaps * 512),
-        xChar(0),
-        yChar(0),
+        xMap(INT_MAX),
         yMap(INT_MAX),
-        xMap(INT_MAX)
+        xChar(0),
+        yChar(0)
         {
             requiresReload = true;
             if (over)
             {
-                overPlaneChar = &vip.read<BGMapData>(overplaneChrAddress * 2 + 0x20000);
+                overPlaneChar = vip.read<BGMapData*>(overplaneChrAddress * 2 + 0x20000);
             }
         }
         
