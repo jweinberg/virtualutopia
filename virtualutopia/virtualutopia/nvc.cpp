@@ -122,7 +122,7 @@ void NVC::NVC::Step(uint32_t cycles)
             else
             {
                 SCR.STAT = 0;
-                if (SCR.INT && setKey)
+                if (!SCR.INT && setKey)
                 {
                     cpu->processInterrupt(CPU::INTKEY);
                 }

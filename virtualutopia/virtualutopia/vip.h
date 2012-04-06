@@ -48,7 +48,8 @@ namespace VIP
                 T *ptr = vip.memoryLookup<T>(offset);
                 if (ptr)
                     return *ptr;
-                assert(false);
+                T val = 0;
+                return val;
             }
         };
 
