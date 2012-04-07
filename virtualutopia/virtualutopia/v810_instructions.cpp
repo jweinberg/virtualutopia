@@ -115,7 +115,7 @@ void CPU::v810::add(uint8_t reg1, uint8_t reg2)
     generalRegisters[reg2] = truncatedResult;           
     
     systemRegisters.PSW.OV = (sign(a) == sign(b)) ? (sign(truncatedResult) != sign(a)) : 0;
-    systemRegisters.PSW.CY = r > INT32_MAX || r < INT32_MIN;
+    systemRegisters.PSW.CY = r < b;
     systemRegisters.PSW.S = truncatedResult < 0;
     systemRegisters.PSW.Z = truncatedResult == 0;
 
@@ -134,7 +134,7 @@ void CPU::v810::addImmediate5(uint8_t imm5, uint8_t reg2)
     generalRegisters[reg2] = truncatedResult;           
     
     systemRegisters.PSW.OV = (sign(a) == sign(b)) ? (sign(truncatedResult) != sign(a)) : 0;
-    systemRegisters.PSW.CY = r > INT32_MAX || r < INT32_MIN;
+    systemRegisters.PSW.CY = r < b;
     systemRegisters.PSW.S = truncatedResult < 0;
     systemRegisters.PSW.Z = truncatedResult == 0;
     
@@ -154,7 +154,7 @@ void CPU::v810::addImmediate(uint8_t reg1, uint8_t reg2, int16_t imm16)
     generalRegisters[reg2] = truncatedResult;           
     
     systemRegisters.PSW.OV = (sign(a) == sign(b)) ? (sign(truncatedResult) != sign(a)) : 0;
-    systemRegisters.PSW.CY = r > INT32_MAX || r < INT32_MIN;
+    systemRegisters.PSW.CY = r < a;
     systemRegisters.PSW.S = truncatedResult < 0;
     systemRegisters.PSW.Z = truncatedResult == 0;
     programCounter += 4;
@@ -269,8 +269,8 @@ void CPU::v810::multiplyUnsigned(uint8_t reg1, uint8_t reg2)
 //Compare Form I
 void CPU::v810::compare(uint8_t reg1, uint8_t reg2)
 {
-    int32_t a = generalRegisters[reg1];
-    int32_t b = generalRegisters[reg2];
+    uint32_t a = generalRegisters[reg1];
+    uint32_t b = generalRegisters[reg2];
     
     d_printf("CMP: GR[%d](0x%X) and GR[%d](0x%X)\n", reg1, a, reg2, b);
     uint32_t result = b-a;
@@ -278,8 +278,8 @@ void CPU::v810::compare(uint8_t reg1, uint8_t reg2)
     
     systemRegisters.PSW.Z = (result == 0) ? 1 : 0;
     systemRegisters.PSW.S = ((int32_t)result < 0) ? 1 : 0;
-    systemRegisters.PSW.OV = calculate_overflow_subtract((int32_t)a, (int32_t)b);
-    systemRegisters.PSW.CY = (result > (uint32_t)b);
+    systemRegisters.PSW.OV = calculate_overflow_subtract(a, b);
+    systemRegisters.PSW.CY = (result > b);
     programCounter += 2;
     cycles += 1;
 }

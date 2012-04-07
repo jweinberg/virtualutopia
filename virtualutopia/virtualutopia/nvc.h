@@ -162,8 +162,6 @@ namespace NVC
                         currentReadButton = (Button)0;
                     }
                     break;
-                //default:
-                 //   assert(false);
             }
         }
                 
