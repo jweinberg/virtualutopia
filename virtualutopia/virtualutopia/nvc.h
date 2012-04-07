@@ -129,10 +129,8 @@ namespace NVC
                     _TCR *incomingTCR = (_TCR*)&val;
                     if (!(TCR.T_ENB && timerCount > 0) && incomingTCR->Z_STAT_CLR)
                         TCR.Z_STAT = 0;
-                    else
-                    {
-                        TCR.T_ENB = incomingTCR->T_ENB;
-                    }
+                    
+                    TCR.T_ENB = incomingTCR->T_ENB;
                     TCR.TIM_Z_INT = incomingTCR->TIM_Z_INT;
                     TCR.T_CLK_SEL = incomingTCR->T_CLK_SEL;
 
