@@ -23,7 +23,7 @@ int32_t sign_extend(int bits, uint32_t rawValue)
     bits -= 1;
     uint32_t signBitMask = 1 << bits;
     char signValue = (rawValue & signBitMask) >> bits;
-    return rawValue | (signValue ? (0xFFFFFFFF << bits) : 0);
+    return (rawValue & (~(0xFFFFFFFF << bits))) | (signValue ? (0xFFFFFFFF << bits) : 0);
 }
 void dumpPCs();
 

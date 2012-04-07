@@ -27,7 +27,7 @@ namespace VIP
     class VIP
     {
     public:
-        void DumpCHR();
+        //        void DumpCHR();
         void DrawObj(const Obj &obj, int row);
         void DrawNormalWorld(int row, const World &world);
         void DrawAffineWorld(int row, const World& world);

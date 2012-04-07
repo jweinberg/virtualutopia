@@ -41,67 +41,69 @@ namespace VIP
         memset((char*)&leftFrameBuffer[0], 0, 0x6000);
         memset((char*)&rightFrameBuffer[1], 0, 0x6000);
         memset((char*)&leftFrameBuffer[1], 0, 0x6000);
+        
+        memset((char*)&worlds, 0, sizeof(worlds));
     }
     
-    void VIP::DumpCHR()
-    {
-        //Draw as 64x32
-        
-        CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-        
-        uint32_t * bmpdata = (uint32_t*)calloc(64 * 8 * 32 * 8 * 4, sizeof(char));
-        memset(bmpdata, 0xFF, 64 * 8 * 32 * 8 * 4);
-        
-        uint16_t * internalData = (uint16_t*)chrRam[0].data;
-        
-        
-        
-        for (int y = 0; y < 16384; ++y)
-        {
-            for (int x = 0; x < 8; ++x)
-            {
-                uint32_t pixel = 0;
-                char px = (*internalData >> (x * 2)) & 0x3;
-                if (px == 1)
-                    pixel = 0xFF520052;
-                else if (px == 2)
-                    pixel = 0xFFAD00AD;
-                else if (px == 3)
-                    pixel = 0xFFFF00FF;
-                else if (px == 0)
-                    pixel = 0xFF000000;
-                
-                *(bmpdata + (8 * y + x)) = pixel;
-                
-            }
-            internalData++;
-        }
-        
-        CGContextRef context = CGBitmapContextCreate(bmpdata,
-                                                     8, 
-                                                     16384, 8, 32, colorSpace, kCGImageAlphaPremultipliedLast);
-        
-        
-        CGImageRef image = CGBitmapContextCreateImage(context);
-        
-        static int f = 0;
-        CFStringRef str = CFStringCreateWithFormat(NULL, NULL, CFSTR("/Users/jweinberg/chr.png"), f++); 
-        CFURLRef url = CFURLCreateWithFileSystemPath(NULL, str, kCFURLPOSIXPathStyle, false);
-        
-        CGImageDestinationRef destination = CGImageDestinationCreateWithURL(url, kUTTypePNG, 1, NULL);
-        CGImageDestinationAddImage(destination, image, NULL);
-        
-        CGImageDestinationFinalize(destination);
-        
-        
-        CFRelease(destination);
-        CFRelease(url);
-        CFRelease(str);
-        
-        CGColorSpaceRelease(colorSpace);
-        CGContextRelease(context);
-        free(bmpdata);
-    }
+//    void VIP::DumpCHR()
+//    {
+//        //Draw as 64x32
+//        
+//        CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+//        
+//        uint32_t * bmpdata = (uint32_t*)calloc(64 * 8 * 32 * 8 * 4, sizeof(char));
+//        memset(bmpdata, 0xFF, 64 * 8 * 32 * 8 * 4);
+//        
+//        uint16_t * internalData = (uint16_t*)chrRam[0].data;
+//        
+//        
+//        
+//        for (int y = 0; y < 16384; ++y)
+//        {
+//            for (int x = 0; x < 8; ++x)
+//            {
+//                uint32_t pixel = 0;
+//                char px = (*internalData >> (x * 2)) & 0x3;
+//                if (px == 1)
+//                    pixel = 0xFF520052;
+//                else if (px == 2)
+//                    pixel = 0xFFAD00AD;
+//                else if (px == 3)
+//                    pixel = 0xFFFF00FF;
+//                else if (px == 0)
+//                    pixel = 0xFF000000;
+//                
+//                *(bmpdata + (8 * y + x)) = pixel;
+//                
+//            }
+//            internalData++;
+//        }
+//        
+//        CGContextRef context = CGBitmapContextCreate(bmpdata,
+//                                                     8, 
+//                                                     16384, 8, 32, colorSpace, kCGImageAlphaPremultipliedLast);
+//        
+//        
+//        CGImageRef image = CGBitmapContextCreateImage(context);
+//        
+//        static int f = 0;
+//        CFStringRef str = CFStringCreateWithFormat(NULL, NULL, CFSTR("/Users/jweinberg/chr.png"), f++); 
+//        CFURLRef url = CFURLCreateWithFileSystemPath(NULL, str, kCFURLPOSIXPathStyle, false);
+//        
+//        CGImageDestinationRef destination = CGImageDestinationCreateWithURL(url, kUTTypePNG, 1, NULL);
+//        CGImageDestinationAddImage(destination, image, NULL);
+//        
+//        CGImageDestinationFinalize(destination);
+//        
+//        
+//        CFRelease(destination);
+//        CFRelease(url);
+//        CFRelease(str);
+//        
+//        CGColorSpaceRelease(colorSpace);
+//        CGContextRelease(context);
+//        free(bmpdata);
+//    }
     
     void VIP::DrawObj(const Obj &obj, int row)
     {
@@ -171,7 +173,7 @@ namespace VIP
                     int w = 8 - xOff;
                     w = MIN(w, world.W + 1 - x);
                     
-                    int xPos = x + world.GX - world.GP;
+                    int xPos = x + world.GX - sign_extend(9, world.GP);
                     if (!(xPos + w < 0 || xPos >= 384))
                     {
                         const BGMapData& data = mapLookup.GetMapData();
@@ -197,7 +199,7 @@ namespace VIP
                     int w = 8 - xOff;
                     w = MIN(w, world.W + 1 - x);
                     
-                    int xPos = x + world.GX + world.GP;
+                    int xPos = x + world.GX + sign_extend(9, world.GP);
                     if (!(xPos + w < 0 || xPos >= 384))
                     {
                         const BGMapData& data = mapLookup.GetMapData();
@@ -238,7 +240,7 @@ namespace VIP
                 
                 if (world.LON)
                 {
-                    int xPos = x + world.GX + world.GP;
+                    int xPos = x + world.GX + sign_extend(9, world.GP);
                     if (!(xPos < 0 || xPos >= 384))
                     {
                         int srcX = (Fixed16x16(affineTable.MX) + (Fixed16x16(affineTable.DX) * (((int64_t)(x + leftParalax)) << 16)));
@@ -262,7 +264,7 @@ namespace VIP
                 }
                 if (world.RON)
                 {
-                    int xPos = x + world.GX - world.GP;
+                    int xPos = x + world.GX - sign_extend(9, world.GP);
                     if (!(xPos < 0 || xPos >= 384))
                     {                                
                         int srcX = (Fixed16x16(affineTable.MX) + (Fixed16x16(affineTable.DX) * (((int64_t)((x + rightParalax))) << 16)));
@@ -317,7 +319,7 @@ namespace VIP
                     int w = 8 - xOff;
                     w = MIN(w, world.W + 1 - x);
                     
-                    int xPos = x + world.GX - world.GP;
+                    int xPos = x + world.GX - sign_extend(9, world.GP);
                     if (!(xPos + w < 0 || xPos >= 384))
                     {
                         const BGMapData &data = mapLookup.GetMapData();
@@ -343,7 +345,7 @@ namespace VIP
                     int w = 8 - xOff;
                     w = MIN(w, world.W + 1 - x);
                     
-                    int xPos = x + world.GX + world.GP;
+                    int xPos = x + world.GX + sign_extend(9, world.GP);
                     if (!(xPos + w < 0 || xPos >= 384))
                     {
                         
