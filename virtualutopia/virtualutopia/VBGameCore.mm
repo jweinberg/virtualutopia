@@ -90,7 +90,7 @@
         {
             int left = *(vb->vip->leftBmpData + (y * 384) + x);
             int right = *(vb->vip->rightBmpData + (y * 384) + x);
-            bmpData[x + (y * 384)] = (0xFF << 24) | (left << 16) | right;
+            bmpData[x + (y * 384)] = (0xFF << 24) | (right << 16) | left;
         }
     }
     

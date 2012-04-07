@@ -121,23 +121,23 @@ namespace VIP
         
         if (obj.JLON)
         {
-            int x = obj.JX - obj.JP;
+            int x = obj.JX - sign_extend<8>(obj.JP);
             if (x + 8 < 0 || x >= 384)
                 return;
             
             if (!chrCache[obj.JCA].valid)
                 chrCache[obj.JCA].LoadData(chrRam[obj.JCA].data);
-            leftFrameBuffer[drawingFB].DrawCachedChr(chrCache[obj.JCA], row, obj.JX - obj.JP, obj.JY, 0, 0, 8, 8, obj.JHFLP, obj.JVFLP, JPLT[obj.JPLTS]);
+            leftFrameBuffer[drawingFB].DrawCachedChr(chrCache[obj.JCA], row, x, obj.JY, 0, 0, 8, 8, obj.JHFLP, obj.JVFLP, JPLT[obj.JPLTS]);
         }
         if (obj.JRON)
         {
-            int x = obj.JX + obj.JP;
+            int x = obj.JX + sign_extend<8>(obj.JP);
             if (x + 8 < 0 || x >= 384)
                 return;
             
             if (!chrCache[obj.JCA].valid)
                 chrCache[obj.JCA].LoadData(chrRam[obj.JCA].data);
-            rightFrameBuffer[drawingFB].DrawCachedChr(chrCache[obj.JCA], row, obj.JX + obj.JP, obj.JY, 0, 0, 8, 8, obj.JHFLP, obj.JVFLP, JPLT[obj.JPLTS]);
+            rightFrameBuffer[drawingFB].DrawCachedChr(chrCache[obj.JCA], row, x, obj.JY, 0, 0, 8, 8, obj.JHFLP, obj.JVFLP, JPLT[obj.JPLTS]);
         }
         
     }
@@ -173,7 +173,7 @@ namespace VIP
                     int w = 8 - xOff;
                     w = MIN(w, world.W + 1 - x);
                     
-                    int xPos = x + world.GX - sign_extend(9, world.GP);
+                    int xPos = x + world.GX - sign_extend<9>(world.GP);
                     if (!(xPos + w < 0 || xPos >= 384))
                     {
                         const BGMapData& data = mapLookup.GetMapData();
@@ -199,7 +199,7 @@ namespace VIP
                     int w = 8 - xOff;
                     w = MIN(w, world.W + 1 - x);
                     
-                    int xPos = x + world.GX + sign_extend(9, world.GP);
+                    int xPos = x + world.GX + sign_extend<9>(world.GP);
                     if (!(xPos + w < 0 || xPos >= 384))
                     {
                         const BGMapData& data = mapLookup.GetMapData();
@@ -240,7 +240,7 @@ namespace VIP
                 
                 if (world.LON)
                 {
-                    int xPos = x + world.GX + sign_extend(9, world.GP);
+                    int xPos = x + world.GX - sign_extend<9>(world.GP);
                     if (!(xPos < 0 || xPos >= 384))
                     {
                         int srcX = (Fixed16x16(affineTable.MX) + (Fixed16x16(affineTable.DX) * (((int64_t)(x + leftParalax)) << 16)));
@@ -264,7 +264,7 @@ namespace VIP
                 }
                 if (world.RON)
                 {
-                    int xPos = x + world.GX - sign_extend(9, world.GP);
+                    int xPos = x + world.GX + sign_extend<9>(world.GP);
                     if (!(xPos < 0 || xPos >= 384))
                     {                                
                         int srcX = (Fixed16x16(affineTable.MX) + (Fixed16x16(affineTable.DX) * (((int64_t)((x + rightParalax))) << 16)));
@@ -319,7 +319,7 @@ namespace VIP
                     int w = 8 - xOff;
                     w = MIN(w, world.W + 1 - x);
                     
-                    int xPos = x + world.GX - sign_extend(9, world.GP);
+                    int xPos = x + world.GX - sign_extend<9>(world.GP);
                     if (!(xPos + w < 0 || xPos >= 384))
                     {
                         const BGMapData &data = mapLookup.GetMapData();
@@ -345,7 +345,7 @@ namespace VIP
                     int w = 8 - xOff;
                     w = MIN(w, world.W + 1 - x);
                     
-                    int xPos = x + world.GX + sign_extend(9, world.GP);
+                    int xPos = x + world.GX + sign_extend<9>(world.GP);
                     if (!(xPos + w < 0 || xPos >= 384))
                     {
                         

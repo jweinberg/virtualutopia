@@ -98,8 +98,8 @@ void CPU::v810::move(uint8_t reg1, uint8_t reg2)
 //Move Form II
 void CPU::v810::moveImmediate(uint8_t imm5, uint8_t reg2)
 {
-    d_printf("MOV: GR[%d] <- (0x%X)\n", reg2, sign_extend(5, imm5));
-    generalRegisters[reg2] = sign_extend(5, imm5);
+    d_printf("MOV: GR[%d] <- (0x%X)\n", reg2, sign_extend<5>(imm5));
+    generalRegisters[reg2] = sign_extend<5>(imm5);
     programCounter += 2;
     cycles += 1;
 }
@@ -126,8 +126,8 @@ void CPU::v810::add(uint8_t reg1, uint8_t reg2)
 //Add Form II
 void CPU::v810::addImmediate5(uint8_t imm5, uint8_t reg2)
 {
-    d_printf("ADD: GR[%d] <- GR[%d](0x%X) + 0x%X\n", reg2, reg2, generalRegisters[reg2], sign_extend(5, imm5));
-    int32_t a = sign_extend(5, imm5);
+    d_printf("ADD: GR[%d] <- GR[%d](0x%X) + 0x%X\n", reg2, reg2, generalRegisters[reg2], sign_extend<5>(imm5));
+    int32_t a = sign_extend<5>(imm5);
     int32_t b = generalRegisters[reg2];
     int64_t r = a+b;
     int32_t truncatedResult = r & 0xFFFFFFFF;
@@ -145,9 +145,9 @@ void CPU::v810::addImmediate5(uint8_t imm5, uint8_t reg2)
 
 void CPU::v810::addImmediate(uint8_t reg1, uint8_t reg2, int16_t imm16)
 {
-    d_printf("ADDI: GR[%d] <- GR[%d](0x%X) + 0x%X\n", reg2, reg1, generalRegisters[reg1], sign_extend(16, imm16));
+    d_printf("ADDI: GR[%d] <- GR[%d](0x%X) + 0x%X\n", reg2, reg1, generalRegisters[reg1], sign_extend<16>(imm16));
     
-    int32_t a = sign_extend(16, imm16);
+    int32_t a = sign_extend<16>(imm16);
     int32_t b = generalRegisters[reg1];
     int64_t r = a+b;
     int32_t truncatedResult = r & 0xFFFFFFFF;
@@ -287,7 +287,7 @@ void CPU::v810::compare(uint8_t reg1, uint8_t reg2)
 //Compare Form II
 void CPU::v810::compareImmediate(uint8_t imm5, uint8_t reg2)
 {
-    int32_t a = sign_extend(5, imm5);
+    int32_t a = sign_extend<5>(imm5);
     int32_t b = generalRegisters[reg2];
     
     d_printf("CMP: 0x%X and GR[%d](0x%X)\n", a, reg2, b);
@@ -565,7 +565,7 @@ void CPU::v810::jump(uint8_t reg1, uint8_t unused)
 
 void CPU::v810::jumpRelative(uint32_t disp26)
 {
-    int32_t relativeJump = sign_extend(26, disp26);
+    int32_t relativeJump = sign_extend<26>(disp26);
     d_printf("JR: PC <- PC + 0x%X\n", relativeJump);
     programCounter += relativeJump;
     cycles += 3;
@@ -576,7 +576,7 @@ void CPU::v810::branchIfNoOverflow(uint16_t disp9)
     d_printf("%s\n", "BNV");
     if (systemRegisters.PSW.OV == 0)
     {
-        programCounter += sign_extend(9, disp9);
+        programCounter += sign_extend<9>(disp9);
         cycles += 3;
     }
     else
@@ -591,7 +591,7 @@ void CPU::v810::branchIfOverflow(uint16_t disp9)
     d_printf("%s\n", "BV");
     if (systemRegisters.PSW.OV)
     {
-        programCounter += sign_extend(9, disp9);
+        programCounter += sign_extend<9>(disp9);
         cycles += 3;
     }
     else
@@ -606,7 +606,7 @@ void CPU::v810::branchIfZero(uint16_t disp9)
     d_printf("%s\n", "BZ");
     if (systemRegisters.PSW.Z)
     {
-        programCounter += sign_extend(9, disp9);
+        programCounter += sign_extend<9>(disp9);
         cycles += 3;
     }
     else
@@ -621,7 +621,7 @@ void CPU::v810::branchIfNotZero(uint16_t disp9)
     d_printf("%s\n", "BNZ");
     if (systemRegisters.PSW.Z == 0)
     {
-        programCounter += sign_extend(9, disp9);
+        programCounter += sign_extend<9>(disp9);
         cycles += 3;
     }
     else
@@ -637,7 +637,7 @@ void CPU::v810::branchIfLessThan(uint16_t disp9)
     d_printf("%s\n", "BLT");
     if ((systemRegisters.PSW.S ^ systemRegisters.PSW.OV) == 1)
     {
-        programCounter += sign_extend(9, disp9);
+        programCounter += sign_extend<9>(disp9);
         cycles += 3;
     }
     else
@@ -652,7 +652,7 @@ void CPU::v810::branchIfNotHigher(uint16_t disp9)
     d_printf("%s\n", "BNH");
     if ((systemRegisters.PSW.Z | systemRegisters.PSW.CY) == 1)
     {
-        programCounter += sign_extend(9, disp9);
+        programCounter += sign_extend<9>(disp9);
         cycles += 3;
     }
     else
@@ -667,7 +667,7 @@ void CPU::v810::branchIfNegative(uint16_t disp9)
     d_printf("%s\n", "BN");
     if (systemRegisters.PSW.S)
     {
-        programCounter += sign_extend(9, disp9);
+        programCounter += sign_extend<9>(disp9);
         cycles += 3;
     }
     else
@@ -682,7 +682,7 @@ void CPU::v810::branchIfPositive(uint16_t disp9)
     d_printf("%s\n", "BP");
     if (systemRegisters.PSW.S == 0)
     {
-        programCounter += sign_extend(9, disp9);
+        programCounter += sign_extend<9>(disp9);
         cycles += 3;
     }
     else
@@ -698,7 +698,7 @@ void CPU::v810::branchIfHigher(uint16_t disp9)
     d_printf("%s\n", "BH");
     if ((systemRegisters.PSW.Z | systemRegisters.PSW.CY) == 0)
     {
-        programCounter += sign_extend(9, disp9);
+        programCounter += sign_extend<9>(disp9);
         cycles += 3;
     }
     else
@@ -713,7 +713,7 @@ void CPU::v810::branchIfGreaterOrEqual(uint16_t disp9)
     d_printf("BGE\n");
     if ((systemRegisters.PSW.S ^ systemRegisters.PSW.OV) == 0)
     {
-        programCounter += sign_extend(9, disp9);
+        programCounter += sign_extend<9>(disp9);
         cycles += 3;
     }
     else
@@ -728,7 +728,7 @@ void CPU::v810::branchIfGreaterThan(uint16_t disp9)
     d_printf("BGT\n");
     if (((systemRegisters.PSW.S ^ systemRegisters.PSW.OV) | systemRegisters.PSW.Z) == 0)
     {
-        programCounter += sign_extend(9, disp9);
+        programCounter += sign_extend<9>(disp9);
         cycles += 3;
     }
     else
@@ -743,7 +743,7 @@ void CPU::v810::branchIfLessOrEqual(uint16_t disp9)
     d_printf("BLE\n");
     if (((systemRegisters.PSW.S ^ systemRegisters.PSW.OV) | systemRegisters.PSW.Z) == 1)
     {
-        programCounter += sign_extend(9, disp9);
+        programCounter += sign_extend<9>(disp9);
         cycles += 3;
     }
     else
@@ -765,7 +765,7 @@ void CPU::v810::branchIfCarry(uint16_t disp9)
     d_printf("BC\n");
     if (systemRegisters.PSW.CY)
     {
-        programCounter += sign_extend(9, disp9);
+        programCounter += sign_extend<9>(disp9);
         cycles += 3;
     }
     else
@@ -780,7 +780,7 @@ void CPU::v810::branchIfNoCarry(uint16_t disp9)
     d_printf("BNC\n");
     if (systemRegisters.PSW.CY == 0)
     {
-        programCounter += sign_extend(9, disp9);
+        programCounter += sign_extend<9>(disp9);
         cycles += 3;
     }
     else
@@ -793,7 +793,7 @@ void CPU::v810::branchIfNoCarry(uint16_t disp9)
 void CPU::v810::branch(uint16_t disp9)
 {
     d_printf("BR\n");
-    programCounter += sign_extend(9, disp9);
+    programCounter += sign_extend<9>(disp9);
     cycles += 3;
 }
 
@@ -807,8 +807,8 @@ void CPU::v810::moveHigh(uint8_t reg1, uint8_t reg2, uint16_t imm16)
 
 void CPU::v810::moveAddImmediate(uint8_t reg1, uint8_t reg2, uint16_t imm16)
 {
-    d_printf("MOVEA: GR[%d] <- GR[%d](0x%X) + 0x%X\n", reg2, reg1, generalRegisters[reg1], sign_extend(16, imm16));
-    generalRegisters[reg2] = generalRegisters[reg1] + sign_extend(16, imm16);
+    d_printf("MOVEA: GR[%d] <- GR[%d](0x%X) + 0x%X\n", reg2, reg1, generalRegisters[reg1], sign_extend<16>(imm16));
+    generalRegisters[reg2] = generalRegisters[reg1] + sign_extend<16>(imm16);
     programCounter += 4;
     cycles += 1;
 }
@@ -816,7 +816,7 @@ void CPU::v810::moveAddImmediate(uint8_t reg1, uint8_t reg2, uint16_t imm16)
 void CPU::v810::storeWord(uint8_t reg1, uint8_t reg2, uint16_t disp16)
 {
     uint32_t address = (generalRegisters[reg1] + (int16_t)disp16) & 0xFFFFFFFC;
-    d_printf("ST.W: [GR[%d](0x%X) + %d](0x%X) <- [GR[%d](0x%X)\n", reg1, generalRegisters[reg1], sign_extend(16, disp16) & 0xFFFFFFFC, address, reg2, generalRegisters[reg2]);
+    d_printf("ST.W: [GR[%d](0x%X) + %d](0x%X) <- [GR[%d](0x%X)\n", reg1, generalRegisters[reg1], sign_extend<16>(disp16) & 0xFFFFFFFC, address, reg2, generalRegisters[reg2]);
 
     memoryManagmentUnit.store<uint32_t>(generalRegisters[reg2], address);
     programCounter += 4;
@@ -826,7 +826,7 @@ void CPU::v810::storeWord(uint8_t reg1, uint8_t reg2, uint16_t disp16)
 void CPU::v810::storeHWord(uint8_t reg1, uint8_t reg2, uint16_t disp16)
 {
     uint32_t address = (generalRegisters[reg1] + (int16_t)disp16) & 0xFFFFFFFE;
-    d_printf("ST.H: [GR[%d](0x%X) + %d](0x%X) <- [GR[%d](0x%X)\n", reg1, generalRegisters[reg1], sign_extend(16, disp16) & 0xFFFFFFFE, address, reg2, generalRegisters[reg2]);
+    d_printf("ST.H: [GR[%d](0x%X) + %d](0x%X) <- [GR[%d](0x%X)\n", reg1, generalRegisters[reg1], sign_extend<16>(disp16) & 0xFFFFFFFE, address, reg2, generalRegisters[reg2]);
 
     
     memoryManagmentUnit.store<uint16_t>(generalRegisters[reg2] & 0xFFFF, address);
@@ -837,7 +837,7 @@ void CPU::v810::storeHWord(uint8_t reg1, uint8_t reg2, uint16_t disp16)
 void CPU::v810::storeByte(uint8_t reg1, uint8_t reg2, uint16_t disp16)
 {
     uint32_t address = (generalRegisters[reg1] + (int16_t)disp16);
-    d_printf("ST.B: [GR[%d](0x%X) + %d](0x%X) <- [GR[%d](0x%X)\n", reg1, generalRegisters[reg1], sign_extend(16, disp16), address, reg2, generalRegisters[reg2]);
+    d_printf("ST.B: [GR[%d](0x%X) + %d](0x%X) <- [GR[%d](0x%X)\n", reg1, generalRegisters[reg1], sign_extend<16>(disp16), address, reg2, generalRegisters[reg2]);
 
 //    if (address == 0x5004194)
 //        printf("Writing %d val\n", generalRegisters[reg2] & 0xFF);
@@ -849,7 +849,7 @@ void CPU::v810::storeByte(uint8_t reg1, uint8_t reg2, uint16_t disp16)
 void CPU::v810::outWord(uint8_t reg1, uint8_t reg2, uint16_t disp16)
 {
     uint32_t address = (generalRegisters[reg1] + (int16_t)disp16) & 0xFFFFFFFC;
-    d_printf("OUT.W: [GR[%d](0x%X) + %d](0x%X) <- [GR[%d](0x%X)\n", reg1, generalRegisters[reg1], sign_extend(16, disp16) & 0xFFFFFFFC, address, reg2, generalRegisters[reg2]);
+    d_printf("OUT.W: [GR[%d](0x%X) + %d](0x%X) <- [GR[%d](0x%X)\n", reg1, generalRegisters[reg1], sign_extend<16>(disp16) & 0xFFFFFFFC, address, reg2, generalRegisters[reg2]);
     
     memoryManagmentUnit.store<uint32_t>(generalRegisters[reg2], address);
     programCounter += 4;
@@ -859,7 +859,7 @@ void CPU::v810::outWord(uint8_t reg1, uint8_t reg2, uint16_t disp16)
 void CPU::v810::outHWord(uint8_t reg1, uint8_t reg2, uint16_t disp16)
 {
     uint32_t address = (generalRegisters[reg1] + (int16_t)disp16) & 0xFFFFFFFE;
-    d_printf("OUT.H: [GR[%d](0x%X) + %d](0x%X) <- [GR[%d](0x%X)\n", reg1, generalRegisters[reg1], sign_extend(16, disp16) & 0xFFFFFFFE, address, reg2, generalRegisters[reg2]);
+    d_printf("OUT.H: [GR[%d](0x%X) + %d](0x%X) <- [GR[%d](0x%X)\n", reg1, generalRegisters[reg1], sign_extend<16>(disp16) & 0xFFFFFFFE, address, reg2, generalRegisters[reg2]);
     
     
     memoryManagmentUnit.store<uint16_t>(generalRegisters[reg2] & 0xFFFF, address);
@@ -870,7 +870,7 @@ void CPU::v810::outHWord(uint8_t reg1, uint8_t reg2, uint16_t disp16)
 void CPU::v810::outByte(uint8_t reg1, uint8_t reg2, uint16_t disp16)
 {
     uint32_t address = (generalRegisters[reg1] + (int16_t)disp16);
-    d_printf("OUT.B: [GR[%d](0x%X) + %d](0x%X) <- [GR[%d](0x%X)\n", reg1, generalRegisters[reg1], sign_extend(16, disp16), address, reg2, generalRegisters[reg2]);
+    d_printf("OUT.B: [GR[%d](0x%X) + %d](0x%X) <- [GR[%d](0x%X)\n", reg1, generalRegisters[reg1], sign_extend<16>(disp16), address, reg2, generalRegisters[reg2]);
     
     //    if (address == 0x5004194)
     //        printf("Writing %d val\n", generalRegisters[reg2] & 0xFF);
@@ -882,7 +882,7 @@ void CPU::v810::outByte(uint8_t reg1, uint8_t reg2, uint16_t disp16)
 
 void CPU::v810::loadByte(uint8_t reg1, uint8_t reg2, uint16_t disp16)
 {
-    d_printf("LD.B: GR[%d] <- [GR[%d](0x%X) + %d\n", reg2, reg1, generalRegisters[reg1], sign_extend(16, disp16));
+    d_printf("LD.B: GR[%d] <- [GR[%d](0x%X) + %d\n", reg2, reg1, generalRegisters[reg1], sign_extend<16>(disp16));
 
     uint32_t address = (generalRegisters[reg1] + (int16_t)disp16);
     
@@ -890,7 +890,7 @@ void CPU::v810::loadByte(uint8_t reg1, uint8_t reg2, uint16_t disp16)
 //    if (address == 0x5004194)
 //        printf("Reading %d val\n", val);
     
-    generalRegisters[reg2] = sign_extend(8, val);
+    generalRegisters[reg2] = sign_extend<8>(val);
     programCounter += 4;    
     cycles += 3;
 }
@@ -899,9 +899,9 @@ void CPU::v810::loadHWord(uint8_t reg1, uint8_t reg2, uint16_t disp16)
 {
     uint32_t address = (generalRegisters[reg1] + (int16_t)disp16);
     address &= 0xFFFFFFFE;
-    d_printf("LD.H: GR[%d] <- [GR[%d](0x%X) + %d]\n", reg2, reg1, generalRegisters[reg1], sign_extend(16, disp16));
+    d_printf("LD.H: GR[%d] <- [GR[%d](0x%X) + %d]\n", reg2, reg1, generalRegisters[reg1], sign_extend<16>(disp16));
     
-    generalRegisters[reg2] = sign_extend(16, memoryManagmentUnit.read<int16_t>(address));
+    generalRegisters[reg2] = sign_extend<16>(memoryManagmentUnit.read<int16_t>(address));
     programCounter += 4;    
     cycles += 3;
 }
@@ -909,7 +909,7 @@ void CPU::v810::loadHWord(uint8_t reg1, uint8_t reg2, uint16_t disp16)
 void CPU::v810::loadWord(uint8_t reg1, uint8_t reg2, uint16_t disp16)
 {
     uint32_t address = (generalRegisters[reg1] + (int16_t)disp16) & 0xFFFFFFFC;
-    d_printf("LD.W: GR[%d] <- [GR[%d](0x%X) + %d]\n", reg2, reg1, generalRegisters[reg1], sign_extend(16, disp16));
+    d_printf("LD.W: GR[%d] <- [GR[%d](0x%X) + %d]\n", reg2, reg1, generalRegisters[reg1], sign_extend<16>(disp16));
     
     generalRegisters[reg2] = memoryManagmentUnit.read<int32_t>(address);
     programCounter += 4;    
@@ -918,7 +918,7 @@ void CPU::v810::loadWord(uint8_t reg1, uint8_t reg2, uint16_t disp16)
 
 void CPU::v810::inByte(uint8_t reg1, uint8_t reg2, uint16_t disp16)
 {
-    d_printf("IN.B: GR[%d] <- [GR[%d](0x%X) + %d]\n", reg2, reg1, generalRegisters[reg1], sign_extend(16, disp16));
+    d_printf("IN.B: GR[%d] <- [GR[%d](0x%X) + %d]\n", reg2, reg1, generalRegisters[reg1], sign_extend<16>(disp16));
     
     uint32_t address = (generalRegisters[reg1] + (int16_t)disp16);
     
@@ -935,7 +935,7 @@ void CPU::v810::inHWord(uint8_t reg1, uint8_t reg2, uint16_t disp16)
 {
     uint32_t address = (generalRegisters[reg1] + (int16_t)disp16);
     address &= 0xFFFFFFFE;
-    d_printf("IN.H: GR[%d] <- [GR[%d](0x%X) + %d\n", reg2, reg1, generalRegisters[reg1], sign_extend(16, disp16));
+    d_printf("IN.H: GR[%d] <- [GR[%d](0x%X) + %d\n", reg2, reg1, generalRegisters[reg1], sign_extend<16>(disp16));
     
     generalRegisters[reg2] = memoryManagmentUnit.read<uint16_t>(address);
     programCounter += 4;    
@@ -945,7 +945,7 @@ void CPU::v810::inHWord(uint8_t reg1, uint8_t reg2, uint16_t disp16)
 void CPU::v810::inWord(uint8_t reg1, uint8_t reg2, uint16_t disp16)
 {
     uint32_t address = (generalRegisters[reg1] + (int16_t)disp16) & 0xFFFFFFFC;
-    d_printf("IN.W: GR[%d] <- [GR[%d](0x%X) + %d\n", reg2, reg1, generalRegisters[reg1], sign_extend(16, disp16));
+    d_printf("IN.W: GR[%d] <- [GR[%d](0x%X) + %d\n", reg2, reg1, generalRegisters[reg1], sign_extend<16>(disp16));
     
     generalRegisters[reg2] = memoryManagmentUnit.read<uint32_t>(address);
     programCounter += 4;    
@@ -980,7 +980,7 @@ void CPU::v810::jumpAndLink(uint32_t disp26)
 #endif
     generalRegisters[31] = currentPC;
     currentPC -= 4;
-    int32_t relativeJump = sign_extend(26, disp26);
+    int32_t relativeJump = sign_extend<26>(disp26);
     currentPC += relativeJump;
     
 #if VIRTUAL_PC

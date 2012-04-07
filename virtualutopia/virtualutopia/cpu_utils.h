@@ -26,7 +26,15 @@
         return ((uint32_t)v >> 31);
     }
     
-int32_t sign_extend(int bits, uint32_t rawValue);
+
+    template <int bits>
+    inline int32_t sign_extend(uint32_t rawValue)
+    {
+        uint32_t bitMask = 0xFFFFFFFF << (bits - 1);
+        uint32_t signBitMask = 1 << (bits - 1);
+        char signValue = (rawValue & signBitMask) >> (bits - 1);
+        return (rawValue & (~bitMask)) | (signValue ? bitMask : 0);
+    }
 
     inline bool calculate_overflow_subtract(int32_t a, int32_t b)
     {
