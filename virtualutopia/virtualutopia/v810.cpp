@@ -14,7 +14,7 @@
 #include <deque>
 
 std::ofstream outFile("/Users/jweinberg/log.asm");
-volatile bool debugOutput = false;
+volatile bool debugOutput = true;
 volatile uint32_t lowAdr = 0x7030000;
 std::deque<uint32_t> pcs;
 
@@ -68,6 +68,7 @@ namespace CPU
 #else
         const uint16_t& partialDecode = *(uint16_t*)programCounter;
 #endif
+        
         OpcodeMnumonic opcode;
         uint8_t arg1 = 0;
         uint8_t arg2 = 0;

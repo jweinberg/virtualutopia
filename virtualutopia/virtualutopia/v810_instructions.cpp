@@ -408,7 +408,7 @@ void CPU::v810::shiftRight(uint8_t reg1, uint8_t reg2)
     generalRegisters[reg2] = result;
     
     systemRegisters.PSW.OV = 0;
-    systemRegisters.PSW.CY = s ? (a >> (a-1)) & 1 : 0;
+    systemRegisters.PSW.CY = s ? (a >> (s-1)) & 1 : 0;
     systemRegisters.PSW.S = result < 0;
     systemRegisters.PSW.Z = result == 0;
     programCounter += 2;
@@ -425,7 +425,7 @@ void CPU::v810::shiftRightImmediate(uint8_t imm5, uint8_t reg2)
     generalRegisters[reg2] = result;
     
     systemRegisters.PSW.OV = 0;
-    systemRegisters.PSW.CY = imm5 ? (a >> (a-1)) & 1 : 0;
+    systemRegisters.PSW.CY = imm5 ? (a >> (s-1)) & 1 : 0;
     systemRegisters.PSW.S = result < 0;
     systemRegisters.PSW.Z = result == 0;
     programCounter += 2;
@@ -1289,6 +1289,11 @@ void CPU::v810::orBitString(uint8_t reg1, uint8_t reg2)
     uint32_t length = generalRegisters[28];
     uint32_t offsetInSource = generalRegisters[27];
     uint32_t offsetInDest = generalRegisters[26];
+    d_printf("\tsource=0x%X\n", startAddress);
+    d_printf("\tdest=0x%X\n", destAddress);
+    d_printf("\tlength=%u\n", length);
+    d_printf("\tsourceoff=%u\n", offsetInSource);
+    d_printf("\tdestoff=%u\n", offsetInDest);
     
     Bitstring source(memoryManagmentUnit, startAddress, offsetInSource, length);
     Bitstring dest(memoryManagmentUnit, destAddress, offsetInDest, length);

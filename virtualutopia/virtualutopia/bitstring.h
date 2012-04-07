@@ -9,6 +9,8 @@
 #include <assert.h>
 #include <cmath>
 #include "mmu.h"
+#include <iostream>
+#include <bitset>
 
 namespace CPU
 {
@@ -16,16 +18,27 @@ namespace CPU
     public:
         Bitstring(MMU& _mmu, uint32_t _address, uint8_t _offset, uint32_t _length) : mmu(_mmu), stringLength(_length), offset(_offset), currentLocation(_address)
         {
+            int wordsShifted = offset / 32;
+            currentLocation += 4 * wordsShifted;
+            offset -= wordsShifted * 32;
+        }
+        
+        void Dump()
+        {
+            for (int i = 3; i >= 0; --i)
+                std::cout << std::bitset<32>(mmu.read<uint32_t>(currentLocation + i * 4)) << " ";
+            
+            std::cout << std::endl << "Offset: " << (int)offset << " Length: " << stringLength << std::endl;
         }
         
         template <typename Functype>
         inline void SetNext(const Functype& op, uint32_t bits, uint8_t length)
         {   
-            uint8_t bitsFromWord = 32-offset;
+            uint8_t bitsFromWord = min<uint8_t>(length, 32-offset);
             uint32_t currentWord = mmu.read<uint32_t>(currentLocation);
             uint32_t modifiedWord = op(currentWord >> offset, bits);
-            currentWord &= ~(~(0xFFFFFFFF << bitsFromWord) << offset);
-            currentWord |= modifiedWord << offset;
+            currentWord = currentWord & (uint32_t)(~(~(0xFFFFFFFFL << bitsFromWord) << offset));
+            currentWord = currentWord | (modifiedWord << offset);
             
             mmu.store(currentWord, currentLocation);
             
@@ -34,8 +47,8 @@ namespace CPU
                 uint32_t leftToWrite = length - bitsFromWord;
                 currentLocation += 4;
                 uint32_t nextWord = mmu.read<uint32_t>(currentLocation);
-                uint32_t modifiedWord = op(nextWord & ~(0xFFFFFFFF << leftToWrite), bits >> bitsFromWord);
-                nextWord &= 0xFFFFFFFF << leftToWrite;
+                uint32_t modifiedWord = op(nextWord & ~(0xFFFFFFFFL << leftToWrite), bits >> bitsFromWord);
+                nextWord &= 0xFFFFFFFFL << leftToWrite;
                 nextWord |= modifiedWord;
                 mmu.store(nextWord, currentLocation);
                 
@@ -85,7 +98,7 @@ namespace CPU
             
             
             stringLength -= readLength;
-            data = readWord & (0xFFFFFFFF >> (32 - readLength));
+            data = readWord & (0xFFFFFFFFL >> (32 - readLength));
         }
         
         inline bool HasData()
