@@ -368,13 +368,13 @@ void CPU::v810::setFlag(uint8_t imm5, uint8_t reg2)
 void CPU::v810::shiftLeft(uint8_t reg1, uint8_t reg2)
 {
     d_printf("SHL: GR[%d] <- GR[%d](0x%X) << GR[%d](0x%X)\n", reg2, reg2, generalRegisters[reg2], reg1, generalRegisters[reg1]);
-    int32_t s = generalRegisters[reg1];
+    uint32_t s = generalRegisters[reg1] & 0x1F;
     int32_t a = generalRegisters[reg2];
     int32_t result = a << s;
     generalRegisters[reg2] = result;
     
     systemRegisters.PSW.OV = 0;
-    systemRegisters.PSW.CY = reg1 ? (a >> (32-s)) & 1 : 0;
+    systemRegisters.PSW.CY = s ? (a >> (32-s)) & 1 : 0;
     systemRegisters.PSW.S = result < 0;
     systemRegisters.PSW.Z = result == 0;
     programCounter += 2;
@@ -402,7 +402,7 @@ void CPU::v810::shiftLeftImmediate(uint8_t imm5, uint8_t reg2)
 void CPU::v810::shiftRight(uint8_t reg1, uint8_t reg2)
 {
     d_printf("SHR: GR[%d] <- GR[%d](0x%X) >> GR[%d](0x%X)\n", reg2, reg2, generalRegisters[reg2], reg1, generalRegisters[reg1]);
-    uint32_t s = generalRegisters[reg1];
+    uint32_t s = generalRegisters[reg1] & 0x1F;
     uint32_t a = generalRegisters[reg2];
     int32_t result = a >> s;
     generalRegisters[reg2] = result;

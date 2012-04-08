@@ -14,7 +14,12 @@
 #include "vip.h"
 #import <OpenGL/gl.h>
 
+@interface VBGameCore ()
+@property (nonatomic, copy) NSString *romPath;
+@end
+
 @implementation VBGameCore
+@synthesize romPath;
 
 - (id)init
 {
@@ -59,6 +64,19 @@
     if (vb)
         delete vb;
     vb = new VB([path UTF8String]);
+    romPath = [path copy];
+    
+    NSString *extensionlessFilename = [[path lastPathComponent] stringByDeletingPathExtension];
+    
+    NSString *batterySavesDirectory = [self batterySavesDirectoryPath];
+
+    if([batterySavesDirectory length] != 0)
+    {
+        [[NSFileManager defaultManager] createDirectoryAtPath:batterySavesDirectory withIntermediateDirectories:YES attributes:nil error:NULL];
+        NSString *filePath = [batterySavesDirectory stringByAppendingPathComponent:[extensionlessFilename stringByAppendingPathExtension:@"sav"]];
+        NSData *data = [NSData dataWithContentsOfFile:filePath];
+        memcpy(vb->mmu->gamepackRam, [data bytes], [data length]);
+    }
     return YES;
 }
 - (void)resetEmulation
@@ -68,6 +86,18 @@
 
 - (void)stopEmulation
 {
+    NSString *extensionlessFilename = [[romPath lastPathComponent] stringByDeletingPathExtension];
+
+    NSString *batterySavesDirectory = [self batterySavesDirectoryPath];
+    
+    if([batterySavesDirectory length] != 0)
+    {
+        [[NSFileManager defaultManager] createDirectoryAtPath:batterySavesDirectory withIntermediateDirectories:YES attributes:nil error:NULL];
+        NSString *filePath = [batterySavesDirectory stringByAppendingPathComponent:[extensionlessFilename stringByAppendingPathExtension:@"sav"]];
+        NSData *data = [NSData dataWithBytesNoCopy:vb->mmu->gamepackRam length:0x20000 freeWhenDone:NO];
+        [data writeToFile:filePath atomically:NO];
+    }
+    
     [super stopEmulation];
 }
 
