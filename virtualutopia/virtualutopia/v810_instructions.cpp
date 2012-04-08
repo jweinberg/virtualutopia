@@ -235,7 +235,7 @@ void CPU::v810::multiply(uint8_t reg1, uint8_t reg2)
     d_printf("MUL: GR[%d] <- GR[%d](0x%X) * GR[%d](0x%X)\n", reg2, reg2, generalRegisters[reg2], reg1, generalRegisters[reg1]);
     int32_t a = generalRegisters[reg1];
     int32_t b = generalRegisters[reg2];
-    int64_t result = a * b;
+    int64_t result = (int64_t)a * b;
     
     generalRegisters[30] = (int32_t)(result >> 32);
     generalRegisters[reg2] = (int32_t)result;
@@ -253,7 +253,7 @@ void CPU::v810::multiplyUnsigned(uint8_t reg1, uint8_t reg2)
     d_printf("MULU: GR[%d] <- GR[%d](0x%X) * GR[%d](0x%X)\n", reg2, reg2, generalRegisters[reg2], reg1, generalRegisters[reg1]);
     uint32_t a = generalRegisters[reg1];
     uint32_t b = generalRegisters[reg2];
-    uint64_t result = b * a;
+    uint64_t result = (uint64_t)a * b;
     
     generalRegisters[30] = (int32_t)(result >> 32);
     generalRegisters[reg2] = (int32_t)(result & 0xFFFFFFFF);
@@ -436,13 +436,13 @@ void CPU::v810::shiftRightImmediate(uint8_t imm5, uint8_t reg2)
 void CPU::v810::shiftArithmeticRight(uint8_t reg1, uint8_t reg2)
 {
     d_printf("SAR: GR[%d] <- GR[%d](0x%X) >>>  GR[%d](0x%X)\n", reg2, reg2, generalRegisters[reg2], reg1, generalRegisters[reg1]);
-    int32_t s = generalRegisters[reg1];
+    uint32_t s = generalRegisters[reg1] & 0x1F;
     int32_t a = generalRegisters[reg2];
     int32_t result = a >> s;
     generalRegisters[reg2] = result;
     
     systemRegisters.PSW.OV = 0;
-    systemRegisters.PSW.CY = s ? (a >> (a-1)) & 1 : 0;
+    systemRegisters.PSW.CY = s ? (a >> (s-1)) & 1 : 0;
     systemRegisters.PSW.S = result < 0;
     systemRegisters.PSW.Z = result == 0;
     programCounter += 2;
@@ -452,13 +452,13 @@ void CPU::v810::shiftArithmeticRight(uint8_t reg1, uint8_t reg2)
 void CPU::v810::shiftArithmeticRightImmediate(uint8_t imm5, uint8_t reg2)
 {
     d_printf("SAR: GR[%d] <- GR[%d](0x%X) >>> 0x%X\n", reg2, reg2, generalRegisters[reg2], imm5);
-    int32_t s = imm5;
+    uint32_t s = imm5;
     int32_t a = generalRegisters[reg2];
     int32_t result = a >> s;
     generalRegisters[reg2] = result;
     
     systemRegisters.PSW.OV = 0;
-    systemRegisters.PSW.CY = imm5 ? (a >> (a-1)) & 1 : 0;
+    systemRegisters.PSW.CY = imm5 ? (a >> (s-1)) & 1 : 0;
     systemRegisters.PSW.S = result < 0;
     systemRegisters.PSW.Z = result == 0;
     programCounter += 2;  
