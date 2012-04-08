@@ -20,9 +20,9 @@ public:
     
     const std::string romName() const;
     template <typename T>
-    const T& read(uint32_t address) const
+    const T *memoryLookup(uint32_t address) const
     {
-        return *((T*)&(*this)[address]);
+        return ((T*)&(*this)[address]);
     }
     
     inline char& operator[](uint32_t address) const

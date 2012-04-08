@@ -21,9 +21,9 @@ namespace VSU
     public:
         VSU();
         template <typename T>
-        inline const T& read(uint32_t offset) const
+        inline T *memoryLookup(uint32_t offset) const
         {
-            return *((T*)&(*this)[offset]);
+            return ((T*)&(*this)[offset]);
         }
         
         inline char& operator[](uint32_t offset) const

@@ -45,7 +45,7 @@ namespace CPU
 #if VIRTUAL_PC
         programCounter = 0xFFFFFFF0;
 #else
-        programCounter = &memoryManagmentUnit.read<char>(0xFFFFFFF0);
+        programCounter = memoryManagmentUnit.read<const char*>(0xFFFFFFF0);
 #endif
         systemRegisters.PSW = 0x00008000;
         memset(generalRegisters, 0, sizeof(generalRegisters));
@@ -379,7 +379,7 @@ namespace CPU
 #if VIRTUAL_PC
         programCounter = 0xFFFFFE00 | interruptCode << 4;
 #else
-        programCounter = &memoryManagmentUnit.read<char>(0xFFFFFE00 | interruptCode << 4);
+        programCounter = memoryManagmentUnit.read<const char*>(0xFFFFFE00 | interruptCode << 4);
 #endif
     }
     
@@ -415,7 +415,7 @@ namespace CPU
 #if VIRTUAL_PC
             programCounter = 0xFFFFFFD0;
 #else
-            programCounter = &memoryManagmentUnit.read<char>(0xFFFFFFD0);
+            programCounter = memoryManagmentUnit.read<const char*>(0xFFFFFFD0);
 #endif
         }
         else
@@ -435,7 +435,7 @@ namespace CPU
 #if VIRTUAL_PC
             programCounter = 0xFFFFFF80;
 #else
-            programCounter = &memoryManagmentUnit.read<char>(0xFFFFFF80);
+            programCounter = memoryManagmentUnit.read<const char*>(0xFFFFFF80);
 #endif
         }
         

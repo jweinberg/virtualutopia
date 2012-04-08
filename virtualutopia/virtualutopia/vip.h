@@ -34,45 +34,6 @@ namespace VIP
         void DrawHBiasWorld(int row, const World& world);
         VIP();
         CPU::v810 *cpu;
-        
-        template <typename T>
-        class Reader
-        {
-            VIP &vip;
-        public:
-            Reader(VIP &_vip) : vip(_vip)
-            {}
-            
-            inline T operator()(const int offset)
-            {
-                T *ptr = vip.memoryLookup<T>(offset);
-                if (ptr)
-                    return *ptr;
-                T val = 0;
-                return val;
-            }
-        };
-
-        template <typename T>
-        class Reader<T*>
-        {
-            VIP &vip;
-        public:
-            Reader(VIP &_vip) : vip(_vip)
-            {}
-            
-            inline T* operator()(const int offset)
-            {
-                return vip.memoryLookup<T>(offset);
-            }
-        };
-
-        template <typename T>
-        inline const T read(const int offset)
-        {
-            Reader<T> r = Reader<T>(*this);
-            return r(offset);
-        }
 
         template <typename T>
         inline void store(T& val, const int offset)
@@ -137,7 +98,7 @@ namespace VIP
         }
         
         template <typename T>
-        T* memoryLookup(const int offset)
+        T* memoryLookup(const int offset) const
         {
             switch (offset)
             {
@@ -393,7 +354,7 @@ namespace VIP
             requiresReload = true;
             if (over)
             {
-                overPlaneChar = vip.read<BGMapData*>(overplaneChrAddress * 2 + 0x20000);
+                overPlaneChar = vip.memoryLookup<BGMapData>(overplaneChrAddress * 2 + 0x20000);
                 assert(overPlaneChar);
             }
         }

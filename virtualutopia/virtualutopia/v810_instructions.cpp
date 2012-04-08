@@ -558,7 +558,7 @@ void CPU::v810::jump(uint8_t reg1, uint8_t unused)
 #if VIRTUAL_PC
     programCounter = generalRegisters[reg1];
 #else
-    programCounter = &memoryManagmentUnit.read<char>(generalRegisters[reg1]);
+    programCounter = memoryManagmentUnit.read<const char*>(generalRegisters[reg1]);
 #endif
     cycles += 3;
 }
@@ -986,7 +986,7 @@ void CPU::v810::jumpAndLink(uint32_t disp26)
 #if VIRTUAL_PC
     programCounter = currentPC;
 #else
-    programCounter = &memoryManagmentUnit.read<char>(currentPC);
+    programCounter = memoryManagmentUnit.read<const char*>(currentPC);
 #endif
     cycles += 3;
 }
@@ -1021,7 +1021,7 @@ void CPU::v810::returnFromTrap(uint8_t imm5, uint8_t reg2)
 #if VIRTUAL_PC
         programCounter = systemRegisters.FEPC;
 #else
-        programCounter = &memoryManagmentUnit.read<char>(systemRegisters.FEPC);
+        programCounter = memoryManagmentUnit.read<const char*>(systemRegisters.FEPC);
 #endif
         systemRegisters.PSW = systemRegisters.FEPSW;
     }
@@ -1030,7 +1030,7 @@ void CPU::v810::returnFromTrap(uint8_t imm5, uint8_t reg2)
 #if VIRTUAL_PC
         programCounter = systemRegisters.EIPC;
 #else
-        programCounter = &memoryManagmentUnit.read<char>(systemRegisters.EIPC);
+        programCounter = memoryManagmentUnit.read<const char*>(systemRegisters.EIPC);
 #endif
 
         systemRegisters.PSW = systemRegisters.EIPSW;            

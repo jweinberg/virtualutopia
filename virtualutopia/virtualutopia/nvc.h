@@ -62,32 +62,32 @@ namespace NVC
         void ApplyWriteWait(uint32_t address);
         
         template <typename T>
-        inline const T& read(uint32_t address) const
+        inline T *memoryLookup(uint32_t address) const
         {
             switch (address)
             {
                 case 0x2000000:
-                    return *((T*)&CCR);
+                    return ((T*)&CCR);
                 case 0x2000004:
-                    return *((T*)&CCSR);
+                    return ((T*)&CCSR);
                 case 0x2000008:
-                    return *((T*)&CDTR);
+                    return ((T*)&CDTR);
                 case 0x200000C:
-                    return *((T*)&CDRR);
+                    return ((T*)&CDRR);
                 case 0x2000010:
-                    return *((T*)(((uint8_t*)&SDR_HW)));
+                    return ((T*)(((uint8_t*)&SDR_HW)));
                 case 0x2000014:
-                    return *((T*)(((uint8_t*)&SDR_HW) + 1));
+                    return ((T*)(((uint8_t*)&SDR_HW) + 1));
                 case 0x2000018:
-                    return *((T*)&TLR);
+                    return ((T*)&TLR);
                 case 0x200001C:
-                    return *((T*)&THR);
+                    return ((T*)&THR);
                 case 0x2000020:
-                    return *((T*)&TCR);
+                    return ((T*)&TCR);
                 case 0x2000024:
-                    return *((T*)&WCR);
+                    return ((T*)&WCR);
                 case 0x2000028:
-                    return *((T*)&SCR);
+                    return ((T*)&SCR);
             }
             assert(false);
         }

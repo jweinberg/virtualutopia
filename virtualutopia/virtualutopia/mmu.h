@@ -4,6 +4,7 @@
 #include "vip.h"
 #include "nvc.h"
 #include "vsu.h"
+#include "memory.h"
 
 namespace VIP
 {
@@ -23,24 +24,31 @@ public:
     MMU(const ROM &rom, VIP::VIP &vip, NVC::NVC &nvc, VSU::VSU &vsu);
 
     template <typename T>
-    inline const T read(uint32_t virtualAddress) const
+    inline T read(uint32_t virtualAddress) const
+    {
+        Memory<MMU>::Reader<T> r(*this);
+        return r(virtualAddress);
+    }
+    
+    template <typename T>
+    inline const T *memoryLookup(uint32_t virtualAddress) const
     {
         virtualAddress = virtualAddress & 0x07FFFFFF;
         //nvc.ApplyReadWait(virtualAddress);
         switch (virtualAddress)
         {
             case 0x0 ... 0xFFFFFF: //Display RAM, VIP
-                return vip.read<T>(virtualAddress & 0x7FFFF);
+                return vip.memoryLookup<T>(virtualAddress & 0x7FFFF);
             case 0x01000000 ... 0x010005FF: //Sound Memory
-                return vsu.read<T>(virtualAddress & 0x5FF);
+                return vsu.memoryLookup<T>(virtualAddress & 0x5FF);
             case 0x02000000 ... 0x0200002C: //Hardware registers
-                return nvc.read<T>(virtualAddress);
+                return nvc.memoryLookup<T>(virtualAddress);
             case 0x05000000 ... 0x05FFFFFF: //Program RAM (mask with 0xFFFF)
-                return *((T*)&programRam[virtualAddress & 0xFFFF]);
+                return ((T*)&programRam[virtualAddress & 0xFFFF]);
             case 0x06000000 ... 0x06FFFFFF: //Cartridge RAM
-                return *((T*)&gamepackRam[(virtualAddress & 0xFFFFFF) & 0x1FFFF]);
+                return ((T*)&gamepackRam[(virtualAddress & 0xFFFFFF) & 0x1FFFF]);
             case 0x07000000 ... 0x07FFFFFF: //Cartridge ROM
-                return rom.read<T>(virtualAddress);
+                return rom.memoryLookup<T>(virtualAddress);
         }
         return 0;
     }

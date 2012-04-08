@@ -226,7 +226,7 @@ namespace VIP
         
         for (; y < (max<int>((row * 8) - world.GY, 0) + 8) && y <= world.H; ++y)
         {
-            const AffineTable &affineTable = *read<AffineTable*>(((world.PARAM_BASE & 0xFFF0) * 2 + 0x00020000) + y * sizeof(AffineTable));
+            const AffineTable &affineTable = *memoryLookup<AffineTable>(((world.PARAM_BASE & 0xFFF0) * 2 + 0x00020000) + y * sizeof(AffineTable));
             
             int rightParalax = (affineTable.MP >= 0 ? affineTable.MP : 0);
             int leftParalax = (affineTable.MP < 0 ? affineTable.MP : 0);
@@ -300,7 +300,7 @@ namespace VIP
         
         for (; y < (max<int>((row * 8) - world.GY, 0) + 8) && y <= world.H; ++y)
         {
-            const HBiasTable &hBiasTable = *read<HBiasTable*>((world.PARAM_BASE & 0xFFF0) * 2 + 0x00020000 + y * sizeof(HBiasTable));
+            const HBiasTable &hBiasTable = *memoryLookup<HBiasTable>((world.PARAM_BASE & 0xFFF0) * 2 + 0x00020000 + y * sizeof(HBiasTable));
             
             int srcY = (y + world.MY);
             mapLookup.SetY(srcY);

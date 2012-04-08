@@ -9,10 +9,41 @@
 #ifndef virtualutopia_memory_h
 #define virtualutopia_memory_h
 
-template <int size>
+template <typename X>
 class Memory
 {
-    uint32_t data[size];
+public:
+    template <typename T>
+    class Reader
+    {
+        const X &memory;
+    public:
+        Reader(const X &_memory) : memory(_memory)
+        {}
+        
+        inline T operator()(const int offset)
+        {
+            const T *ptr = memory.template memoryLookup<T>(offset);
+            if (ptr)
+                return *ptr;
+            T val = 0;
+            return val;
+        }
+    };
+    
+    template <typename T>
+    class Reader<T*>
+    {
+        const X &memory;
+    public:
+        Reader(const X &_memory) : memory(_memory)
+        {}
+        
+        inline const T* operator()(const int offset)
+        {
+            return memory.template memoryLookup<T>(offset);
+        }
+    };
 };
 
 
