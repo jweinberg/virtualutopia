@@ -30,10 +30,10 @@
     template <int bits>
     inline int32_t sign_extend(uint32_t rawValue)
     {
-        uint32_t bitMask = 0xFFFFFFFF << (bits - 1);
-        uint32_t signBitMask = 1 << (bits - 1);
-        char signValue = (rawValue & signBitMask) >> (bits - 1);
-        return (rawValue & (~bitMask)) | (signValue ? bitMask : 0);
+        const uint32_t signBitValue = 1 << (bits - 1);
+        rawValue = rawValue & (~(0xFFFFFFFF << bits));
+        int32_t result = ((rawValue ^ signBitValue) - signBitValue);
+        return result;
     }
 
     inline bool calculate_overflow_subtract(int32_t a, int32_t b)
