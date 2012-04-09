@@ -17,6 +17,7 @@ void NVC::NVC::Reset()
     TCR = 0;
     THR = 0xFF;
     TLR = 0xFF;
+    cachedTimerStep = 2000;
     internalTimerCount = 0;
     lastTimer = 0;
     readCounter = 0;
@@ -137,7 +138,7 @@ void NVC::NVC::Step(uint32_t cycles)
     //Update timer
     if (TCR.T_ENB)
     {
-        if ((cycles-lastTimer) > (TCR.T_CLK_SEL ? 500 : 2000))
+        if ((cycles-lastTimer) > cachedTimerStep)
         {
             if (timerCount == 0 || awaitingReload) 
             {

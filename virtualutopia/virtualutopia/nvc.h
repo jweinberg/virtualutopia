@@ -53,6 +53,7 @@ namespace NVC
         int32_t readCounter;
         int32_t lastInputUpdate;
         uint32_t lastTimer;
+        int16_t cachedTimerStep;
         bool setKey;
         bool awaitingReload;
         Button currentReadButton;
@@ -133,7 +134,7 @@ namespace NVC
                     TCR.T_ENB = incomingTCR->T_ENB;
                     TCR.TIM_Z_INT = incomingTCR->TIM_Z_INT;
                     TCR.T_CLK_SEL = incomingTCR->T_CLK_SEL;
-
+                    cachedTimerStep = (TCR.T_CLK_SEL ? 500 : 2000);
                     break;
                 }
                 case 0x2000024:

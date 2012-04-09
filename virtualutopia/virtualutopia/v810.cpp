@@ -322,15 +322,16 @@ namespace CPU
     {    
         //Some instructions think its FUNNY to assign to reg 0 as an optimization
         generalRegisters[0] = 0;   
-        
-        vip.Step(cycles);
-        nvc.Step(cycles);
+
         //        vsu.Step(cycles);
 //        
 //        if (vip.INTENB & vip.INTPND)
 //            processInterrupt(INTVPU);
 //        
         fetchAndDecode();
+        
+        vip.Step(cycles);
+        nvc.Step(cycles);
     }
     
     void v810::processInterrupt(InterruptCode interruptCode)
