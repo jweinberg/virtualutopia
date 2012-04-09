@@ -37,8 +37,8 @@
 		822530CF14424F200065B088 /* OEVBSystemResponder.m in Sources */ = {isa = PBXBuildFile; fileRef = 822530CB14424F200065B088 /* OEVBSystemResponder.m */; };
 		822530D3144254D80065B088 /* VB-Controller.png in Resources */ = {isa = PBXBuildFile; fileRef = 822530D2144254D70065B088 /* VB-Controller.png */; };
 		822530D7144256180065B088 /* ControlsPreference.xib in Resources */ = {isa = PBXBuildFile; fileRef = 822530D6144256180065B088 /* ControlsPreference.xib */; };
-		82AA7355144D20A5008BF178 /* v810_instructions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82C8AB6314180083006213AA /* v810_instructions.cpp */; };
-		82AA7356144D20A6008BF178 /* v810_instructions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82C8AB6314180083006213AA /* v810_instructions.cpp */; };
+		82AA7355144D20A5008BF178 /* v810_instructions.h in Sources */ = {isa = PBXBuildFile; fileRef = 82C8AB6314180083006213AA /* v810_instructions.h */; };
+		82AA7356144D20A6008BF178 /* v810_instructions.h in Sources */ = {isa = PBXBuildFile; fileRef = 82C8AB6314180083006213AA /* v810_instructions.h */; };
 		82C8AB5D1417DFB3006213AA /* instruction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82C8AB5C1417DFB3006213AA /* instruction.cpp */; };
 		82E9442A14339FCB007F3291 /* vip.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82E9442914339FCB007F3291 /* vip.cpp */; };
 		82E944301433A9F7007F3291 /* nvc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 82E9442F1433A9F7007F3291 /* nvc.cpp */; };
@@ -254,7 +254,7 @@
 		82C8AB591417D5B0006213AA /* cpu_utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cpu_utils.h; sourceTree = "<group>"; };
 		82C8AB5C1417DFB3006213AA /* instruction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = instruction.cpp; sourceTree = "<group>"; };
 		82C8AB5E1417DFBE006213AA /* instruction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = instruction.h; sourceTree = "<group>"; };
-		82C8AB6314180083006213AA /* v810_instructions.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = v810_instructions.cpp; sourceTree = "<group>"; };
+		82C8AB6314180083006213AA /* v810_instructions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = v810_instructions.h; sourceTree = "<group>"; };
 		82E9442914339FCB007F3291 /* vip.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vip.cpp; sourceTree = "<group>"; };
 		82E9442B14339FD9007F3291 /* vip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vip.h; sourceTree = "<group>"; };
 		82E9442C1433A169007F3291 /* registers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = registers.h; sourceTree = "<group>"; };
@@ -407,7 +407,7 @@
 			isa = PBXGroup;
 			children = (
 				821438DB14146D1500A98E34 /* v810.cpp */,
-				82C8AB6314180083006213AA /* v810_instructions.cpp */,
+				82C8AB6314180083006213AA /* v810_instructions.h */,
 				821438DD14146D2500A98E34 /* v810.h */,
 				82C8AB591417D5B0006213AA /* cpu_utils.h */,
 				82C8AB5C1417DFB3006213AA /* instruction.cpp */,
@@ -768,7 +768,7 @@
 				82E9442A14339FCB007F3291 /* vip.cpp in Sources */,
 				82E944301433A9F7007F3291 /* nvc.cpp in Sources */,
 				82EB1CB014422403007A22EA /* vb.cpp in Sources */,
-				82AA7355144D20A5008BF178 /* v810_instructions.cpp in Sources */,
+				82AA7355144D20A5008BF178 /* v810_instructions.h in Sources */,
 				820E0E871454CEB80065AE37 /* vsu.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -795,7 +795,7 @@
 				82EB1D2714422731007A22EA /* vb.cpp in Sources */,
 				82EB1D2F144227F6007A22EA /* VBGameCore.mm in Sources */,
 				82EB1D34144228C2007A22EA /* VBGameCoreController.mm in Sources */,
-				82AA7356144D20A6008BF178 /* v810_instructions.cpp in Sources */,
+				82AA7356144D20A6008BF178 /* v810_instructions.h in Sources */,
 				820E0E881454CEB80065AE37 /* vsu.cpp in Sources */,
 				82F9E2FD14E6E9EF004D82BA /* channel.cpp in Sources */,
 			);

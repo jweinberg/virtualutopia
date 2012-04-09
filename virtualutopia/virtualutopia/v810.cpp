@@ -12,6 +12,7 @@
 #include <iterator>
 #include "vsu.h"
 #include <deque>
+#include "v810_instructions.h"
 
 std::ofstream outFile("/Users/jweinberg/log.asm");
 volatile bool debugOutput = true;
