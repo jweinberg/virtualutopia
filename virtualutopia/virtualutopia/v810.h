@@ -16,24 +16,24 @@ extern std::ofstream outFile;
 extern volatile bool debugOutput;
 
 
-#define VIRTUAL_PC 1
+#define VIRTUAL_PC 0
 
-#if VIRTUAL_PC
-//#define d_printf(A, ...)
-#define d_printf(A, ...) do{ if(debugOutput) {\
-char buffer[255];\
-sprintf(buffer, "%X (%u): " A, programCounter, cycles , ##__VA_ARGS__);\
-outFile << buffer;\
-outFile.flush();\
-} }while(0)
-#else
-#define d_printf(A, ...) do{ if(debugOutput) {\
-char buffer[255];\
-sprintf(buffer, "%X (%u): " A, (0x07000000 + (uint32_t)((char*)programCounter - ((char*)memoryManagmentUnit.rom.data))),cycles , ##__VA_ARGS__);\
-outFile << buffer;\
-outFile.flush();\
-} }while(0)
-#endif
+#define d_printf(A, ...)
+//#if VIRTUAL_PC
+//#define d_printf(A, ...) do{ if(debugOutput) {\
+//char buffer[255];\
+//sprintf(buffer, "%X (%u): " A, programCounter, cycles , ##__VA_ARGS__);\
+//outFile << buffer;\
+//outFile.flush();\
+//} }while(0)
+//#else
+//#define d_printf(A, ...) do{ if(debugOutput) {\
+//char buffer[255];\
+//sprintf(buffer, "%X (%u): " A, (0x07000000 + (uint32_t)((char*)programCounter - ((char*)memoryManagmentUnit.rom.data))),cycles , ##__VA_ARGS__);\
+//outFile << buffer;\
+//outFile.flush();\
+//} }while(0)
+//#endif
 
 
 class MMU;

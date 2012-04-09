@@ -31,7 +31,7 @@ namespace VIP
             *column |= (color << shift);
         }
         
-        inline void DrawCachedChr(const ChrCacheEntry &chrCache, uint8_t row, int xoff, int yoff, int sourceXOffset, int sourceYOffset, int w, int h, bool flipHor, bool flipVert,const Palette &palette)
+        void DrawCachedChr(const ChrCacheEntry &chrCache, uint8_t row, int xoff, int yoff, int sourceXOffset, int sourceYOffset, int w, int h, bool flipHor, bool flipVert,const Palette &palette)
         {
             const uint8_t * const data = chrCache.expandedData;
             const uint8_t expandedRow = row * 8;
