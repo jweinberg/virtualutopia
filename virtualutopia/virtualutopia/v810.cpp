@@ -57,7 +57,7 @@ namespace CPU
     void v810::fetchAndDecode()
     {
 #if VIRTUAL_PC
-        const uint16_t& partialDecode = memoryManagmentUnit.rom.read<uint16_t>(programCounter);
+        const uint16_t& partialDecode = *memoryManagmentUnit.rom.memoryLookup<uint16_t>(programCounter);
 #else
         const uint16_t& partialDecode = *(uint16_t*)programCounter;
 #endif
@@ -83,7 +83,7 @@ namespace CPU
             case 0xA000:
                 opcode = (OpcodeMnumonic)(partialDecode >> 10);
 #if VIRTUAL_PC
-                arg3 = memoryManagmentUnit.rom.read<uint16_t>(programCounter + 2);
+                arg3 = *memoryManagmentUnit.rom.memoryLookup<uint16_t>(programCounter + 2);
 #else
                 arg3 = *(uint16_t*)(programCounter + 2);
 #endif
@@ -105,7 +105,7 @@ namespace CPU
                 arg1 = partialDecode & 0x1F;
                 arg2 = (partialDecode >> 5) & 0x1F;
 #if VIRTUAL_PC
-                arg3 = memoryManagmentUnit.rom.read<uint16_t>(programCounter + 2);
+                arg3 = *memoryManagmentUnit.memoryLookup<uint16_t>(programCounter + 2);
 #else
                 arg3 = *(uint16_t*)(programCounter + 2);
 #endif

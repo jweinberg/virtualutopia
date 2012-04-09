@@ -209,7 +209,7 @@ void CPU::v810::divideUnsigned(uint8_t reg1, uint8_t reg2)
 {
     d_printf("DIVU: GR[%d] <- GR[%d](0x%X) / GR[%d](0x%X)\n", reg2, reg2, generalRegisters[reg2], reg1, generalRegisters[reg1]);
     uint32_t a = generalRegisters[reg1];
-    int32_t b = generalRegisters[reg2];
+    uint32_t b = generalRegisters[reg2];
     
     if (a == 0)
     {
@@ -217,13 +217,13 @@ void CPU::v810::divideUnsigned(uint8_t reg1, uint8_t reg2)
         return;
     }
     
-    int32_t result = b / a;
+    uint32_t result = b / a;
     
     generalRegisters[30] = b % a;
     generalRegisters[reg2] = result;
     
     systemRegisters.PSW.OV = 0;
-    systemRegisters.PSW.S = (result < 0) ? 1 : 0;
+    systemRegisters.PSW.S = ((int32_t)result < 0) ? 1 : 0;
     systemRegisters.PSW.Z = (result == 0) ? 1 : 0;
     
     programCounter += 2;
@@ -235,10 +235,10 @@ void CPU::v810::multiply(uint8_t reg1, uint8_t reg2)
     d_printf("MUL: GR[%d] <- GR[%d](0x%X) * GR[%d](0x%X)\n", reg2, reg2, generalRegisters[reg2], reg1, generalRegisters[reg1]);
     int32_t a = generalRegisters[reg1];
     int32_t b = generalRegisters[reg2];
-    int64_t result = (int64_t)a * b;
+    uint64_t result = (int64_t)a * b;
     
-    generalRegisters[30] = (int32_t)(result >> 32);
-    generalRegisters[reg2] = (int32_t)result;
+    generalRegisters[30] = (result >> 32);
+    generalRegisters[reg2] = (result & 0xFFFFFFFF);
     
     systemRegisters.PSW.OV = (generalRegisters[30] == 0) ? 0 : 1;
     systemRegisters.PSW.S = (generalRegisters[reg2] < 0) ? 1 : 0;
@@ -255,8 +255,8 @@ void CPU::v810::multiplyUnsigned(uint8_t reg1, uint8_t reg2)
     uint32_t b = generalRegisters[reg2];
     uint64_t result = (uint64_t)a * b;
     
-    generalRegisters[30] = (int32_t)(result >> 32);
-    generalRegisters[reg2] = (int32_t)(result & 0xFFFFFFFF);
+    generalRegisters[30] = (result >> 32);
+    generalRegisters[reg2] = (result & 0xFFFFFFFF);
     
     systemRegisters.PSW.OV = (generalRegisters[30] == 0) ? 0 : 1;
     systemRegisters.PSW.S = (generalRegisters[reg2] < 0) ? 1 : 0;
@@ -1224,8 +1224,8 @@ void CPU::v810::moveBitString(uint8_t reg1, uint8_t reg2)
     uint32_t startAddress = generalRegisters[30] & 0xFFFFFFFC;
     uint32_t destAddress = generalRegisters[29] & 0xFFFFFFFC;
     uint32_t length = generalRegisters[28];
-    uint32_t offsetInSource = generalRegisters[27];
-    uint32_t offsetInDest = generalRegisters[26];
+    uint32_t offsetInSource = generalRegisters[27] & 0x1F;
+    uint32_t offsetInDest = generalRegisters[26] & 0x1F;
     
     Bitstring source(memoryManagmentUnit, startAddress, offsetInSource, length);
     Bitstring dest(memoryManagmentUnit, destAddress, offsetInDest, length);
@@ -1257,8 +1257,8 @@ void CPU::v810::andBitString(uint8_t reg1, uint8_t reg2)
     uint32_t startAddress = generalRegisters[30];
     uint32_t destAddress = generalRegisters[29];
     uint32_t length = generalRegisters[28];
-    uint32_t offsetInSource = generalRegisters[27];
-    uint32_t offsetInDest = generalRegisters[26];
+    uint32_t offsetInSource = generalRegisters[27] & 0x1F;
+    uint32_t offsetInDest = generalRegisters[26] & 0x1F;
     
     Bitstring source(memoryManagmentUnit, startAddress, offsetInSource, length);
     Bitstring dest(memoryManagmentUnit, destAddress, offsetInDest, length);
@@ -1287,8 +1287,8 @@ void CPU::v810::orBitString(uint8_t reg1, uint8_t reg2)
     uint32_t startAddress = generalRegisters[30];
     uint32_t destAddress = generalRegisters[29];
     uint32_t length = generalRegisters[28];
-    uint32_t offsetInSource = generalRegisters[27];
-    uint32_t offsetInDest = generalRegisters[26];
+    uint32_t offsetInSource = generalRegisters[27] & 0x1F;
+    uint32_t offsetInDest = generalRegisters[26] & 0x1F;
     d_printf("\tsource=0x%X\n", startAddress);
     d_printf("\tdest=0x%X\n", destAddress);
     d_printf("\tlength=%u\n", length);
@@ -1324,8 +1324,8 @@ void CPU::v810::xorBitString(uint8_t reg1, uint8_t reg2)
     uint32_t startAddress = generalRegisters[30];
     uint32_t destAddress = generalRegisters[29];
     uint32_t length = generalRegisters[28];
-    uint32_t offsetInSource = generalRegisters[27];
-    uint32_t offsetInDest = generalRegisters[26];
+    uint32_t offsetInSource = generalRegisters[27] & 0x1F;
+    uint32_t offsetInDest = generalRegisters[26] & 0x1F;
     
     Bitstring source(memoryManagmentUnit, startAddress, offsetInSource, length);
     Bitstring dest(memoryManagmentUnit, destAddress, offsetInDest, length);
@@ -1354,8 +1354,8 @@ void CPU::v810::andNotBitString(uint8_t reg1, uint8_t reg2)
     uint32_t startAddress = generalRegisters[30];
     uint32_t destAddress = generalRegisters[29];
     uint32_t length = generalRegisters[28];
-    uint32_t offsetInSource = generalRegisters[27];
-    uint32_t offsetInDest = generalRegisters[26];
+    uint32_t offsetInSource = generalRegisters[27] & 0x1F;
+    uint32_t offsetInDest = generalRegisters[26] & 0x1F;
     
     Bitstring source(memoryManagmentUnit, startAddress, offsetInSource, length);
     Bitstring dest(memoryManagmentUnit, destAddress, offsetInDest, length);
@@ -1385,8 +1385,8 @@ void CPU::v810::orNotBitString(uint8_t reg1, uint8_t reg2)
     uint32_t startAddress = generalRegisters[30];
     uint32_t destAddress = generalRegisters[29];
     uint32_t length = generalRegisters[28];
-    uint32_t offsetInSource = generalRegisters[27];
-    uint32_t offsetInDest = generalRegisters[26];
+    uint32_t offsetInSource = generalRegisters[27] & 0x1F;
+    uint32_t offsetInDest = generalRegisters[26] & 0x1F;
     
     Bitstring source(memoryManagmentUnit, startAddress, offsetInSource, length);
     Bitstring dest(memoryManagmentUnit, destAddress, offsetInDest, length);
@@ -1416,8 +1416,8 @@ void CPU::v810::xorNotBitString(uint8_t reg1, uint8_t reg2)
     uint32_t startAddress = generalRegisters[30];
     uint32_t destAddress = generalRegisters[29];
     uint32_t length = generalRegisters[28];
-    uint32_t offsetInSource = generalRegisters[27];
-    uint32_t offsetInDest = generalRegisters[26];
+    uint32_t offsetInSource = generalRegisters[27] & 0x1F;
+    uint32_t offsetInDest = generalRegisters[26] & 0x1F;
     
     Bitstring source(memoryManagmentUnit, startAddress, offsetInSource, length);
     Bitstring dest(memoryManagmentUnit, destAddress, offsetInDest, length);
@@ -1446,8 +1446,8 @@ void CPU::v810::notBitString(uint8_t reg1, uint8_t reg2)
     uint32_t startAddress = generalRegisters[30];
     uint32_t destAddress = generalRegisters[29];
     uint32_t length = generalRegisters[28];
-    uint32_t offsetInSource = generalRegisters[27];
-    uint32_t offsetInDest = generalRegisters[26];
+    uint32_t offsetInSource = generalRegisters[27] & 0x1F;
+    uint32_t offsetInDest = generalRegisters[26] & 0x1F;
     
     Bitstring source(memoryManagmentUnit, startAddress, offsetInSource, length);
     Bitstring dest(memoryManagmentUnit, destAddress, offsetInDest, length);

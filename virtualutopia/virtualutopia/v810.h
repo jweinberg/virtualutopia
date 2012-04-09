@@ -16,7 +16,7 @@ extern std::ofstream outFile;
 extern volatile bool debugOutput;
 
 
-#define VIRTUAL_PC 0
+#define VIRTUAL_PC 1
 
 #if VIRTUAL_PC
 //#define d_printf(A, ...)
