@@ -37,7 +37,7 @@ namespace VIP
             const uint8_t expandedRow = row * 8;
             
             int yOver = (expandedRow + 8) - (yoff + h);
-            uint8_t y = 0;
+            uint8_t yStart = 0;
             if (yOver > -h && yOver < 0)
                 h += yOver;
             
@@ -49,23 +49,30 @@ namespace VIP
             if (xoff < 0)
                 xStart = -xoff;
             
-            if (yoff < expandedRow) 
-                y = -(yoff - expandedRow);
             
-            for (; y < h; ++y)
-            {                   
-                uint16_t yPxl = y + yoff;    
-                uint8_t yIdx = y + sourceYOffset;
-                if (flipVert) yIdx = 7 - yIdx;
-                for (uint8_t x = xStart; x < w; ++x)
-                {
-                    uint16_t xPxl = x + xoff;
-                    uint8_t xIdx = x + sourceXOffset;
-                    if (flipHor) xIdx = 7 - xIdx;
+            if (yoff < expandedRow) 
+                yStart = -(yoff - expandedRow);
+            
+            for (uint8_t x = xStart; x < w; ++x)
+            {
+                uint16_t xPxl = x + xoff;
+                uint8_t xIdx = x + sourceXOffset;
+                if (flipHor) xIdx = 7 - xIdx;
+                
+                char * column = this->data + (xPxl * 64);
+                
+                for (uint8_t y = yStart; y < h; ++y)
+                {                   
+                    uint16_t yPxl = y + yoff;    
+                    uint8_t yIdx = y + sourceYOffset;
+                    if (flipVert) yIdx = 7 - yIdx;
+                    
                     uint8_t colorIdx = data[xIdx + (yIdx * 8)];
                     if (colorIdx)
                     {
-                        SetPixel(xPxl, yPxl, palette[colorIdx]);
+                        uint8_t shift = (yPxl & 3) * 2;
+                        column[yPxl / 4] &= ~(0x3 << shift);
+                        column[yPxl / 4] |= (palette[colorIdx] << shift);
                     }
                 }
             }   

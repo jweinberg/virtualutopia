@@ -949,10 +949,12 @@
 				GCC_ENABLE_SSE42_EXTENSIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "VirtualUtopia/VirtualUtopia-Prefix.pch";
+				GCC_STRICT_ALIASING = NO;
 				GCC_THREADSAFE_STATICS = NO;
 				GCC_UNROLL_LOOPS = YES;
 				INFOPLIST_FILE = "VirtualUtopia/VirtualUtopia-Info.plist";
 				INSTALL_PATH = "$(HOME)/Library/Bundles";
+				LLVM_LTO = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WARNING_CFLAGS = (
 					"-Wextra",
@@ -974,10 +976,12 @@
 				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "VirtualUtopia/VirtualUtopia-Prefix.pch";
+				GCC_STRICT_ALIASING = NO;
 				GCC_THREADSAFE_STATICS = NO;
 				GCC_UNROLL_LOOPS = YES;
 				INFOPLIST_FILE = "VirtualUtopia/VirtualUtopia-Info.plist";
 				INSTALL_PATH = "$(HOME)/Library/Bundles";
+				LLVM_LTO = NO;
 				OTHER_CPLUSPLUSFLAGS = (
 					"-ffast-math",
 					"-fomit-frame-pointer",
