@@ -16,7 +16,7 @@ namespace CPU
 {
     class Bitstring {
     public:
-        Bitstring(MMU& _mmu, uint32_t _address, uint8_t _offset, uint32_t _length) : mmu(_mmu), stringLength(_length), offset(_offset), currentLocation(_address)
+        Bitstring(MMU& _mmu, uint32_t _address, uint8_t _offset, uint32_t _length) : mmu(_mmu), stringLength(_length), currentLocation(_address), offset(_offset)
         {
             int wordsShifted = offset / 32;
             currentLocation += 4 * wordsShifted;
@@ -110,8 +110,8 @@ namespace CPU
         MMU &mmu;
     public:
         uint32_t stringLength;
-        uint8_t offset;
         uint32_t currentLocation;
+        uint8_t offset;
     };
 }
 

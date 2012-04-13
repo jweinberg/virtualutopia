@@ -42,7 +42,7 @@ namespace VIP
             kObjType,
             kNormalType,
             kHBiasType,
-            kAffineType,
+            kAffineType
         };
         
         union

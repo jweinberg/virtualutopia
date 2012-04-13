@@ -39,7 +39,7 @@ namespace NVC
         SELECT,
         RL,
         RD,
-        INVALID,
+        INVALID
     };
     
     class NVC
@@ -49,14 +49,6 @@ namespace NVC
         {
         }
         void Reset();
-        CPU::v810 *cpu;
-        int32_t readCounter;
-        int32_t lastInputUpdate;
-        uint32_t lastTimer;
-        int16_t cachedTimerStep;
-        bool setKey;
-        bool awaitingReload;
-        Button currentReadButton;
         void Step(uint32_t cycles);
         void SetButton(Button button, bool val);
         void ApplyReadWait(uint32_t address);
@@ -165,33 +157,15 @@ namespace NVC
                     break;
             }
         }
-                
-        REGISTER_BITFIELD(uint8_t, SCR,
-                          uint8_t DIS:1;
-                          uint8_t STAT:1;
-                          uint8_t HWSI:1;
-                          uint8_t reserved_0:1;
-                          uint8_t SOFTCK:1;
-                          uint8_t PARA:1;
-                          uint8_t reserved_1:1;
-                          uint8_t INT:1;
-                          );
-                          
-        REGISTER_BITFIELD(uint8_t, WCR,
-                          uint8_t ROM1W:1;
-                          uint8_t EXP1W:1;
-                          uint8_t padding:6;
-                          );
+           
         
-        REGISTER_BITFIELD(uint8_t, TCR, 
-                          uint8_t T_ENB:1;
-                          uint8_t Z_STAT:1;
-                          uint8_t Z_STAT_CLR:1;
-                          uint8_t TIM_Z_INT:1;
-                          uint8_t T_CLK_SEL:1;
-                          uint8_t padding:3;
-                        );
-        union
+        CPU::v810 *cpu; //8 bytes
+        int32_t readCounter; //4
+        int32_t lastInputUpdate; //4
+        uint32_t lastTimer; //4
+        uint16_t cachedTimerStep; //2 
+
+        union //2
         {
             struct
             {
@@ -237,6 +211,38 @@ namespace NVC
 
         uint16_t SDR_HW;
         uint16_t SDR_LATCHED;
+
+        Button currentReadButton; //4
+        
+        bool setKey; //1
+        bool awaitingReload; //1
+        
+        
+        REGISTER_BITFIELD(uint8_t, SCR, // 1
+                          uint8_t DIS:1;
+                          uint8_t STAT:1;
+                          uint8_t HWSI:1;
+                          uint8_t reserved_0:1;
+                          uint8_t SOFTCK:1;
+                          uint8_t PARA:1;
+                          uint8_t reserved_1:1;
+                          uint8_t INT:1;
+                          );
+        
+        REGISTER_BITFIELD(uint8_t, WCR, //1
+                          uint8_t ROM1W:1;
+                          uint8_t EXP1W:1;
+                          uint8_t padding:6;
+                          );
+        
+        REGISTER_BITFIELD(uint8_t, TCR, //1
+                          uint8_t T_ENB:1;
+                          uint8_t Z_STAT:1;
+                          uint8_t Z_STAT_CLR:1;
+                          uint8_t TIM_Z_INT:1;
+                          uint8_t T_CLK_SEL:1;
+                          uint8_t padding:3;
+                          );
         
         uint8_t CDRR;
         uint8_t CDTR;

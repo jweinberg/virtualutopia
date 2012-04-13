@@ -11,8 +11,7 @@
 namespace VSU
 {
 
-    VSU::VSU() : lastUpdate(0),
-    sampleTimer(41700)
+    VSU::VSU() : sampleTimer(41700), lastUpdate(0)
     {
     }
     

@@ -68,10 +68,10 @@ namespace VSU
         }
         void Step(uint32_t cycles);
     private:
-        char soundBuffer[0x1000];
-        uint32_t lastUpdate;
-        int64_t sampleTimer;
         Channel channels[6];
+        int64_t sampleTimer;
+        uint32_t lastUpdate;
+        char soundBuffer[0x1000];
         char soundData[0x20][6];
     };
 }

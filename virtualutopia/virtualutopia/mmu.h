@@ -9,11 +9,11 @@
 namespace VIP
 {
     class VIP;
-};
+}
 namespace NVC 
 {
     class NVC;
-};
+}
 
 class MMU 
 {

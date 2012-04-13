@@ -12,7 +12,6 @@
 #include "v810.h"
 #include "affinetable.h"
 #include "hbiastable.h"
-#import <QuartzCore/QuartzCore.h>
 
 namespace VIP
 {
@@ -158,7 +157,7 @@ namespace VIP
             mapLookup.SetY(srcY);
             
             int h = 8 - yOff;
-            h = MIN(h, world.H + 1 - y);
+            h = min<int>(h, world.H + 1 - y);
             
             if (world.LON)
             {
@@ -171,7 +170,7 @@ namespace VIP
                     mapLookup.SetX(srcX);
                     
                     int w = 8 - xOff;
-                    w = MIN(w, world.W + 1 - x);
+                    w = min<int>(w, world.W + 1 - x);
                     
                     int xPos = x + world.GX - sign_extend<9>(world.GP);
                     if (!(xPos + w < 0 || xPos >= 384))
@@ -197,7 +196,7 @@ namespace VIP
                     mapLookup.SetX(srcX);
                     
                     int w = 8 - xOff;
-                    w = MIN(w, world.W + 1 - x);
+                    w = min<int>(w, world.W + 1 - x);
                     
                     int xPos = x + world.GX + sign_extend<9>(world.GP);
                     if (!(xPos + w < 0 || xPos >= 384))
@@ -317,7 +316,7 @@ namespace VIP
                     int xOff = srcX & 7;
                     
                     int w = 8 - xOff;
-                    w = MIN(w, world.W + 1 - x);
+                    w = min<int>(w, world.W + 1 - x);
                     
                     int xPos = x + world.GX - sign_extend<9>(world.GP);
                     if (!(xPos + w < 0 || xPos >= 384))
@@ -343,7 +342,7 @@ namespace VIP
                     int xOff = srcX & 7;
                     
                     int w = 8 - xOff;
-                    w = MIN(w, world.W + 1 - x);
+                    w = min<int>(w, world.W + 1 - x);
                     
                     int xPos = x + world.GX + sign_extend<9>(world.GP);
                     if (!(xPos + w < 0 || xPos >= 384))

@@ -33,7 +33,6 @@ namespace VIP
         void DrawAffineWorld(int row, const World& world);
         void DrawHBiasWorld(int row, const World& world);
         VIP();
-        CPU::v810 *cpu;
 
         template <typename T>
         inline void store(T& val, const int offset)
@@ -180,6 +179,8 @@ namespace VIP
 
         uint16_t Step(int32_t cycles);
         void Draw(int row);
+        
+        CPU::v810 *cpu;
         World worlds[32];
         
         Chr chrRam[2048];
@@ -192,11 +193,7 @@ namespace VIP
         char paramTables[0x1800];
         Framebuffer leftFrameBuffer[2];
         Framebuffer rightFrameBuffer[2];
-        char columnTable[0x400];
-        
-        bool gameStartTriggered;
-        uint8_t framesWaited;
-        int8_t rowCount;
+
         int32_t drawingCounter;
         int32_t columnCounter;
         int32_t sbOutResetTime;
@@ -209,11 +206,16 @@ namespace VIP
         int drawingRegion;
         int column;
         
-        bool drawingActive;
-        
         uint32_t lastFrameBuffer;
+        bool drawingActive;
         char frame;
+        int8_t rowCount;
         int8_t objSearchIndex;
+        
+        char columnTable[0x400];
+        
+        bool gameStartTriggered;
+        uint8_t framesWaited;
 
 #pragma mark - 4.1 Interrupt Registers
         REGISTER_BITFIELD(uint16_t, INTPND,
@@ -319,37 +321,40 @@ namespace VIP
     {
     private:
         VIP& vip;
-        const BGMap * const baseMap;
-        const uint8_t xMaps;
-        const uint8_t yMaps;
-        const bool over;
+        const BGMapData *cachedData;
+        const BGMapData *overPlaneChar;
+        const BGMap * const baseMap;    
         const uint16_t overplaneChrAddress;
-        bool requiresReload;
-        bool useOverplane;
         uint16_t maxX;
         uint16_t maxY;
-        uint8_t xMap;
-        uint8_t yMap;
         int16_t x;
         int16_t y;
         uint16_t xChar;
         uint16_t yChar;
-        const BGMapData *cachedData;
-        const BGMapData *overPlaneChar;
+        const uint8_t xMaps;
+        const uint8_t yMaps;
+        const bool over;
+        bool requiresReload;
+        bool useOverplane;
+
+        uint8_t xMap;
+        uint8_t yMap;
+
+
     public: 
         BGMapLookup(VIP& _vip, const BGMap * const _baseMap, uint8_t _xMaps, uint8_t _yMaps, bool _over, uint16_t _overAddress) : 
         vip(_vip),
         baseMap(_baseMap), 
+        overplaneChrAddress(_overAddress),
+        maxX(_xMaps * 512),
+        maxY(_yMaps * 512),
+        xChar(0),
+        yChar(0),
         xMaps(_xMaps), 
         yMaps(_yMaps),
         over(_over),
-        overplaneChrAddress(_overAddress),
-        maxX(xMaps * 512),
-        maxY(yMaps * 512),
         xMap(INT_MAX),
-        yMap(INT_MAX),
-        xChar(0),
-        yChar(0)
+        yMap(INT_MAX)
         {
             requiresReload = true;
             if (over)

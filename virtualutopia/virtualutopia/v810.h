@@ -40,7 +40,7 @@ class MMU;
 namespace VIP
 {
     class VIP;
-};
+}
 
 namespace VSU
 {
@@ -56,7 +56,7 @@ namespace CPU
     
     enum ExceptionCode
     {
-        DIV0 = 0xFF80,
+        DIV0 = 0xFF80
     };
     
     enum InterruptCode
@@ -65,7 +65,7 @@ namespace CPU
         INTTIM,
         INTCRO,
         INTCOM,
-        INTVPU,
+        INTVPU
     };
     
     class v810 
@@ -75,7 +75,6 @@ namespace CPU
         void reset();
         void step();
         const std::string registerDescription() const;
-        uint32_t cycles;
 
         void fetchAndDecode();
         void bitstringDecode(const Instruction &instruction);
@@ -83,11 +82,19 @@ namespace CPU
         void throwException(ExceptionCode exceptionCode);
         void processInterrupt(InterruptCode interruptCode);
     private: 
+        MMU &memoryManagmentUnit;
+        VIP::VIP &vip;
+        NVC::NVC &nvc;
+        VSU::VSU &vsu;
+        
 #if VIRTUAL_PC
         uint32_t programCounter;
 #else
         const char *programCounter;
 #endif
+    public:
+        uint32_t cycles;
+    private:
         union
         {
             int32_t generalRegisters[32];
@@ -140,10 +147,6 @@ namespace CPU
             int32_t& operator [] (const int index) { return ((int32_t*)this)[index]; }
         }systemRegisters;
         
-        MMU &memoryManagmentUnit;
-        VIP::VIP &vip;
-        NVC::NVC &nvc;
-        VSU::VSU &vsu;
 #pragma mark - Instructions
         void move(uint8_t reg1, uint8_t reg2);
         void moveImmediate(uint8_t imm5, uint8_t reg2);

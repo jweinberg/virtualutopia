@@ -26,6 +26,8 @@ public:
     double frequency();
     void update(long nanoseconds);
     
+    uint64_t currentTimestep;
+    uint64_t envelopeTimer;
     REGISTER_BITFIELD(uint8_t, SxINT, 
                       uint8_t counter : 5;
                       uint8_t data : 1;
@@ -59,8 +61,6 @@ public:
                       uint8_t waveformAddress : 4;
                       uint8_t reserved : 4;
                       );
-    uint64_t currentTimestep;
-    uint64_t envelopeTimer;
     int8_t envelopeValue;
 };
 }

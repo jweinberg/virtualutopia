@@ -92,7 +92,7 @@ namespace CPU
         BP    = 0x4C,//0b1001100,
         NOP   = 0x4D,//0b1001101,
         BGE   = 0x4E,//0b1001110,
-        BGT   = 0x4F,//0b1001111,
+        BGT   = 0x4F//0b1001111,
     };
     
     enum BinaryStringMnumonic
@@ -112,7 +112,7 @@ namespace CPU
         ORNBSU  = 0x0C,//0b01100,,
         ANDNBSU = 0x0D,//0b01101,,
         XORNBSU = 0x0E,//0b01110,,
-        NOTBSU  = 0x0F,//0b01111,
+        NOTBSU  = 0x0F//0b01111,
     };
     
     enum FloatingPointMnumonic
@@ -129,7 +129,7 @@ namespace CPU
         XH      = 0x09,//0b001001,
         REV     = 0x0A,//0b001010,
         TRNC_SW = 0x0B,//0b001011,
-        MPYHW   = 0x0C,//0b001100,
+        MPYHW   = 0x0C//0b001100,
     };
     
     class Instruction 

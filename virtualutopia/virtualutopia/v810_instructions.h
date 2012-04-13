@@ -83,7 +83,7 @@ enum FlagCondition
     kFlagLessThan = 0x6, //LT
     kFlagGreaterOrEqual = 0xE, //GE
     kFlagLessOrEqual = 0x7, //LE
-    kFlagGreaterThan = 0xF, //GT
+    kFlagGreaterThan = 0xF //GT
 }; 
 
 //Move Form I
